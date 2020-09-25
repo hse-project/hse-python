@@ -70,12 +70,6 @@ cdef class Kvdb:
 	def __dealloc__(self):
 		pass
 
-	def __enter__(self):
-		return self
-
-	def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]):
-		self.close()
-
 	def close(self):
 		if not self._c_hse_kvdb:
 			return
@@ -202,12 +196,6 @@ cdef class Kvs:
 
 	def __dealloc__(self):
 		pass
-
-	def __enter__(self):
-		return self
-
-	def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]):
-		self.close()
 
 	def close(self):
 		if not self._c_hse_kvs:

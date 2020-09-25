@@ -16,12 +16,6 @@ class KvdbException(Exception):
 
 
 class Kvdb:
-    def __enter__(self) -> KvsCursor:
-        ...
-
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]) -> None:
-        ...
-
     def close(self) -> None:
         ...
 
@@ -67,12 +61,6 @@ class Kvdb:
 
 
 class Kvs:
-    def __enter__(self) -> Kvs:
-        ...
-
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]) -> None:
-        ...
-
     def close(self) -> None:
         ...
 
