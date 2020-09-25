@@ -295,7 +295,7 @@ cdef class Kvs:
 
 		cdef hse_err_t err = 0
 		try:
-			if filt:
+			if filt is not None:
 				err = hse_kvs_cursor_create(
 					self._c_hse_kvs,
 					opspec,
@@ -356,7 +356,7 @@ cdef class KvdbTxn:
 		if exc_tb:
 			self.abort()
 
-		if self.get_state() == KvdbTxnState.ACTIVE:
+		if self.state == KvdbTxnState.ACTIVE:
 			self.commit()
 
 	def begin(self):
@@ -374,7 +374,8 @@ cdef class KvdbTxn:
 		if err != 0:
 			raise KvdbException(err)
 
-	def get_state(self) -> KvdbTxnState:
+	@property
+	def state(self) -> KvdbTxnState:
 		return KvdbTxnState(hse_kvdb_txn_get_state(self._c_hse_kvdb, self._c_hse_kvdb_txn))
 
 

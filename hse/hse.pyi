@@ -103,7 +103,8 @@ class KvdbTxn:
     def abort(self) -> None:
         ...
 
-    def get_state(self) -> KvdbTxnState:
+    @property
+    def state(self) -> KvdbTxnState:
         ...
 
 
