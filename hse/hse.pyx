@@ -295,7 +295,7 @@ cdef class Kvs:
 
 		cdef hse_err_t err = 0
 		try:
-			if len(filt) != 0:
+			if filt:
 				err = hse_kvs_cursor_create(
 					self._c_hse_kvs,
 					opspec,
