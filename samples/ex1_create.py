@@ -3,6 +3,7 @@
 import hse
 import sys
 
+
 def main() -> int:
     if len(sys.argv) < 3:
         print(f"Usage: {sys.argv[0]} <mpool> <kvs1> [<kvs2> ... <kvsN>")
@@ -25,6 +26,7 @@ def main() -> int:
     hse.Kvdb.fini()
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -48,3 +48,8 @@ export PYTHONPATH=.
 # export LD_LIBRARY_PATH=path/to/library:$LD_LIBRARY_PATH
 python -c "import hse"
 ```
+
+## Contributing
+
+Please format Python source and stub files with
+[`black`](https://github.com/psf/black).

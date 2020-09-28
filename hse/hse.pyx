@@ -185,14 +185,21 @@ cdef class Kvdb:
 	#		raise KvdbException(err)
 
 	def txn_alloc(self) -> KvdbTxn:
-		return KvdbTxn(self)
+		txn = KvdbTxn()
+
+		txn._c_hse_kvdb = self._c_hse_kvdb
+		txn._c_hse_kvdb_txn = hse_kvdb_txn_alloc(self._c_hse_kvdb)
+		if not txn._c_hse_kvdb_txn:
+			raise MemoryError()
+
+		return txn
 
 
 cdef class Kvs:
 	cdef hse_kvs *_c_hse_kvs
 
 	def __cinit__(self):
-		pass
+		self._c_hse_kvs = NULL
 
 	def __dealloc__(self):
 		pass
@@ -332,11 +339,9 @@ cdef class KvdbTxn:
 	cdef hse_kvdb_txn *_c_hse_kvdb_txn
 	cdef hse_kvdb *_c_hse_kvdb
 
-	def __cinit__(self, kvdb: Kvdb):
-		self._c_hse_kvdb = kvdb._c_hse_kvdb
-		self._c_hse_kvdb_txn = hse_kvdb_txn_alloc(self._c_hse_kvdb)
-		if not self._c_hse_kvdb_txn:
-			raise MemoryError()
+	def __cinit__(self):
+		self._c_hse_kvdb_txn = NULL
+		self._c_hse_kvdb = NULL
 
 	def __dealloc__(self):
 		if not self._c_hse_kvdb:
@@ -345,7 +350,6 @@ cdef class KvdbTxn:
 			return
 
 		hse_kvdb_txn_free(self._c_hse_kvdb, self._c_hse_kvdb_txn)
-		self._c_hse_kvdb_txn = NULL
 
 	def __enter__(self):
 		self.begin()
@@ -383,12 +387,11 @@ cdef class KvsCursor:
 	cdef hse_kvs_cursor* _c_hse_kvs_cursor
 
 	def __cinit__(self):
-		self._c_hse_kvs_cursor
+		self._c_hse_kvs_cursor = NULL
 
 	def __dealloc__(self):
 		if self._c_hse_kvs_cursor:
 			hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
-			self._c_hse_kvs_cursor = NULL
 
 	def __enter__(self):
 		return self
@@ -520,7 +523,6 @@ cdef class Params:
 	def __dealloc__(self):
 		if self._c_hse_params:
 			hse_params_destroy(self._c_hse_params)
-			self._c_hse_params = NULL
 
 	def __getitem__(self, key) -> Optional[str]:
 		return self.get(key)

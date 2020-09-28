@@ -3,6 +3,7 @@
 import hse
 import sys
 
+
 def main() -> int:
     if len(sys.argv) != 3:
         print(f"Usage: {sys.argv[0]} <mpool> <kvs>")

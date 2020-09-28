@@ -57,13 +57,14 @@ def extract_kv_to_files(kvs: hse.Kvs, files: List[str]) -> None:
 def put_files_as_kv(kvs: hse.Kvs, keys: List[str]) -> None:
     for key in keys:
         with open(key, "rb") as f:
-            for i, chunk in enumerate(iter(partial(f.read, limits.KVS_VLEN_MAX), b'')):
+            for i, chunk in enumerate(iter(partial(f.read, limits.KVS_VLEN_MAX), b"")):
                 kvs.put(f"{key}|{i:08x}".encode(), chunk)
 
 
-
 def main() -> int:
-    parser = argparse.ArgumentParser(usage=f"{sys.argv[0]} <kvdb> <kvs> <file1> [<fileN> ...]", add_help=True)
+    parser = argparse.ArgumentParser(
+        usage=f"{sys.argv[0]} <kvdb> <kvs> <file1> [<fileN> ...]", add_help=True
+    )
     parser.add_argument("kvdb", help="kvdb to operate in")
     parser.add_argument("kvs", help="kvs to operate in")
     parser.add_argument("files", nargs="+", help="files to operate on")
@@ -89,6 +90,7 @@ def main() -> int:
     hse.Kvdb.fini()
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
