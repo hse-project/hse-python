@@ -25,14 +25,14 @@ def main() -> int:
         while not eof:
             key, val, eof = cursor.read()
             if not eof:
-                print(f"key: {key.decode()}\tval: {val.decode()}")
+                print(f"key: {key.decode()}\tval: {val.decode() if val else None}")
 
         cursor.seek(b"key010")
         key, val, eof = cursor.read()
 
         print("After seek to key010:")
         print(f"expected: key: key010\tval: val010")
-        print(f"found   : key: {key.decode()}\tval: {val.decode()}")
+        print(f"found   : key: {key.decode()}\tval: {val.decode() if val else None}")
 
     kvdb.close()
 

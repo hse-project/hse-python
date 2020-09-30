@@ -5,7 +5,7 @@ bindings for Python.
 
 ## Dependencies
 
-* Cython (optional, if building from source distributions such as release tarballs)
+* Cython (optional if building from source distributions such as release tarballs)
 * HSE, cloned locally and built, or installed on your system including the
 development package
 
@@ -53,3 +53,15 @@ python -c "import hse"
 
 Please format Python source and stub files with
 [`black`](https://github.com/psf/black).
+
+Cython source files, docstrings, and stub files do not seem to mesh well
+together. In order to get `__doc__` attributes in Python and documentation on
+hover in various editors and IDEs, docstrings need to be in the Cython source
+and the stub files. Because of this unfortunate fact, docstrings are kept out
+of source files and in `docstrings.toml`. The `docstrings.py` script will
+perform text insertion based on keys in the TOML file when processing the
+Cython source and stub files. That means in order to get a build of
+`hse-python` with docstrings, you will need to run `docstrings.py` on any
+`pyi.in` and `pyx.in` files in this repository. This has been seemlessly
+added to the `build_ext` process, so it should insert docstrings
+automagically.

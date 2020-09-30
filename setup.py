@@ -1,5 +1,7 @@
 import os
 import pathlib
+import docstrings
+from typing import Any, List
 from setuptools import setup, Extension
 
 
@@ -10,7 +12,7 @@ from setuptools import setup, Extension
 USE_CYTHON = os.environ.get("USE_CYTHON")
 PROJECT_PATH = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
 
-extensions = [
+extensions: List[Extension] = [
     Extension(
         "hse.hse",
         [str(PROJECT_PATH.joinpath("hse", f"hse.{'pyx' if USE_CYTHON else 'c'}"))],
@@ -37,7 +39,15 @@ if USE_CYTHON:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
 
-    extensions = cythonize(extensions, include_path=["."])
+    def docstring_cythonize(modules: List[Extension]) -> List[Any]:
+        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyx.in")))
+        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyi.in")))
+        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse_limits.pyx.in")))
+        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
+
+        return cythonize(modules, include_path=["."])
+
+    extensions = docstring_cythonize(extensions)
     cmdclass["build_ext"] = build_ext
 
 
