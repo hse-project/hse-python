@@ -1,3 +1,18 @@
+"""
+KVDB_VERSION_STRING:
+
+@SUB@ hse.KVDB_VERSION_STRING.__doc__
+
+KVDB_VERSION_TAG:
+
+@SUB@ hse.KVDB_VERSION_TAG.__doc__
+
+KVDB_VERSION_SHA:
+
+@SUB@ hse.KVDB_VERSION_SHA.__doc__
+"""
+
+
 from enum import Enum
 from types import TracebackType
 from typing import Dict, Iterator, List, Optional, Tuple, Type, Any
@@ -288,22 +303,37 @@ class KvdbCompactStatus:
 
     @property
     def samp_lwm(self) -> int:
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+        """
         ...
 
     @property
     def samp_hwm(self) -> int:
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
+        """
         ...
 
     @property
     def samp_curr(self) -> int:
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
+        """
         ...
 
     @property
     def active(self) -> int:
+        """
+        @SUB@ hse.KvdbCompactStatus.active.__doc__
+        """
         ...
 
     @property
     def canceled(self) -> int:
+        """
+        @SUB@ hse.KvdbCompactStatus.canceled.__doc__
+        """
         ...
 
 

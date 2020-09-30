@@ -1,5 +1,29 @@
 # Docstrings for the hse module
 
+[hse.KVDB_VERSION_STRING]
+__doc__ = """
+A string representing the HSE KVDB libary version
+
+The version string starts with a numeric sequence (e.g., 1.7.0) and then, depending
+on the type of build may have additional information appended.
+"""
+
+[hse.KVDB_VERSION_TAG]
+__doc__ = """
+A string representing the HSE KVDB libary version tag
+
+The version tag starts with a sequence (e.g., r1.9.0) and then, depending
+on the type of build may have additional information appended.
+"""
+
+[hse.KVDB_VERSION_SHA]
+__doc__ = """
+A string representing the HSE KVDB library version commit hash
+
+The version commit hash is a git commit hash
+(e.g., b55fe07774d7cbc1492d7b8a47dc2c194cd3e24a).
+"""
+
 [hse.KvdbException]
 __doc__ = """
 Thrown when HSE encounters an error. Wrapper around `hse_err_t`.
@@ -45,7 +69,7 @@ mpool. This function is not thread safe.
 
 Args:
 
-mp_name - Mpool name in which the KVDB exists\n
+mp_name - Mpool name in which the KVDB exists\\n
 params - Configuration parameters
 """
 
@@ -58,7 +82,7 @@ function is not thread safe.
 
 Args:
 
-mp_name - Mpool name in which the KVDB exists\n
+mp_name - Mpool name in which the KVDB exists\\n
 params - Configuration parameters
 """
 
@@ -104,7 +128,7 @@ This function is not thread safe.
 
 Args:
 
-kvs_name - KVS name\n
+kvs_name - KVS name\\n
 params - Parameters that affect how the KVS will function
 """
 
@@ -138,7 +162,7 @@ See the property `kvdb.compact_status`. This function is thread safe.
 
 Args:
 
-cancel - To cancel an ongoing compaction request for a KVDB\n
+cancel - To cancel an ongoing compaction request for a KVDB\\n
 samp_lwm - To perform compaction to its fullest extent
 """
 
@@ -186,9 +210,9 @@ per second marked as PRIORITY is almost certainly fine.
 
 Args:
 
-key - Key to put into KVS\n
-value - Value associated with key\n
-priority - Operation won't be throttled\n
+key - Key to put into KVS\\n
+value - Value associated with key\\n
+priority - Operation won't be throttled\\n
 txn - Transaction context
 """
 
@@ -202,8 +226,8 @@ function is thread safe.
 
 Args:
 
-key - Key to get from KVS\n
-txn - Transaction context\n
+key - Key to get from KVS\\n
+txn - Transaction context\\n
 buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
@@ -217,8 +241,8 @@ function is thread safe.
 
 Args:
 
-key - Key to be deleted from KVS\n
-priority - Operation won't be throttled\n
+key - Key to be deleted from KVS\\n
+priority - Operation won't be throttled\\n
 txn - Transaction context
 """
 
@@ -234,8 +258,8 @@ a filter matching the iteration. This function is thread safe.
 
 Args:
 
-filt - Filter for keys to delete\n
-priority - Operation won't be throttled\n
+filt - Filter for keys to delete\\n
+priority - Operation won't be throttled\\n
 txn - Transaction context
 """
 
@@ -289,10 +313,10 @@ mutations that occurred during the lifespan of the transaction visible as well.
 
 Args:
 
-filt - Iteration limited to keys matching this prefix filter\n
-reverse - Reverse cursor\n
-static_view - Bound cursor's view is static\n
-bind_txn - Cursor bound to transaction\n
+filt - Iteration limited to keys matching this prefix filter\\n
+reverse - Reverse cursor\\n
+static_view - Bound cursor's view is static\\n
+bind_txn - Cursor bound to transaction\\n
 txn - Transaction context
 """
 
@@ -408,9 +432,9 @@ across disparate cursors.
 
 Args:
 
-reverse - Reverse cursor\n
-static_view - Bound cursor's view is static\n
-bind_txn - Cursor bound to transaction\n
+reverse - Reverse cursor\\n
+static_view - Bound cursor's view is static\\n
+bind_txn - Cursor bound to transaction\\n
 txn - Transaction context
 """
 
@@ -439,7 +463,7 @@ Note: this is only supported for forward cursors.
 
 Args:
 
-filt_min - Filter minimum\n
+filt_min - Filter minimum\\n
 filt_max - Filter maximum
 """
 
@@ -456,6 +480,31 @@ cursor. This function is thread safe across disparate cursors.
 __doc__ = """
 Contains infomation about the Kvdb's current compaction status including
 `samp_lwm`, `samp_hwm`, `samp_curr`, `samp_active`, and `canceled`.
+"""
+
+[hse.KvdbCompactStatus.samp_lwm]
+__doc__ = """
+space amp low water mark (%)
+"""
+
+[hse.KvdbCompactStatus.samp_hwm]
+__doc__ = """
+space amp high water mark (%)
+"""
+
+[hse.KvdbCompactStatus.samp_curr]
+__doc__ = """
+current space amp (%)
+"""
+
+[hse.KvdbCompactStatus.active]
+__doc__ = """
+is an externally requested compaction underway
+"""
+
+[hse.KvdbCompactStatus.canceled]
+__doc__ = """
+was an externally requested compaction canceled
 """
 
 [hse.Params.get]
@@ -479,15 +528,15 @@ invalid then the call will fail.
 
 The following syntax is supported for keys:
 
-kvdb.<param>           # param is set for the KVDB\n
-kvs.<param>            # param is set for all KVSs in the KVDB\n
+kvdb.<param>           # param is set for the KVDB\\n
+kvs.<param>            # param is set for all KVSs in the KVDB\\n
 kvs.<kvs_name>.<param> # param is set for the named KVS
 
 This function is not thread safe.
 
 Args:
 
-key - Target key\n
+key - Target key\\n
 value - Target value
 """
 
@@ -536,4 +585,38 @@ not thread safe.
 Args:
 
 input - Input paramters in YAML format
+"""
+
+[limits]
+__doc__ = """
+Global Limits
+"""
+
+[limits.KVS_COUNT_MAX]
+__doc__ = """
+Maximum number of KVS's contained within one KVDB
+"""
+
+[limits.KVS_KLEN_MAX]
+__doc__ = """
+A common requirement for key length for the software above HSE KVDB is 1024.
+Combined with a discriminant and (potentially) a chunk key, this pushes us to
+1030 bytes keys. Looking at the packing for the on-media format for data, we
+can have at most 3 keys of such large size in a 4k page. Lopping off 64-bytes
+for other data, and we can have 3 keys of 1344 bytes.
+"""
+
+[limits.KVS_VLEN_MAX]
+__doc__ = """
+Max value length is 1MiB
+"""
+
+[limits.KVS_MAX_PFXLEN]
+__doc__ = """
+Max key prefix length
+"""
+
+[limits.KVS_NAME_LEN_MAX]
+__doc__ = """
+Max KVS name lengths
 """

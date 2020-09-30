@@ -88,6 +88,15 @@ cdef extern from "hse/hse.h":
 
 	hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags)
 
+	cdef struct hse_kvdb_compact_status:
+		unsigned int kvcs_samp_lwm
+		unsigned int kvcs_samp_hwm
+		unsigned int kvcs_samp_curr
+		unsigned int kvcs_active
+		unsigned int kvcs_canceled
+
+	hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status)
+
 	hse_kvdb_txn * hse_kvdb_txn_alloc(hse_kvdb *kvdb)
 	void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn)
 	hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn)

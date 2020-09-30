@@ -40,10 +40,11 @@ if USE_CYTHON:
     from Cython.Distutils import build_ext
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
-        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyx.in")))
-        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyi.in")))
-        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse_limits.pyx.in")))
-        docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
+        if USE_CYTHON:
+            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyx.in")))
+            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyi.in")))
+            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse_limits.pyx.in")))
+            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
 
         return cythonize(modules, include_path=["."])
 

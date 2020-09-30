@@ -1,3 +1,18 @@
+"""
+KVDB_VERSION_STRING:
+
+@SUB@ hse.KVDB_VERSION_STRING.__doc__
+
+KVDB_VERSION_TAG:
+
+@SUB@ hse.KVDB_VERSION_TAG.__doc__
+
+KVDB_VERSION_SHA:
+
+@SUB@ hse.KVDB_VERSION_SHA.__doc__
+"""
+
+
 import errno
 import os
 import yaml
@@ -200,9 +215,9 @@ cdef class Kvdb:
         @SUB@ hse.Kvdb.compact_status.__doc__
         """
         status = KvdbCompactStatus()
-    #	cdef hse_err_t err = hse_kvdb_compact_status(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
-    #	if err != 0:
-    #		raise KvdbException(err)
+        cdef hse_err_t err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
+        if err != 0:
+            raise KvdbException(err)
         return status
 
     def txn_alloc(self) -> KvdbTxn:
@@ -652,32 +667,42 @@ cdef class KvdbCompactStatus:
     """
     @SUB@ hse.KvdbCompactStatus.__doc__
     """
-    #cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
+    cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
 
     @property
     def samp_lwm(self) -> int:
-        #return self._c_hse_kvdb_compact_status.kvcs_samp_lwm
-        return 0
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+        """
+        return self._c_hse_kvdb_compact_status.kvcs_samp_lwm
 
     @property
     def samp_hwm(self) -> int:
-        #return self._c_hse_kvdb_compact_status.kvcs_samp_hwm
-        return 0
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
+        """
+        return self._c_hse_kvdb_compact_status.kvcs_samp_hwm
 
     @property
     def samp_curr(self) -> int:
-        #return self._c_hse_kvdb_compact_status.kvcs_samp_curr
-        return 0
+        """
+        @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
+        """
+        return self._c_hse_kvdb_compact_status.kvcs_samp_curr
 
     @property
     def active(self) -> int:
-        #return self._c_hse_kvdb_compact_status.kvcs_active
-        return 0
+        """
+        @SUB@ hse.KvdbCompactStatus.active.__doc__
+        """
+        return self._c_hse_kvdb_compact_status.kvcs_active
 
     @property
     def canceled(self) -> int:
-        #return self._c_hse_kvdb_compact_status.kvcs_canceled
-        return 0
+        """
+        @SUB@ hse.KvdbCompactStatus.canceled.__doc__
+        """
+        return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
 cdef class Params:
