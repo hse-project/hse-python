@@ -68,3 +68,6 @@ Cython source and stub files. That means in order to get a build of
 `pyi.in` and `pyx.in` files in this repository. This has been seemlessly
 added to the `build_ext` process, so it should insert docstrings
 automagically when `USE_CYTHON` is defined.
+
+When finishing up contributions to the project, make sure your changes
+compile with `-Werror`.
