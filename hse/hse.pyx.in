@@ -545,10 +545,7 @@ cdef class KvsCursor:
         @SUB@ hse.KvsCursor.update.__doc__
         """
         txn_changed = (self._c_hse_kvdb_txn is not NULL and not txn) or self._c_hse_kvdb_txn != txn._c_hse_kvdb_txn
-        if reverse is None and static_view is None and bind_txn is None and txn_changed:
-            return
-
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse is not None or static_view is not None or bind_txn is not None or txn is not None else NULL
+        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse is not None or static_view is not None or bind_txn is not None or txn_changed else NULL
 
         if reverse:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_REVERSE
