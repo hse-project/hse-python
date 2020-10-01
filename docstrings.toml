@@ -427,7 +427,7 @@ This operation serves to either move the snapshot view forward for a type (1) cu
 or to transition between being a type (1), type (2), and type (3) cursor.  That
 includes toggling the state of the `static_view` parameter.  For example,
 to "un-bind" a cursor from a transaction the caller may either set the `txn` parameter
-to None or clear the `bind_txn` parameter. This function is thread safe
+to `None` or clear the `bind_txn` parameter. This function is thread safe
 across disparate cursors.
 
 Args:
