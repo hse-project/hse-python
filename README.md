@@ -26,8 +26,14 @@ python setup.py install
 
 ## Building
 
-If you need to point Cython toward the HSE include directory or the shared
+If you need to point the build toward the HSE include directory or the shared
 library, you can use `CFLAGS` and `LDFLAGS` respectively.
+
+In the case you are bootstrapping your build, such as from a fresh clone, you
+will want to define an environment variable called `USE_CYTHON`. What it is
+defined as is unimportant. If you are building from a source distribution, then
+`USE_CYTHON` is unimportant. The Cython generated `.c` files are distributed in
+the source distribution.
 
 ```shell
 python setup.py build_ext -i
