@@ -9,7 +9,7 @@ from functools import partial
 
 
 # This example demonstrates how one could add key-value pairs where the value
-# length could be larger than the allowed maximum HSE_KVS_VLEN_MAX.
+# length could be larger than the allowed maximum hse.KVS_VLEN_MAX.
 #
 # To put keys, this example uses files passed to it on the commandline. Each
 # file's name forms the prefix of a key and its contents are chunked into the
@@ -26,7 +26,7 @@ from functools import partial
 #     ...
 #     /tmp/foo00000NNN
 #
-# for chunks of size HSE_KVS_VLEN_MAX read from /tmp/foo. Similarly, the file
+# for chunks of size hse.KVS_VLEN_MAX read from /tmp/foo. Similarly, the file
 # /tmp/bar will be split into multiple chunks starting with keys starting at
 # /tmp/bar00000000
 #
