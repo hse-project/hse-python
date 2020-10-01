@@ -1,5 +1,7 @@
 # Docstrings for the hse module
 
+# Be sure to double escape \n. May have unintended effects otherwise
+
 [hse.KVDB_VERSION_STRING]
 __doc__ = """
 A string representing the HSE KVDB libary version
