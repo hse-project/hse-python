@@ -5,7 +5,9 @@ bindings for Python.
 
 ## Dependencies
 
-* Cython (optional if building from source distributions such as release tarballs)
+* Cython (optional unless `USE_CYTHON` is defined)
+* [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
+defined)
 * HSE, cloned locally and built, or installed on your system including the
 development package
 
