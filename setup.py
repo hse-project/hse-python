@@ -36,7 +36,7 @@ if USE_CYTHON:
             docstrings.insert(os.path.join("hse", "hse.pyx.in"))
             docstrings.insert(os.path.join("hse", "hse.pyi.in"))
             docstrings.insert(os.path.join("hse", "hse_limits.pyx.in"))
-            docstrings.insert(os.path.join("hse", "hse_limits.pyi.in"))
+            docstrings.insert(os.path.join("hse", "limits.pyi.in"))
 
         return cythonize(
             modules,
