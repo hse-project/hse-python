@@ -1,5 +1,4 @@
 import os
-import pathlib
 import docstrings
 from typing import Any, List
 from setuptools import setup, Extension
@@ -10,23 +9,16 @@ from setuptools import setup, Extension
 
 
 USE_CYTHON = os.environ.get("USE_CYTHON")
-PROJECT_PATH = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
 
 extensions: List[Extension] = [
     Extension(
         "hse.hse",
-        [str(PROJECT_PATH.joinpath("hse", f"hse.{'pyx' if USE_CYTHON else 'c'}"))],
+        [os.path.join("hse", f"hse.{'pyx' if USE_CYTHON else 'c'}")],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.limits",
-        [
-            str(
-                PROJECT_PATH.joinpath(
-                    "hse", f"hse_limits.{'pyx' if USE_CYTHON else 'c'}"
-                )
-            )
-        ],
+        [os.path.join("hse", f"hse_limits.{'pyx' if USE_CYTHON else 'c'}")],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -41,14 +33,14 @@ if USE_CYTHON:
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
-            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyx.in")))
-            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse.pyi.in")))
-            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse_limits.pyx.in")))
-            docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
+            docstrings.insert(os.path.join("hse", "hse.pyx.in"))
+            docstrings.insert(os.path.join("hse", "hse.pyi.in"))
+            docstrings.insert(os.path.join("hse", "hse_limits.pyx.in"))
+            docstrings.insert(os.path.join("hse", "hse_limits.pyi.in"))
 
         return cythonize(
             modules,
-            include_path=["."],
+            include_path=["hse"],
             compiler_directives={
                 "embedsignature": True,
                 "profile": True,
@@ -85,9 +77,11 @@ setup(
     packages=["hse", "hse.limits"],
     cmdclass=cmdclass,
     package_dir={
-        "hse": str(PROJECT_PATH.joinpath("hse")),
-        "hse.limits": str(PROJECT_PATH.joinpath("hse")),
+        "hse": "hse",
+        "hse.limits": "hse",
     },
-    package_data={"hse": ["*.pyi", "py.typed"]},
+    package_data={"hse": ["py.typed"]},
+    exclude_package_data={"hse": ["*.pyi.in"]},
+    include_package_data=True,
     keywords="micron hse key value object store",
 )
