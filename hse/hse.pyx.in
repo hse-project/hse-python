@@ -16,6 +16,7 @@ KVDB_VERSION_SHA:
 import errno
 import os
 import yaml
+cimport hse_limits
 from ctypes import c_int, c_bool
 from enum import Enum
 from types import TracebackType
@@ -284,7 +285,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(1024 * 1024)) -> Optional[bytes]:
+    def get(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
@@ -737,7 +738,7 @@ cdef class Params:
 
         cdef size_t param_len = 0
         cdef char *param = hse_params_get(self._c_hse_params, key, buf_addr, buf_len, &param_len)
-        return param[:param_len]
+        return param[:param_len] if param else None
 
     @staticmethod
     def create() -> Params:
