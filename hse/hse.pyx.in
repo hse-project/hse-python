@@ -112,7 +112,7 @@ cdef class Kvdb:
         cdef mp_name_bytes = mp_name.encode()
         cdef hse_params *p = params._c_hse_params if params else NULL
 
-        kvdb = Kvdb()
+        kvdb: Kvdb = Kvdb()
 
         err = hse_kvdb_open(<char *>mp_name_bytes, p, &kvdb._c_hse_kvdb)
         if err != 0:
@@ -169,7 +169,7 @@ cdef class Kvdb:
         cdef hse_params *p = params._c_hse_params if params else NULL
         cdef kvs_name_bytes = kvs_name.encode()
 
-        kvs = Kvs()
+        kvs: Kvs = Kvs()
 
         cdef hse_err_t err = hse_kvdb_kvs_open(self._c_hse_kvdb, <char *>kvs_name_bytes, p, &kvs._c_hse_kvs)
         if err != 0:
@@ -214,7 +214,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.compact_status.__doc__
         """
-        status = KvdbCompactStatus()
+        status: KvdbCompactStatus = KvdbCompactStatus()
         cdef hse_err_t err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
         if err != 0:
             raise KvdbException(err)
@@ -224,7 +224,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.txn_alloc.__doc__
         """
-        txn = KvdbTxn()
+        txn: KvdbTxn = KvdbTxn()
 
         txn._c_hse_kvdb = self._c_hse_kvdb
         txn._c_hse_kvdb_txn = hse_kvdb_txn_alloc(self._c_hse_kvdb)
@@ -268,10 +268,10 @@ cdef class Kvs:
         cdef size_t key_len = 0
         cdef const void *value_addr = NULL
         cdef value_len = 0
-        if key is not None:
+        if key is not None and len(key) > 0:
             key_addr = &key[0]
             key_len = len(key)
-        if value is not None:
+        if value is not None and len(value) > 0:
             value_addr = &value[0]
             value_len = len(value)
 
@@ -296,10 +296,10 @@ cdef class Kvs:
         cdef size_t key_len = 0
         cdef void *buf_addr = NULL
         cdef size_t buf_len = 0
-        if key is not None:
+        if key is not None and len(key) > 0:
             key_addr = &key[0]
             key_len = len(key)
-        if buf is not None:
+        if buf is not None and len(buf) > 0:
             buf_addr = &buf[0]
             buf_len = len(buf)
 
@@ -330,7 +330,7 @@ cdef class Kvs:
 
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
-        if key is not None:
+        if key is not None and len(key) > 0:
             key_addr = &key[0]
             key_len = len(key)
 
@@ -354,7 +354,7 @@ cdef class Kvs:
 
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
-        if filt is not None:
+        if filt is not None and len(filt) > 0:
             filt_addr = &filt[0]
             filt_len = len(filt)
 
@@ -391,11 +391,11 @@ cdef class Kvs:
 
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
-        if filt is not None:
+        if filt is not None and len(filt) > 0:
             filt_addr = &filt[0]
             filt_len = len(filt)
 
-        cursor = KvsCursor()
+        cursor: KvsCursor = KvsCursor()
         cursor._c_hse_kvdb_txn = txn._c_hse_kvdb_txn
 
         cdef hse_err_t err = 0
@@ -571,7 +571,7 @@ cdef class KvsCursor:
         """
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
-        if key is not None:
+        if key is not None and len(key) > 0:
             key_addr = &key[0]
             key_len = len(key)
 
@@ -601,10 +601,10 @@ cdef class KvsCursor:
         cdef size_t filt_min_len = 0
         cdef const void *filt_max_addr = NULL
         cdef size_t filt_max_len = 0
-        if filt_min is not None:
+        if filt_min is not None and len(filt_min) > 0:
             filt_min_addr = &filt_min[0]
             filt_min_len = len(filt_min)
-        if filt_max is not None:
+        if filt_max is not None and len(filt_max) > 0:
             filt_max_addr = &filt_max[0]
             filt_max_len = len(filt_max)
 
@@ -731,7 +731,7 @@ cdef class Params:
         """
         cdef char *buf_addr = NULL
         cdef size_t buf_len = 0
-        if buf is not None:
+        if buf is not None and len(buf) > 0:
             buf_addr = &buf[0]
             buf_len = len(buf)
 
@@ -744,7 +744,7 @@ cdef class Params:
         """
         @SUB@ hse.Params.create.__doc__
         """
-        p = Params()
+        p: Params = Params()
 
         cdef hse_err_t err = hse_params_create(&p._c_hse_params)
         if err == errno.ENOMEM:
@@ -759,7 +759,7 @@ cdef class Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """
-        p = Params()
+        p: Params = Params()
 
         input_bytes = yaml.dump(params).encode()
         cdef int err = hse_params_from_string(p._c_hse_params, <char *>input_bytes)
@@ -777,7 +777,7 @@ cdef class Params:
         """
         cdef path_bytes = path.encode()
 
-        p = Params()
+        p: Params = Params()
 
         cdef int err = hse_params_from_file(p._c_hse_params, <char *>path_bytes)
         if err == errno.ENOMEM:
@@ -794,7 +794,7 @@ cdef class Params:
         """
         cdef input_bytes = input.encode()
 
-        p = Params()
+        p: Params = Params()
 
         cdef int err = hse_params_from_string(p._c_hse_params, <char *>input_bytes)
         if err == errno.ENOMEM:
