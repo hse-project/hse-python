@@ -46,7 +46,9 @@ if USE_CYTHON:
             docstrings.insert(str(PROJECT_PATH.joinpath("hse", "hse_limits.pyx.in")))
             docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
 
-        return cythonize(modules, include_path=["."])
+        return cythonize(
+            modules, include_path=["."], compiler_directives={"embedsignature": True}
+        )
 
     extensions = docstring_cythonize(extensions)
     cmdclass["build_ext"] = build_ext
