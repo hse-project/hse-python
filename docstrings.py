@@ -64,10 +64,10 @@ def insert(file: str) -> None:
 
     file - Path to file to insert docstrings into
     """
-    assert file.endswith(".in")
+    assert file.find(".in.") != -1
 
     input_file_mtime = os.path.getmtime(file)
-    output_file = file[:-3]
+    output_file = file.replace(".in", "")
     if os.path.exists(output_file):
         output_file_mtime = os.path.getmtime(output_file)
         if (

@@ -33,10 +33,10 @@ if USE_CYTHON:
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
-            docstrings.insert(os.path.join("hse", "hse.pyx.in"))
-            docstrings.insert(os.path.join("hse", "hse.pyi.in"))
-            docstrings.insert(os.path.join("hse", "hse_limits.pyx.in"))
-            docstrings.insert(os.path.join("hse", "limits.pyi.in"))
+            docstrings.insert(os.path.join("hse", "hse.in.pyx"))
+            docstrings.insert(os.path.join("hse", "hse.in.pyi"))
+            docstrings.insert(os.path.join("hse", "hse_limits.in.pyx"))
+            docstrings.insert(os.path.join("hse", "limits.in.pyi"))
 
         return cythonize(
             modules,
@@ -74,14 +74,13 @@ setup(
     license="Apache-2.0",
     url="https://github.com/hse-project",
     ext_modules=extensions,
-    packages=["hse", "hse.limits"],
+    packages=["hse"],
     cmdclass=cmdclass,
     package_dir={
         "hse": "hse",
-        "hse.limits": "hse",
     },
-    package_data={"hse": ["py.typed"]},
-    exclude_package_data={"hse": ["*.pyi.in"]},
+    zip_safe=False,
+    exclude_package_data={"hse": "*.c"},
     include_package_data=True,
     keywords="micron hse key value object store",
 )

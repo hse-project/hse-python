@@ -5,4 +5,5 @@ include hse/py.typed
 include LICENSE
 # Remove the following line when we support only platforms with setuptools >= 43.0.0 by default
 include pyproject.toml
-recursive-include hse *.c *.pyx *.pyi *.pyx.in *.pyi.in
+recursive-include hse *.c *.pyx *.pyi
+recursive-exclude hse *.in.pyi *.in.pyx
