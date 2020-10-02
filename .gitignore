@@ -7,4 +7,6 @@ __pycache__
 venv/
 typings/
 *.pyx
+!*.in.pyx
 *.pyi
+!*.in.pyi

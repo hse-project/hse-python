@@ -80,7 +80,8 @@ setup(
         "hse": "hse",
     },
     zip_safe=False,
-    exclude_package_data={"hse": "*.c"},
-    include_package_data=True,
+    package_data={"hse": ["*.pyi", "py.typed"]},
+    exclude_package_data={"hse": ["*.in.pyi"]},
+    # include_package_data=True,
     keywords="micron hse key value object store",
 )
