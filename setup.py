@@ -47,7 +47,20 @@ if USE_CYTHON:
             docstrings.insert(str(PROJECT_PATH.joinpath("hse", "limits.pyi.in")))
 
         return cythonize(
-            modules, include_path=["."], compiler_directives={"embedsignature": True}
+            modules,
+            include_path=["."],
+            compiler_directives={
+                "embedsignature": True,
+                "profile": True,
+                "infer_types": False,
+                "annotation_typing": True,
+                "emit_code_comments": True,
+                "optimize.use_switch": True,
+                "optimize.unpack_method_calls": True,
+                "warn.unreachable": True,
+                "warn.maybe_uninitialized": True,
+                "warn.multiple_declarators": True,
+            },
         )
 
     extensions = docstring_cythonize(extensions)
