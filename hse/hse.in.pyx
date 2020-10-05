@@ -20,9 +20,8 @@ cimport hse_limits
 from ctypes import c_int
 from enum import Enum
 from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Any, Iterator, Type, Union
+from typing import List, Optional, Tuple, Dict, Any, Iterator, Type
 from libc.stdlib cimport calloc, free
-from libcpp cimport bool
 
 
 # Throughout these bindings, you will see C pointers be set to NULL after their
@@ -286,9 +285,17 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), peek: bool=False) -> Union[Optional[bytes], Tuple[Optional[bytes], int]]:
+    def get(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
+        """
+        value, length = self.get_with_length(key, txn=txn, buf=buf)
+        return value[:length] if len(value) > length else value
+
+
+    def get_with_length(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+        """
+        @SUB@ hse.Kvs.get_with_length.__doc__
         """
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if txn else NULL
         if txn:
@@ -318,7 +325,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-        return bytes(buf[:value_len]) if not peek else bytes(buf), value_len
+        return bytes(buf), value_len
 
     def delete(self, const unsigned char [:]key, priority=False, KvdbTxn txn=None):
         """
@@ -635,7 +642,7 @@ cdef class KvsCursor:
     # Tuple[bytes, bytes, Union[Literal[True], Literal[False]]] as a workaround
     # int is just a placeholder since return types in Cython seem to be
     # ignored
-    def read(self) -> Tuple[bytes, Optional[bytes], int]:
+    def read(self) -> Tuple[bytes, Optional[bytes], bool]:
         """
         @SUB@ hse.KvsCursor.read.__doc__
         """

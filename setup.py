@@ -42,6 +42,7 @@ if USE_CYTHON:
             modules,
             include_path=["hse"],
             compiler_directives={
+                "language_level": "3",
                 "embedsignature": True,
                 "profile": True,
                 "infer_types": False,
@@ -82,6 +83,5 @@ setup(
     zip_safe=False,
     package_data={"hse": ["*.pyi", "py.typed"]},
     exclude_package_data={"hse": ["*.in.pyi"]},
-    # include_package_data=True,
     keywords="micron hse key value object store",
 )

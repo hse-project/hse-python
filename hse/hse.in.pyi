@@ -15,7 +15,7 @@ KVDB_VERSION_SHA:
 
 from enum import Enum
 from types import TracebackType
-from typing import Dict, Iterator, List, Optional, Tuple, Type, Any, Union
+from typing import Dict, Iterator, List, Optional, Tuple, Type, Any
 
 KVDB_VERSION_STRING: str
 KVDB_VERSION_TAG: str
@@ -148,10 +148,20 @@ class Kvs:
         key: bytes,
         txn: Optional[KvdbTxn] = ...,
         buf: bytes = ...,
-        peek: bool = ...,
-    ) -> Union[Optional[bytes], Tuple[Optional[bytes], int]]:
+    ) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
+        """
+        ...
+
+    def get_with_length(
+        self,
+        key: bytes,
+        txn: Optional[KvdbTxn] = ...,
+        buf: bytes = ...,
+    ) -> Tuple[Optional[bytes], int]:
+        """
+        @SUB@ hse.Kvs.get_with_length.__doc__
         """
         ...
 

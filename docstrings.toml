@@ -233,6 +233,21 @@ txn - Transaction context\\n
 buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
+[hse.Kvs.get_with_length]
+__doc__ = """
+Retrieve the value and length for a given key from KVS
+
+If the key exists in the KVS then the first value of the tuple is not None. See
+the section on transactions for information on how gets within transactions are
+handled. This function is thread safe.
+
+Args:
+
+key - Key to get from KVS\\n
+txn - Transaction context\\n
+buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+"""
+
 [hse.Kvs.delete]
 __doc__ = """
 Delete the key and its associated value from KVS
