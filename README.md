@@ -5,12 +5,15 @@ bindings for Python.
 
 ## Dependencies
 
-* [`yaml`](https://pypi.org/project/PyYAML/)
+Dependencies that are bolded are runtime dependencies. **HSE** is both a
+runtime and build dependency.
+
+* **[`yaml`](https://pypi.org/project/PyYAML/)**
+* **HSE**, cloned locally and built, or installed on your system including the
+development package
 * `Cython >= 3.0` (optional unless `USE_CYTHON` is defined)
 * [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
 defined)
-* HSE, cloned locally and built, or installed on your system including the
-development package
 
 ## Installation
 
