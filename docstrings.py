@@ -44,7 +44,7 @@ def insert(file: str) -> None:
     Insert docstrings into a file out of place. `file.py.in` will output to
     `file.py`. If the input file has an older modified time than the previously
     created output file, then `insert` is a no-op. If the `docstrings.toml` has
-    a newer modified time than the input file, the docstring insertion will
+    a newer modified time than the output file, the docstring insertion will
     always occur.
 
     Example location of where text replacement would happen::
@@ -72,7 +72,7 @@ def insert(file: str) -> None:
         output_file_mtime = os.path.getmtime(output_file)
         if (
             input_file_mtime < output_file_mtime
-            and __DOCSTRINGS_TOML_MDATE < input_file_mtime
+            and __DOCSTRINGS_TOML_MDATE < output_file_mtime
         ):
             return
 
