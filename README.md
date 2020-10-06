@@ -5,7 +5,7 @@ bindings for Python.
 
 ## Dependencies
 
-* Cython (optional unless `USE_CYTHON` is defined)
+* `Cython >= 3.0` (optional unless `USE_CYTHON` is defined)
 * [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
 defined)
 * HSE, cloned locally and built, or installed on your system including the
@@ -79,3 +79,12 @@ automagically when `USE_CYTHON` is defined.
 
 When finishing up contributions to the project, make sure your changes
 compile with `-Werror`.
+
+In order to contribute to the project, you may want to setup a virtual
+environment for the project which can be done using the following:
+
+```shell
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
