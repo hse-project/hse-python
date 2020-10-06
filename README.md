@@ -5,6 +5,7 @@ bindings for Python.
 
 ## Dependencies
 
+* [`yaml`](https://pypi.org/project/PyYAML/)
 * `Cython >= 3.0` (optional unless `USE_CYTHON` is defined)
 * [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
 defined)
