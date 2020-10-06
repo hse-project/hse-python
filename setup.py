@@ -1,5 +1,4 @@
 import os
-import docstrings
 from typing import Any, Dict, List, Type
 from setuptools import Command, setup, Extension
 
@@ -33,6 +32,8 @@ if USE_CYTHON:
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
+            import docstrings
+
             docstrings.insert(os.path.join("hse", "hse.in.pyx"))
             docstrings.insert(os.path.join("hse", "hse.in.pyi"))
             docstrings.insert(os.path.join("hse", "hse_limits.in.pyx"))
