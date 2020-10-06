@@ -1,7 +1,7 @@
 import os
 import docstrings
-from typing import Any, List
-from setuptools import setup, Extension
+from typing import Any, Dict, List, Type
+from setuptools import Command, setup, Extension
 
 
 # Distribute the generated C source files so that consumers don't necessarily
@@ -24,7 +24,7 @@ extensions: List[Extension] = [
 ]
 
 
-cmdclass = {}
+cmdclass: Dict[str, Type[Command]] = {}
 
 
 if USE_CYTHON:
