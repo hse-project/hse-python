@@ -66,7 +66,7 @@ cdef class Kvdb:
     def __dealloc__(self):
         pass
 
-    def close(self):
+    def close(self) -> None:
         """
         @SUB@ hse.Kvdb.close.__doc__
         """
@@ -78,7 +78,7 @@ cdef class Kvdb:
             raise KvdbException(err)
 
     @staticmethod
-    def init():
+    def init() -> None:
         """
         @SUB@ hse.Kvdb.init.__doc__
         """
@@ -87,14 +87,14 @@ cdef class Kvdb:
             raise KvdbException(err)
 
     @staticmethod
-    def fini():
+    def fini() -> None:
         """
         @SUB@ hse.Kvdb.fini.__doc__
         """
         hse_kvdb_fini()
 
     @staticmethod
-    def make(mp_name: str, Params params=None):
+    def make(mp_name: str, Params params=None) -> None:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
@@ -143,7 +143,7 @@ cdef class Kvdb:
 
         return result
 
-    def kvs_make(self, kvs_name: str, Params params=None):
+    def kvs_make(self, kvs_name: str, Params params=None) -> None:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
@@ -154,7 +154,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def kvs_drop(self, kvs_name: str):
+    def kvs_drop(self, kvs_name: str) -> None:
         """
         @SUB@ hse.Kvdb.kvs_drop.__doc__
         """
@@ -180,7 +180,7 @@ cdef class Kvdb:
 
         return kvs
 
-    def sync(self):
+    def sync(self) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
@@ -188,7 +188,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def flush(self):
+    def flush(self) -> None:
         """
         @SUB@ hse.Kvdb.flush.__doc__
         """
@@ -196,7 +196,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def compact(self, cancel=False, samp_lwm=False):
+    def compact(self, cancel=False, samp_lwm=False) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
         """
@@ -244,7 +244,7 @@ cdef class Kvs:
     def __dealloc__(self):
         pass
 
-    def close(self):
+    def close(self) -> None:
         """
         @SUB@ hse.Kvs.close.__doc__
         """
@@ -255,7 +255,7 @@ cdef class Kvs:
         if err != 0:
             raise KvdbException(err)
 
-    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority=False, KvdbTxn txn=None):
+    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority=False, KvdbTxn txn=None) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
@@ -327,7 +327,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, priority=False, KvdbTxn txn=None):
+    def delete(self, const unsigned char [:]key, priority=False, KvdbTxn txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -351,7 +351,7 @@ cdef class Kvs:
         finally:
             free(opspec)
 
-    def prefix_delete(self, const unsigned char [:]filt, priority=False, KvdbTxn txn=None):
+    def prefix_delete(self, const unsigned char [:]filt, priority=False, KvdbTxn txn=None) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -383,7 +383,7 @@ cdef class Kvs:
         static_view=False,
         bind_txn=False,
         KvdbTxn txn=None
-    ):
+    ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor_create.__doc__
         """
@@ -466,7 +466,7 @@ cdef class KvdbTxn:
 
         self.commit()
 
-    def begin(self):
+    def begin(self) -> None:
         """
         @SUB@ hse.KvdbTxn.begin.__doc__
         """
@@ -474,7 +474,7 @@ cdef class KvdbTxn:
         if err != 0:
             raise KvdbException(err)
 
-    def commit(self):
+    def commit(self) -> None:
         """
         @SUB@ hse.KvdbTxn.commit.__doc__
         """
@@ -482,7 +482,7 @@ cdef class KvdbTxn:
         if err != 0:
             raise KvdbException(err)
 
-    def abort(self):
+    def abort(self) -> None:
         """
         @SUB@ hse.KvdbTxn.abort.__doc__
         """
@@ -549,7 +549,7 @@ cdef class KvsCursor:
 
         return _iter()
 
-    def update(self, reverse=None, static_view=None, bind_txn=None, KvdbTxn txn=None):
+    def update(self, reverse=None, static_view=None, bind_txn=None, KvdbTxn txn=None) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
         """
@@ -721,13 +721,13 @@ cdef class Params:
         if self._c_hse_params:
             hse_params_destroy(self._c_hse_params)
 
-    def __getitem__(self, key) -> Optional[str]:
+    def __getitem__(self, key: str) -> Optional[str]:
         return self.get(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: str):
         self.set(key, value)
 
-    def set(self, key: str, value: str):
+    def set(self, key: str, value: str) -> None:
         """
         @SUB@ hse.Params.set.__doc__
         """
