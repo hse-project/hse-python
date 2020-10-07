@@ -303,7 +303,7 @@ class KvsCursor:
         """
         ...
 
-    def read(self) -> Tuple[bytes, Optional[bytes], bool]:
+    def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
         """
         @SUB@ hse.KvsCursor.read.__doc__
         """

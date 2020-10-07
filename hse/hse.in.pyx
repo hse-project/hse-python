@@ -637,12 +637,7 @@ cdef class KvsCursor:
 
         return (<char *>found)[:found_len]
 
-    # Compiler error when using Tuple[bytes, Optional[bytes], bool]
-    # When we move to Python >= 3.8, use
-    # Tuple[bytes, bytes, Union[Literal[True], Literal[False]]] as a workaround
-    # int is just a placeholder since return types in Cython seem to be
-    # ignored
-    def read(self) -> Tuple[bytes, Optional[bytes], bool]:
+    def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
         """
         @SUB@ hse.KvsCursor.read.__doc__
         """
