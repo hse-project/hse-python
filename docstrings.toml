@@ -336,17 +336,17 @@ time.
 
 The general lifecycle of a transaction is as follows:
 
-                        +----------+
-                        | INVALID  |
-                        +----------+
+                      +----------+
+                      | INVALID  |
+                      +----------+
                             |
                             v
-                        +----------+
+                      +----------+
     +---------------->|  ACTIVE  |<----------------+
     |                 +----------+                 |
     |  +-----------+    |      |     +----------+  |
     +--| COMMITTED |<---+      +---->| ABORTED  |--+
-        +-----------+                 +----------+
+       +-----------+                 +----------+
 
 When a transaction is initially allocated, it starts in the INVALID state. When
 `hse.KvdbTxn.begin()` is called with transaction in the INVALID, COMMITTED, or ABORTED
