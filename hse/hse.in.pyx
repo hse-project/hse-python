@@ -706,6 +706,7 @@ cdef class KvdbCompactStatus:
         return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
+# The bool in quotes is a work-around until I can figure this out with the Cython devs
 Config = Dict[str, Union[str, int, float, "bool", List[str], List[int], "Config"]]
 
 

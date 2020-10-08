@@ -43,7 +43,7 @@ if USE_CYTHON:
             modules,
             include_path=["hse"],
             compiler_directives={
-                "language_level": "3",
+                "language_level": "3str",
                 "embedsignature": True,
                 "profile": True,
                 "infer_types": False,
