@@ -312,7 +312,7 @@ cdef class Kvs:
             buf_addr = &buf[0]
             buf_len = len(buf)
 
-        cdef bool found = False
+        cdef cbool found = False
         cdef size_t value_len = 0
         cdef hse_err_t err = 0
         try:
@@ -645,7 +645,7 @@ cdef class KvsCursor:
         cdef const void *value = NULL
         cdef size_t key_len = 0
         cdef size_t value_len = 0
-        cdef bool eof = False
+        cdef cbool eof = False
         cdef hse_err_t err = hse_kvs_cursor_read(
             self._c_hse_kvs_cursor,
             NULL,
@@ -706,8 +706,7 @@ cdef class KvdbCompactStatus:
         return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
-# The bool in quotes is a work-around until I can figure this out with the Cython devs
-Config = Dict[str, Union[str, int, float, "bool", List[str], List[int], "Config"]]
+Config = Dict[str, Union[str, int, float, bool, List[str], List[int], "Config"]]
 
 
 cdef class Params:

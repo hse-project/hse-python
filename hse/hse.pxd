@@ -1,5 +1,7 @@
 from libc.stdint cimport uint64_t
-from libcpp cimport bool
+# Avoid interfering with Python bool type since Cython seems to struggle
+# differentiating the 2
+from libcpp cimport bool as cbool
 
 cdef extern from "hse/hse.h":
 	ctypedef uint64_t hse_err_t
@@ -58,7 +60,7 @@ cdef extern from "hse/hse.h":
 		hse_kvdb_opspec *opspec,
 		const void *     key,
 		size_t           key_len,
-		bool *           found,
+		cbool *           found,
 		void *           buf,
 		size_t           buf_len,
 		size_t *         val_len)
@@ -134,7 +136,7 @@ cdef extern from "hse/hse.h":
 		size_t *         key_len,
 		const void **    val,
 		size_t *         val_len,
-		bool *           eof)
+		cbool *           eof)
 	hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor)
 
 	hse_err_t hse_params_create(hse_params **params)
