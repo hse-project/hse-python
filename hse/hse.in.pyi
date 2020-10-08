@@ -15,7 +15,8 @@ KVDB_VERSION_SHA:
 
 from enum import Enum
 from types import TracebackType
-from typing import Dict, Iterator, List, Optional, Tuple, Type, Any
+from typing import Dict, Iterator, List, Optional, Tuple, Type, Any, Union
+
 
 KVDB_VERSION_STRING: str
 KVDB_VERSION_TAG: str
@@ -351,6 +352,9 @@ class KvdbCompactStatus:
         ...
 
 
+Config = Dict[str, Union[str, int, float, bool, List[str], List[int], "Config"]]
+
+
 class Params:
     def __getitem__(self, key: str) -> Optional[str]:
         ...
@@ -378,7 +382,7 @@ class Params:
         ...
 
     @staticmethod
-    def from_dict(params: Dict[str, str]) -> Params:
+    def from_dict(params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """

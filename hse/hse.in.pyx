@@ -20,7 +20,7 @@ cimport hse_limits
 from ctypes import c_int
 from enum import Enum
 from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Any, Iterator, Type
+from typing import List, Optional, Tuple, Dict, Any, Iterator, Type, Union
 from libc.stdlib cimport calloc, free
 
 
@@ -706,6 +706,9 @@ cdef class KvdbCompactStatus:
         return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
+Config = Dict[str, Union[str, int, float, "bool", List[str], List[int], "Config"]]
+
+
 cdef class Params:
     cdef hse_params *_c_hse_params
 
@@ -759,7 +762,7 @@ cdef class Params:
         return p
 
     @staticmethod
-    def from_dict(params: Dict[str, str]) -> Params:
+    def from_dict(params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """
