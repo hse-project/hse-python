@@ -15,7 +15,7 @@ KVDB_VERSION_SHA:
 
 from enum import Enum
 from types import TracebackType
-from typing import Dict, Iterator, List, Optional, Tuple, Type, Any, Union
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple, Type, Any, Union
 
 
 KVDB_VERSION_STRING: str
@@ -352,7 +352,19 @@ class KvdbCompactStatus:
         ...
 
 
-Config = Dict[str, Union[str, int, float, bool, List[str], List[int], "Config"]]
+Config = Dict[
+    str,
+    Optional[
+        Union[
+            str,
+            int,
+            float,
+            bool,
+            Iterable[Optional[Union[str, float, int, bool, "Config"]]],
+            "Config",
+        ]
+    ],
+]
 
 
 class Params:
