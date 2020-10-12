@@ -4,6 +4,7 @@ from libc.stdint cimport uint64_t
 from libcpp cimport bool as cbool
 from libc.stdlib cimport calloc
 
+
 cdef extern from "hse/hse.h":
     ctypedef uint64_t hse_err_t
     cdef struct hse_params:

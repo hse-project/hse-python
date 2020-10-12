@@ -28,11 +28,11 @@ The version commit hash is a git commit hash
 
 [hse.KvdbException]
 __doc__ = """
-Thrown when HSE encounters an error. Wrapper around `hse_err_t`.
+Raised when HSE encounters an error. Wrapper around `hse_err_t`.
 
 Members:
 
-returncode - error code returned by HSE
+returncode - Error code returned by HSE
 """
 
 [hse.Kvdb.close]
@@ -645,6 +645,15 @@ Experimental APIs which may or may not changed, added, or deleted
 between releases
 """
 
+[experimental.ParamsException]
+__doc__ = """
+Raised when `hse.experimental.params_err()` is called.
+
+Members:
+
+error - Error string
+"""
+
 [experimental.KvsPfxProbeCnt]
 __doc__ = """
 Enum representing how many results were found in the probe operation.
@@ -702,4 +711,11 @@ pfx: Prefix to be probed\\n
 key_buf: Buffer which will be populated with contents of first seen key\\n
 val_buf: Buffer which will be populated with value for `key_buf`\\n
 txn: Transaction context
+"""
+
+[experimental.params_err]
+__doc__ = """
+Check an `hse.Params` object for an error
+
+Raises an `hse.experimental.ParamsException` if error occured.
 """
