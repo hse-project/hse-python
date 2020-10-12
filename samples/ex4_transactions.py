@@ -13,8 +13,6 @@ def main() -> int:
     KVS1_NAME = sys.argv[2]
     KVS2_NAME = sys.argv[3]
 
-    hse.Kvdb.init()
-
     # Open the KVDB and the KVS instances in it
     kvdb = hse.Kvdb.open(MPOOL_NAME)
     kvs1 = kvdb.kvs_open(KVS1_NAME)
@@ -53,12 +51,16 @@ def main() -> int:
         val4 = kvs1.get(b"k4")
         print(f"txn2(aborted), k4 from outside txn: found = {val4 is not None}")
 
+    kvs1.close()
+    kvs2.close()
     kvdb.close()
-
-    hse.Kvdb.fini()
 
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    hse.Kvdb.init()
+    try:
+        main()
+    finally:
+        hse.Kvdb.fini()

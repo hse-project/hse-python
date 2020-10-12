@@ -12,8 +12,6 @@ def main() -> int:
     MPOOL_NAME = sys.argv[1]
     KVS_LIST = sys.argv[2:]
 
-    hse.Kvdb.init()
-
     hse.Kvdb.make(MPOOL_NAME)
     kvdb = hse.Kvdb.open(MPOOL_NAME)
     for kvs in KVS_LIST:
@@ -23,10 +21,12 @@ def main() -> int:
 
     kvdb.close()
 
-    hse.Kvdb.fini()
-
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    hse.Kvdb.init()
+    try:
+        main()
+    finally:
+        hse.Kvdb.fini()

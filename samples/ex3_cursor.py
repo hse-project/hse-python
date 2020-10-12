@@ -12,8 +12,6 @@ def main() -> int:
     MPOOL_NAME = sys.argv[1]
     KVS_NAME = sys.argv[2]
 
-    hse.Kvdb.init()
-
     kvdb = hse.Kvdb.open(MPOOL_NAME)
     kvs = kvdb.kvs_open(KVS_NAME)
 
@@ -38,12 +36,15 @@ def main() -> int:
             f"found   : key: {key.decode() if key else None}\tval: {val.decode() if val else None}"
         )
 
+    kvs.close()
     kvdb.close()
-
-    hse.Kvdb.fini()
 
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    hse.Kvdb.init()
+    try:
+        main()
+    finally:
+        hse.Kvdb.fini()

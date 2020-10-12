@@ -75,8 +75,6 @@ def main() -> int:
     KVS_NAME: str = args.kvs
     FILES: List[str] = args.files
 
-    hse.Kvdb.init()
-
     kvdb = hse.Kvdb.open(MPOOL_NAME)
     kvs = kvdb.kvs_open(KVS_NAME)
 
@@ -85,12 +83,15 @@ def main() -> int:
     else:
         put_files_as_kv(kvs, FILES)
 
+    kvs.close()
     kvdb.close()
-
-    hse.Kvdb.fini()
 
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    hse.Kvdb.init()
+    try:
+        main()
+    finally:
+        hse.Kvdb.fini()
