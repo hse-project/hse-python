@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import Any, Dict, List, Type
 from setuptools import Command, setup, Extension
 
@@ -33,7 +32,7 @@ extensions: List[Extension] = [
 cmdclass: Dict[str, Type[Command]] = {}
 
 
-if USE_CYTHON and "build_ext" in sys.argv:
+if USE_CYTHON:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
 
