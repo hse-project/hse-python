@@ -69,7 +69,8 @@ class Kvdb:
         """
         ...
 
-    def get_names(self) -> List[str]:
+    @property
+    def names(self) -> List[str]:
         """
         @SUB@ hse.Kvdb.get_names.__doc__
         """
@@ -148,7 +149,7 @@ class Kvs:
         self,
         key: bytes,
         txn: Optional[KvdbTxn] = ...,
-        buf: bytes = ...,
+        buf: bytearray = ...,
     ) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
@@ -159,7 +160,7 @@ class Kvs:
         self,
         key: bytes,
         txn: Optional[KvdbTxn] = ...,
-        buf: bytes = ...,
+        buf: bytearray = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
