@@ -22,7 +22,7 @@ __INDENT = " " * 4  # 4 space indents in source files
 
 def __flatten(
     d: MutableMapping[str, Any], parent_key: str = "", sep: str = "."
-) -> Dict[str, Any]:
+) -> Dict[str, str]:
     items = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
@@ -37,9 +37,10 @@ def __flatten(
 
 __HSE_DOCSTRINGS = __flatten(toml.load("docstrings.toml"))
 __DOCSTRINGS_TOML_MDATE = os.path.getmtime("docstrings.toml")
+__SCRIPT_MTIME = os.path.getmtime(__file__)
 
 
-def insert(file: str) -> None:
+def insert(input_file: str) -> None:
     """
     Insert docstrings into a file out of place. `file.py.in` will output to
     `file.py`. If the input file has an older modified time than the previously
@@ -62,21 +63,22 @@ def insert(file: str) -> None:
 
     Args:
 
-    file - Path to file to insert docstrings into
+    input_file - Path to file to insert docstrings into
     """
-    assert file.find(".in.") != -1
+    assert input_file.find(".in.") != -1
 
-    input_file_mtime = os.path.getmtime(file)
-    output_file = file.replace(".in", "")
+    input_file_mtime = os.path.getmtime(input_file)
+    output_file = input_file.replace(".in", "")
     if os.path.exists(output_file):
         output_file_mtime = os.path.getmtime(output_file)
         if (
             input_file_mtime < output_file_mtime
             and __DOCSTRINGS_TOML_MDATE < output_file_mtime
+            and __SCRIPT_MTIME < output_file_mtime
         ):
             return
 
-    with open(file, "r") as input:
+    with open(input_file, "r") as input:
         output_lines = []
         for line in input.readlines():
             match = __DOCSTRING_PATTERN.search(line)
@@ -86,7 +88,7 @@ def insert(file: str) -> None:
             indents = int(len(match.group(1)) / 4)
             key = match.group(2)
             if key in __HSE_DOCSTRINGS.keys():
-                with StringIO(__HSE_DOCSTRINGS[key]) as docstring:
+                with StringIO(__HSE_DOCSTRINGS[key].lstrip()) as docstring:
                     output_lines.extend(
                         map(
                             lambda s: __INDENT * indents + s if not s.isspace() else s,
