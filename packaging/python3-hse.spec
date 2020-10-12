@@ -1,6 +1,6 @@
 Name:          python3-hse
 Version:       1.9
-Release:       1%\{?dist}
+Release:       1
 Summary:       Python bindings for the Heterogeneous-Memory Storage Engine
 License:       Apache-2.0
 URL:           https://github.com/hse-project/hse
@@ -18,7 +18,7 @@ Software-Defined Storage (SDS), High-Performance Computing (HPC), Big Data,
 Internet of Things (IoT), and Artificial Intelligence (AI) solutions.
 
 %prep
-tar -xzf %{Source0}
+tar -xzf hse-%{version}.tar.gz
 
 %build
 python setup.py build_ext
