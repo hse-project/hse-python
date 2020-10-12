@@ -1,30 +1,34 @@
 # Docstrings for the hse module
 
-# Be sure to double escape \n. May have unintended effects otherwise
+# Be sure to double escape \n. May have unintended effects otherwise.
 
 [hse.KVDB_VERSION_STRING]
-__doc__ = """A string representing the HSE KVDB libary version
+__doc__ = """
+A string representing the HSE KVDB libary version
 
 The version string starts with a numeric sequence (e.g., 1.7.0) and then, depending
 on the type of build may have additional information appended.
 """
 
 [hse.KVDB_VERSION_TAG]
-__doc__ = """A string representing the HSE KVDB libary version tag
+__doc__ = """
+A string representing the HSE KVDB libary version tag
 
 The version tag starts with a sequence (e.g., r1.9.0) and then, depending
 on the type of build may have additional information appended.
 """
 
 [hse.KVDB_VERSION_SHA]
-__doc__ = """A string representing the HSE KVDB library version commit hash
+__doc__ = """
+A string representing the HSE KVDB library version commit hash
 
 The version commit hash is a git commit hash
 (e.g., b55fe07774d7cbc1492d7b8a47dc2c194cd3e24a).
 """
 
 [hse.KvdbException]
-__doc__ = """Thrown when HSE encounters an error. Wrapper around `hse_err_t`.
+__doc__ = """
+Thrown when HSE encounters an error. Wrapper around `hse_err_t`.
 
 Members:
 
@@ -32,14 +36,16 @@ returncode - error code returned by HSE
 """
 
 [hse.Kvdb.close]
-__doc__ = """Close an open HSE KVDB
+__doc__ = """
+Close an open HSE KVDB
 
 No client thread may enter the HSE KVDB API with the referenced KVDB after this
 function starts. This function is not thread safe.
 """
 
 [hse.Kvdb.init]
-__doc__ = """Initialize the HSE KVDB subsystem
+__doc__ = """
+Initialize the HSE KVDB subsystem
 
 This function initializes a range of different internal HSE structures. It must be
 called before any other HSE functions are used. It is not thread safe and is
@@ -47,7 +53,8 @@ idempotent.
 """
 
 [hse.Kvdb.fini]
-__doc__ = """Shutdown the HSE KVDB subsystem
+__doc__ = """
+Shutdown the HSE KVDB subsystem
 
 This function cleanly finalizes a range of different internal HSE structures. It
 should be called prior to application exit and is not thread safe. After it is
@@ -56,7 +63,8 @@ undefined behavior. This function is not thread safe.
 """
 
 [hse.Kvdb.make]
-__doc__ = """Create a new KVDB instance within the named mpool
+__doc__ = """
+Create a new KVDB instance within the named mpool
 
 The mpool must already exist and the client must have permission to use the
 mpool. This function is not thread safe.
@@ -68,7 +76,8 @@ params - Configuration parameters
 """
 
 [hse.Kvdb.open]
-__doc__ = """Open an HSE KVDB for use by the application
+__doc__ = """
+Open an HSE KVDB for use by the application
 
 The KVDB must already exist and the client must have permission to use it. This
 function is not thread safe.
@@ -79,15 +88,17 @@ mp_name - Mpool name in which the KVDB exists\\n
 params - Configuration parameters
 """
 
-[hse.Kvdb.get_names]
-__doc__ = """Get the names of the KVSs within the given KVDB
+[hse.Kvdb.names]
+__doc__ = """
+Get the names of the KVSs within the given KVDB
 
 Key-value stores (KVSs) are opened by name. This function allocates a list of
 strings, each containing the name of a KVS. This function is thread safe.
 """
 
 [hse.Kvdb.kvs_make]
-__doc__ = """Create a new KVS within the referenced KVDB
+__doc__ = """
+Create a new KVS within the referenced KVDB
 
 If the KVS will store multi-segment keys then the parameter `pfx_len` should be set
 to the desired key prefix length - see `hse.Params.set()` and related functions
@@ -100,7 +111,8 @@ kvs_name - KVS name
 """
 
 [hse.Kvdb.kvs_drop]
-__doc__ = """Remove a KVS from the referenced KVDB
+__doc__ = """
+Remove a KVS from the referenced KVDB
 
 It is an error to call this function on a KVS that is open. This function is not
 thread safe.
@@ -111,7 +123,8 @@ kvs_name - KVS name
 """
 
 [hse.Kvdb.kvs_open]
-__doc__ = """Open a KVS in a KVDB
+__doc__ = """
+Open a KVS in a KVDB
 
 This function is not thread safe.
 
@@ -122,15 +135,18 @@ params - Parameters that affect how the KVS will function
 """
 
 [hse.Kvdb.sync]
-__doc__ = """Flush data in all of the referenced KVDB's KVSs to stable media and return
+__doc__ = """
+Flush data in all of the referenced KVDB's KVSs to stable media and return
 """
 
 [hse.Kvdb.flush]
-__doc__ = """Initiate data flush in all of the referenced KVDB's KVSs
+__doc__ = """
+Initiate data flush in all of the referenced KVDB's KVSs
 """
 
 [hse.Kvdb.compact]
-__doc__ = """Request a data compaction operation
+__doc__ = """
+Request a data compaction operation
 
 In managing the data within an HSE KVDB, there are maintenance activities that occur
 as background processing. The application may be aware that it is advantageous to do
@@ -153,28 +169,32 @@ samp_lwm - To perform compaction to its fullest extent
 """
 
 [hse.Kvdb.compact_status]
-__doc__ = """Get status of an ongoing compaction activity
+__doc__ = """
+Get status of an ongoing compaction activity
 
 The caller can examine the properties of the `KvdbCompactStatus` class to determine
 the current state of maintenance compaction. This function is thread safe.
 """
 
 [hse.Kvdb.txn_alloc]
-__doc__ = """Allocate transaction object
+__doc__ = """
+Allocate transaction object
 
 This object can and should be re-used many times to avoid the overhead of
 allocation. This function is thread safe.
 """
 
 [hse.Kvs.close]
-__doc__ = """Close an open KVS
+__doc__ = """
+Close an open KVS
 
 No client thread may enter the HSE KVDB API with the referenced KVS after this
 function starts. This function is not thread safe.
 """
 
 [hse.Kvs.put]
-__doc__ = """Put a KV pair into KVS
+__doc__ = """
+Put a KV pair into KVS
 
 If the key already exists in the KVS then the value is effectively overwritten. The
 key length must be in the range [1, `hse.KVS_KLEN_MAX`] while the value length must be
@@ -199,7 +219,8 @@ txn - Transaction context
 """
 
 [hse.Kvs.get]
-__doc__ = """Retrieve the value for a given key from KVS
+__doc__ = """
+Retrieve the value for a given key from KVS
 
 If the key exists in the KVS then the return value is not None. See the section
 on transactions for information on how gets within transactions are handled. This
@@ -213,10 +234,11 @@ buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
 [hse.Kvs.get_with_length]
-__doc__ = """Retrieve the value and length for a given key from KVS
+__doc__ = """
+Retrieve the value and length for a given key from KVS
 
-If the key exists in the KVS then the first value of the tuple is not None. See
-the section on transactions for information on how gets within transactions are
+If the key exists in the KVS then the first value of the return tuple is not None.
+See the section on transactions for information on how gets within transactions are
 handled. This function is thread safe.
 
 Args:
@@ -227,7 +249,8 @@ buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
 [hse.Kvs.delete]
-__doc__ = """Delete the key and its associated value from KVS
+__doc__ = """
+Delete the key and its associated value from KVS
 
 It is not an error if the key does not exist within the KVS. See the section on
 transactions for information on how deletes within transactions are handled. This
@@ -241,7 +264,8 @@ txn - Transaction context
 """
 
 [hse.Kvs.prefix_delete]
-__doc__ = """Delete all KV pairs matching the key prefix from a KVS storing multi-segment keys
+__doc__ = """
+Delete all KV pairs matching the key prefix from a KVS storing multi-segment keys
 
 This interface is used to delete an entire range of multi-segment keys. To do this
 the caller passes a filter with a length equal to the KVS's key prefix length. It is
@@ -257,7 +281,8 @@ txn - Transaction context
 """
 
 [hse.Kvs.cursor_create]
-__doc__ = """Creates a cursor used to iterate over a KVS
+__doc__ = """
+Creates a cursor used to iterate over a KVS
 
 When cursors are created they are by default forward iterating. If the caller of
 hse.Kvs.cursor_create() passes a reference to an initialized opspec with the
@@ -313,11 +338,13 @@ txn - Transaction context
 """
 
 [hse.KvdbTxnState]
-__doc__ = """State a transaction could be in
+__doc__ = """
+State a transaction could be in
 """
 
 [hse.KvdbTxn]
-__doc__ = """The HSE KVDB provides transactions with operations spanning KVSs within a single
+__doc__ = """
+The HSE KVDB provides transactions with operations spanning KVSs within a single
 KVDB. These transactions have snapshot isolation (a specific form of MVCC) with the
 normal semantics (see "Concurrency Control and Recovery in Database Systems" by PA
 Bernstein).
@@ -363,40 +390,46 @@ until it is committed. All such mutations become visible atomically.
 """
 
 [hse.KvdbTxn.begin]
-__doc__ = """Initiate transaction
+__doc__ = """
+Initiate transaction
 
 The call fails if the transaction handle refers to an ACTIVE transaction. This
 function is thread safe with different transactions.
 """
 
 [hse.KvdbTxn.commit]
-__doc__ = """Commit all the mutations of the referenced transaction
+__doc__ = """
+Commit all the mutations of the referenced transaction
 
 The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
 [hse.KvdbTxn.abort]
-__doc__ = """Abort/rollback transaction
+__doc__ = """
+Abort/rollback transaction
 
 The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
 [hse.KvdbTxn.state]
-__doc__ = """Retrieve the state of the referenced transaction
+__doc__ = """
+Retrieve the state of the referenced transaction
 
 This function is thread safe with different transactions.
 """
 
 [hse.KvsCursor.destroy]
-__doc__ = """Destroy cursor
+__doc__ = """
+Destroy cursor
 
 This function is thread safe.
 """
 
 [hse.KvsCursor.items]
-__doc__ = """Convenience function to return an iterator over key/values in a KVS
+__doc__ = """
+Convenience function to return an iterator over key/values in a KVS
 
 Args:
 
@@ -404,7 +437,8 @@ max_count - Limit for the number of results
 """
 
 [hse.KvsCursor.update]
-__doc__ = """Update a plain cursor or modify any cursor
+__doc__ = """
+Update a plain cursor or modify any cursor
 
 This operation serves to either move the snapshot view forward for a type (1) cursor,
 or to transition between being a type (1), type (2), and type (3) cursor.  That
@@ -422,7 +456,8 @@ txn - Transaction context
 """
 
 [hse.KvsCursor.seek]
-__doc__ = """Move the cursor to point at the key/value pair at or closest to `key`
+__doc__ = """
+Move the cursor to point at the key/value pair at or closest to `key`
 
 The next `hse.KvsCursor.read()` will start at this point. This function is
 thread safe across disparate cursors.
@@ -433,7 +468,8 @@ key - Key to find
 """
 
 [hse.KvsCursor.seek_range]
-__doc__ = """Move the cursor to the closest match to key, gated by the given filter
+__doc__ = """
+Move the cursor to the closest match to key, gated by the given filter
 
 Keys read from this cursor will belong to the closed interval defined by the given
 filter: [`filt_min`, `filt_max`]. For KVSs storing multi-segment keys, performance
@@ -449,7 +485,8 @@ filt_max - Filter maximum
 """
 
 [hse.KvsCursor.read]
-__doc__ = """Iteratively access the elements pointed to by the cursor
+__doc__ = """
+Iteratively access the elements pointed to by the cursor
 
 Read a KV pair from the cursor, advancing the cursor past its current location. If
 the cursor is at EOF, attempts to read from it will not change the state of the
@@ -458,32 +495,39 @@ This function is thread safe across disparate cursors.
 """
 
 [hse.KvdbCompactStatus]
-__doc__ = """Contains infomation about the Kvdb's current compaction status including
+__doc__ = """
+Contains infomation about the Kvdb's current compaction status including
 `samp_lwm`, `samp_hwm`, `samp_curr`, `samp_active`, and `canceled`.
 """
 
 [hse.KvdbCompactStatus.samp_lwm]
-__doc__ = """space amp low water mark (%)
+__doc__ = """
+space amp low water mark (%)
 """
 
 [hse.KvdbCompactStatus.samp_hwm]
-__doc__ = """space amp high water mark (%)
+__doc__ = """
+space amp high water mark (%)
 """
 
 [hse.KvdbCompactStatus.samp_curr]
-__doc__ = """current space amp (%)
+__doc__ = """
+current space amp (%)
 """
 
 [hse.KvdbCompactStatus.active]
-__doc__ = """is an externally requested compaction underway
+__doc__ = """
+is an externally requested compaction underway
 """
 
 [hse.KvdbCompactStatus.canceled]
-__doc__ = """was an externally requested compaction canceled
+__doc__ = """
+was an externally requested compaction canceled
 """
 
 [hse.Params.get]
-__doc__ = """Get configuration parameter
+__doc__ = """
+Get configuration parameter
 
 Obtain the value the parameter denoted by `key` is set to in the params object.
 This function is not thread safe.
@@ -494,7 +538,8 @@ key - Target key
 """
 
 [hse.Params.set]
-__doc__ = """Set configuration parameter
+__doc__ = """
+Set configuration parameter
 
 Set the parameter setting given by `key` to `value`. If the `key` or `value` is
 invalid then the call will fail.
@@ -514,7 +559,8 @@ value - Target value
 """
 
 [hse.Params.create]
-__doc__ = """Create a params object
+__doc__ = """
+Create a params object
 
 This function allocates an empty params object. This object can then be populated
 through `hse.Params.from_file()`, `hse.Params.from_string()`, or via `hse.Params.set()`.
@@ -522,7 +568,8 @@ Usage of a given params object is not thread safe.
 """
 
 [hse.Params.from_dict]
-__doc__ = """Parse params from a dictionary
+__doc__ = """
+Parse params from a dictionary
 
 This function takes a dictionary and transforms it, populating the
 supplied params object. This function is not thread safe.
@@ -533,7 +580,8 @@ params - Configuration parameters
 """
 
 [hse.Params.from_file]
-__doc__ = """Parse params from a file
+__doc__ = """
+Parse params from a file
 
 This function takes a filename and parses it, populating the supplied params
 object. If the file is not a valid params specification, the parsing will
@@ -545,7 +593,8 @@ path - Path to configuration file
 """
 
 [hse.Params.from_string]
-__doc__ = """Parse params from a string
+__doc__ = """
+Parse params from a string
 
 This function takes a YAML string and parses it, populating the supplied params object. If
 the string is not a valid params specification, the parsing will fail. This function is
@@ -557,15 +606,18 @@ input - Input paramters in YAML format
 """
 
 [limits]
-__doc__ = """Global Limits
+__doc__ = """
+Global Limits
 """
 
 [limits.KVS_COUNT_MAX]
-__doc__ = """Maximum number of KVS's contained within one KVDB
+__doc__ = """
+Maximum number of KVS's contained within one KVDB
 """
 
 [limits.KVS_KLEN_MAX]
-__doc__ = """A common requirement for key length for the software above HSE KVDB is 1024.
+__doc__ = """
+A common requirement for key length for the software above HSE KVDB is 1024.
 Combined with a discriminant and (potentially) a chunk key, this pushes us to
 1030 bytes keys. Looking at the packing for the on-media format for data, we
 can have at most 3 keys of such large size in a 4k page. Lopping off 64-bytes
@@ -573,13 +625,81 @@ for other data, and we can have 3 keys of 1344 bytes.
 """
 
 [limits.KVS_VLEN_MAX]
-__doc__ = """Max value length is 1MiB
+__doc__ = """
+Max value length is 1MiB
 """
 
 [limits.KVS_MAX_PFXLEN]
-__doc__ = """Max key prefix length
+__doc__ = """
+Max key prefix length
 """
 
 [limits.KVS_NAME_LEN_MAX]
-__doc__ = """Max KVS name lengths
+__doc__ = """
+Max KVS name lengths
+"""
+
+[experimental]
+__doc__ = """
+Experimental APIs which may or may not changed, added, or deleted
+between releases
+"""
+
+[experimental.KvsPfxProbeCnt]
+__doc__ = """
+Enum representing how many results were found in the probe operation.
+"""
+
+[experimental.kvdb_export]
+__doc__ = """
+Export a kvdb into files
+
+Args:
+
+kvdb: Kvdb instance\\n
+params: Configuration parameters\\n
+path: Export target path
+"""
+
+[experimental.kvdb_import]
+__doc__ = """
+Import a kvdb from files
+
+Args:
+
+mpool_name: Name of mpool\\n
+path: Import target path
+"""
+
+[experimental.kvs_prefix_probe]
+__doc__ = """
+Probe for prefix
+
+Outputs how many matches were encountered - zero, one or multiple.
+
+Args:
+
+kvs: Kvs instance\\n
+opspec: Specification for delete operation\\n
+pfx: Prefix to be probed\\n
+key_buf: Buffer which will be populated with contents of first seen key\\n
+val_buf: Buffer which will be populated with value for `key_buf`\\n
+txn: Transaction context
+"""
+
+[experimental.kvs_prefix_probe_with_lengths]
+__doc__ = """
+Probe for prefix
+
+Outputs how many matches were encountered - zero, one or multiple. Returns
+lengths of key and value in addition to the `bytes` objects.
+
+Args:
+
+kvs: Kvs instance\\n
+opspec: Specification for delete operation\\n
+pfx: Prefix to be probed\\n
+key_buf: Buffer which will be populated with contents of first seen key\\n
+val_buf: Buffer which will be populated with value for `key_buf`\\n
+txn: Transaction context
 """

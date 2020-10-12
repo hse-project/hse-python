@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import Any, Dict, List, Type
 from setuptools import Command, setup, Extension
 
@@ -8,16 +9,22 @@ from setuptools import Command, setup, Extension
 
 
 USE_CYTHON = os.environ.get("USE_CYTHON")
+SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 
 extensions: List[Extension] = [
     Extension(
         "hse.hse",
-        [os.path.join("hse", f"hse.{'pyx' if USE_CYTHON else 'c'}")],
+        [os.path.join("hse", f"hse.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.limits",
-        [os.path.join("hse", f"hse_limits.{'pyx' if USE_CYTHON else 'c'}")],
+        [os.path.join("hse", f"hse_limits.{SOURCE_EXTENSION}")],
+        libraries=["hse_kvdb"],
+    ),
+    Extension(
+        "hse.experimental",
+        [os.path.join("hse", f"experimental.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -26,7 +33,7 @@ extensions: List[Extension] = [
 cmdclass: Dict[str, Type[Command]] = {}
 
 
-if USE_CYTHON:
+if USE_CYTHON and "build_ext" in sys.argv:
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
 
@@ -38,6 +45,8 @@ if USE_CYTHON:
             docstrings.insert(os.path.join("hse", "hse.in.pyi"))
             docstrings.insert(os.path.join("hse", "hse_limits.in.pyx"))
             docstrings.insert(os.path.join("hse", "limits.in.pyi"))
+            docstrings.insert(os.path.join("hse", "experimental.in.pyx"))
+            docstrings.insert(os.path.join("hse", "experimental.in.pyi"))
 
         return cythonize(
             modules,

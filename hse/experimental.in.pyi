@@ -1,0 +1,58 @@
+"""
+@SUB@ experimental
+"""
+
+
+from typing import Optional, Tuple
+from hse import Kvdb, Params, Kvs, KvdbTxn
+from enum import Enum
+
+
+class KvsPfxProbeCnt(Enum):
+    """
+    @SUB@ experimental.KvsPfxProbeCnt.__doc__
+    """
+
+    ZERO = ...
+    ONE = ...
+    MUL = ...
+
+
+def kvdb_export(kvdb: Kvdb, params: Params, path: str) -> None:
+    """
+    @SUB@ experimental.kvdb_export.__doc__
+    """
+    ...
+
+
+def kvdb_import(mpool_name: str, path: str) -> None:
+    """
+    @SUB@ experimental.kvdb_import.__doc__
+    """
+    ...
+
+
+def kvs_prefix_probe(
+    kvs: Kvs,
+    pfx: bytes,
+    key_buf: bytearray = ...,
+    val_buf: bytearray = ...,
+    txn: Optional[KvdbTxn] = ...,
+) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+    """
+    @SUB@ experimental.kvs_prefix_probe.__doc__
+    """
+    ...
+
+
+def kvs_prefix_probe_with_lengths(
+    kvs: Kvs,
+    pfx: bytes,
+    key_buf: bytearray = ...,
+    val_buf: bytearray = ...,
+    txn: Optional[KvdbTxn] = ...,
+) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+    """
+    @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
+    """
+    ...
