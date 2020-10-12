@@ -21,7 +21,7 @@ from ctypes import c_int
 from enum import Enum
 from types import TracebackType
 from typing import List, Optional, Tuple, Dict, Any, Iterator, Type, Union, Iterable
-from libc.stdlib cimport calloc, free
+from libc.stdlib cimport free
 
 
 # Throughout these bindings, you will see C pointers be set to NULL after their
@@ -47,19 +47,7 @@ class KvdbException(Exception):
         return self.message
 
 
-cdef hse_kvdb_opspec *HSE_KVDB_OPSPEC_INIT():
-    cdef hse_kvdb_opspec *opspec = <hse_kvdb_opspec *>calloc(1, sizeof(hse_kvdb_opspec))
-    if not opspec:
-        raise MemoryError()
-
-    opspec.kop_opaque = 0xb0de0001
-
-    return opspec
-
-
 cdef class Kvdb:
-    cdef hse_kvdb *_c_hse_kvdb
-
     def __cinit__(self):
         self._c_hse_kvdb = NULL
 
@@ -123,9 +111,10 @@ cdef class Kvdb:
 
         return kvdb
 
-    def get_names(self) -> List[str]:
+    @property
+    def names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.get_names.__doc__
+        @SUB@ hse.Kvdb.names.__doc__
         """
         cdef unsigned int count = 0
         cdef char **kvs_list = NULL
@@ -236,8 +225,6 @@ cdef class Kvdb:
 
 
 cdef class Kvs:
-    cdef hse_kvs *_c_hse_kvs
-
     def __cinit__(self):
         self._c_hse_kvs = NULL
 
@@ -290,7 +277,7 @@ cdef class Kvs:
         @SUB@ hse.Kvs.get.__doc__
         """
         value, length = self.get_with_length(key, txn=txn, buf=buf)
-        return value[:length] if len(value) > length else value
+        return value[:length] if value and len(value) > length else value
 
 
     def get_with_length(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
@@ -320,7 +307,7 @@ cdef class Kvs:
             if err != 0:
                 raise KvdbException(err)
             if not found:
-                return None
+                return None, 0
         finally:
             if opspec:
                 free(opspec)
@@ -439,9 +426,6 @@ cdef class KvdbTxn:
     """
     @SUB@ hse.KvdbTxn.__doc__
     """
-    cdef hse_kvdb_txn *_c_hse_kvdb_txn
-    cdef hse_kvdb *_c_hse_kvdb
-
     def __cinit__(self):
         self._c_hse_kvdb_txn = NULL
         self._c_hse_kvdb = NULL
@@ -503,9 +487,6 @@ cdef class KvsCursor:
     See the concept and best practices sections on the HSE Wiki at
     https://github.com/hse-project/hse/wiki
     """
-    cdef hse_kvs_cursor *_c_hse_kvs_cursor
-    cdef hse_kvdb_txn *_c_hse_kvdb_txn
-
     def __cinit__(self):
         self._c_hse_kvs_cursor = NULL
         self._c_hse_kvdb_txn = NULL
@@ -668,8 +649,6 @@ cdef class KvdbCompactStatus:
     """
     @SUB@ hse.KvdbCompactStatus.__doc__
     """
-    cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
-
     @property
     def samp_lwm(self) -> int:
         """
@@ -722,8 +701,9 @@ Config = Dict[
 
 
 cdef class Params:
-    cdef hse_params *_c_hse_params
-
+    """
+    @SUB@ hse.Params.__doc__
+    """
     def __cinit__(self):
         self._c_hse_params = NULL
 
