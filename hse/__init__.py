@@ -5,26 +5,26 @@ entry point's operation.
 
 Terminology:
 
-    KVS               - Key-value store, containing zero or more key-value (KV)
-                        pairs
+KVS               - Key-value store, containing zero or more key-value (KV)
+                    pairs
 
-    KVDB              - Key-value database, comprised of one or more KVSs and
-                        defining a transaction domain
+KVDB              - Key-value database, comprised of one or more KVSs and
+                    defining a transaction domain
 
-    key               - A byte string used to uniquely identify values for
-                        storage, retrieval, and deletion in a KVS
+key               - A byte string used to uniquely identify values for
+                    storage, retrieval, and deletion in a KVS
 
-    multi-segment key - A key that is logically divided into N segments (N >= 2),
-                        arranged to group related KV pairs when keys are sorted
-                        lexicographically
+multi-segment key - A key that is logically divided into N segments (N >= 2),
+                    arranged to group related KV pairs when keys are sorted
+                    lexicographically
 
-    key prefix        - For multi-segment keys, the first K segments (1 <= K < N)
-                        that group related KV pairs when keys are sorted lexi-
-                        cographically
+key prefix        - For multi-segment keys, the first K segments (1 <= K < N)
+                    that group related KV pairs when keys are sorted lexi-
+                    cographically
 
-    key prefix length - For multi-segment keys, the length of a key prefix (bytes)
+key prefix length - For multi-segment keys, the length of a key prefix (bytes)
 
-    unsegmented key   - A key that is not logically divided into segments
+unsegmented key   - A key that is not logically divided into segments
 """
 
 from hse.hse import *
