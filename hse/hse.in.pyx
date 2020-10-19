@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
+
 """
 KVDB_VERSION_STRING:
 
@@ -448,7 +452,8 @@ cdef class KvdbTxn:
             self.abort()
             return
 
-        self.commit()
+        if self.state == KvdbTxnState.ACTIVE:
+            self.commit()
 
     def begin(self) -> None:
         """
