@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
+
 """
 The HSE library is generally described in other places. The documentation here is
 geared towards describing the structure of the HSE API and the specifics of each
@@ -26,5 +30,6 @@ key prefix length - For multi-segment keys, the length of a key prefix (bytes)
 
 unsegmented key   - A key that is not logically divided into segments
 """
+
 
 from hse.hse import *
