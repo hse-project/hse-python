@@ -548,7 +548,7 @@ cdef class KvsCursor:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_STATIC_VIEW
         if bind_txn:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_BIND_TXN
-        if txn is not self._c_hse_kvdb_txn:
+        if txn._c_hse_kvdb_txn is not self._c_hse_kvdb_txn:
             opspec.kop_txn = txn._c_hse_kvdb_txn
 
         cdef hse_err_t err = 0
