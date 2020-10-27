@@ -86,7 +86,7 @@ cdef class Kvdb:
         hse_kvdb_fini()
 
     @staticmethod
-    def make(mp_name: str, Params params=None) -> None:
+    def make(mp_name: str, params: Params=None) -> None:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
@@ -98,7 +98,7 @@ cdef class Kvdb:
             raise KvdbException(err)
 
     @staticmethod
-    def open(mp_name: str, Params params=None) -> Kvdb:
+    def open(mp_name: str, params: Params=None) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
@@ -136,7 +136,7 @@ cdef class Kvdb:
 
         return result
 
-    def kvs_make(self, kvs_name: str, Params params=None) -> None:
+    def kvs_make(self, kvs_name: str, params: Params=None) -> None:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
@@ -156,7 +156,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def kvs_open(self, kvs_name: str, Params params=None) -> Kvs:
+    def kvs_open(self, kvs_name: str, params: Params=None) -> Kvs:
         """
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
@@ -189,7 +189,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def compact(self, cancel=False, samp_lwm=False) -> None:
+    def compact(self, cancel: bool=False, samp_lwm: bool=False) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
         """
@@ -246,7 +246,7 @@ cdef class Kvs:
         if err != 0:
             raise KvdbException(err)
 
-    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority=False, KvdbTxn txn=None) -> None:
+    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, txn: KvdbTxn=None) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
@@ -276,7 +276,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
+    def get(self, const unsigned char [:]key, txn: KvdbTxn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
@@ -284,7 +284,7 @@ cdef class Kvs:
         return value[:length] if value and len(value) > length else value
 
 
-    def get_with_length(self, const unsigned char [:]key, KvdbTxn txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_with_length(self, const unsigned char [:]key, txn: KvdbTxn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
@@ -318,7 +318,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, priority=False, KvdbTxn txn=None) -> None:
+    def delete(self, const unsigned char [:]key, priority: bool=False, txn: KvdbTxn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -342,7 +342,7 @@ cdef class Kvs:
         finally:
             free(opspec)
 
-    def prefix_delete(self, const unsigned char [:]filt, priority=False, KvdbTxn txn=None) -> None:
+    def prefix_delete(self, const unsigned char [:]filt, priority: bool=False, txn: KvdbTxn=None) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -370,10 +370,10 @@ cdef class Kvs:
     def cursor_create(
         self,
         const unsigned char [:]filt=None,
-        reverse=False,
-        static_view=False,
-        bind_txn=False,
-        KvdbTxn txn=None
+        reverse: bool=False,
+        static_view: bool=False,
+        bind_txn: bool=False,
+        txn: KvdbTxn=None
     ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor_create.__doc__
@@ -535,15 +535,13 @@ cdef class KvsCursor:
 
         return _iter()
 
-    def update(self, reverse=None, static_view=None, bind_txn=None, KvdbTxn txn=None) -> None:
+    def update(self, static_view: Optional[bool]=None, bind_txn: Optional[bool]=None, txn: KvdbTxn=None) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
         """
         txn_changed = (self._c_hse_kvdb_txn is not NULL and not txn) or self._c_hse_kvdb_txn != txn._c_hse_kvdb_txn
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse is not None or static_view is not None or bind_txn is not None or txn_changed else NULL
+        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if static_view is not None or bind_txn is not None or txn_changed else NULL
 
-        if reverse:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_REVERSE
         if static_view:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_STATIC_VIEW
         if bind_txn:

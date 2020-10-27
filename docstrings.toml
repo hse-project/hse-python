@@ -449,7 +449,6 @@ across disparate cursors.
 
 Args:
 
-reverse - Reverse cursor\\n
 static_view - Bound cursor's view is static\\n
 bind_txn - Cursor bound to transaction\\n
 txn - Transaction context

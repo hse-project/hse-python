@@ -287,7 +287,6 @@ class KvsCursor:
 
     def update(
         self,
-        reverse: Optional[bool] = ...,
         static_view: Optional[bool] = ...,
         bind_txn: Optional[bool] = ...,
         txn: Optional[KvdbTxn] = ...,
