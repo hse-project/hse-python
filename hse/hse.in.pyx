@@ -708,7 +708,11 @@ cdef class Params:
     @SUB@ hse.Params.__doc__
     """
     def __cinit__(self):
-        self._c_hse_params = NULL
+        cdef hse_err_t err = hse_params_create(&self._c_hse_params)
+        if err == errno.ENOMEM:
+            raise MemoryError()
+        if err != 0:
+            raise KvdbException(err)
 
     def __dealloc__(self):
         if self._c_hse_params:
@@ -742,29 +746,18 @@ cdef class Params:
         return param[:param_len] if param else None
 
     @staticmethod
-    def create() -> Params:
-        """
-        @SUB@ hse.Params.create.__doc__
-        """
-        p: Params = Params()
-
-        cdef hse_err_t err = hse_params_create(&p._c_hse_params)
-        if err == errno.ENOMEM:
-            raise MemoryError()
-        if err != 0:
-            raise KvdbException(err)
-
-        return p
-
-    @staticmethod
     def from_dict(params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """
+        input_bytes = yaml.dump(params).encode()
+        cdef char *input_addr = input_bytes
+
         p: Params = Params()
 
-        input_bytes = yaml.dump(params).encode()
-        cdef int err = hse_params_from_string(p._c_hse_params, <char *>input_bytes)
+        cdef int err = 0
+        with nogil:
+            err = hse_params_from_string(p._c_hse_params, input_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
@@ -777,11 +770,14 @@ cdef class Params:
         """
         @SUB@ hse.Params.from_file.__doc__
         """
-        cdef path_bytes = path.encode()
+        path_bytes = path.encode()
+        cdef char *path_addr = path_bytes
 
         p: Params = Params()
 
-        cdef int err = hse_params_from_file(p._c_hse_params, <char *>path_bytes)
+        cdef int err = 0
+        with nogil:
+            err = hse_params_from_file(p._c_hse_params, path_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
@@ -794,11 +790,14 @@ cdef class Params:
         """
         @SUB@ hse.Params.from_string.__doc__
         """
-        cdef input_bytes = input.encode()
+        input_bytes = input.encode()
+        cdef char *input_addr = input_bytes
 
         p: Params = Params()
 
-        cdef int err = hse_params_from_string(p._c_hse_params, <char *>input_bytes)
+        cdef int err = 0
+        with nogil:
+            err = hse_params_from_string(p._c_hse_params, input_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:

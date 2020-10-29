@@ -557,15 +557,6 @@ key - Target key\\n
 value - Target value
 """
 
-[hse.Params.create]
-__doc__ = """
-Create a params object
-
-This function allocates an empty params object. This object can then be populated
-through `hse.Params.from_file()`, `hse.Params.from_string()`, or via `hse.Params.set()`.
-Usage of a given params object is not thread safe.
-"""
-
 [hse.Params.from_dict]
 __doc__ = """
 Parse params from a dictionary

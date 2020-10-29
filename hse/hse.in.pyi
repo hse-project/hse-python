@@ -391,13 +391,6 @@ class Params:
         ...
 
     @staticmethod
-    def create() -> Params:
-        """
-        @SUB@ hse.Params.create.__doc__
-        """
-        ...
-
-    @staticmethod
     def from_dict(params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
