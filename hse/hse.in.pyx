@@ -90,7 +90,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
-        cdef mp_name_bytes = mp_name.encode()
+        mp_name_bytes = mp_name.encode()
         cdef hse_params *p = params._c_hse_params if params else NULL
 
         cdef hse_err_t err = hse_kvdb_make(<char *>mp_name_bytes, p)
@@ -102,7 +102,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
-        cdef mp_name_bytes = mp_name.encode()
+        mp_name_bytes = mp_name.encode()
         cdef hse_params *p = params._c_hse_params if params else NULL
 
         kvdb: Kvdb = Kvdb()
@@ -140,7 +140,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
-        cdef kvs_name_bytes = kvs_name.encode()
+        kvs_name_bytes = kvs_name.encode()
         cdef hse_params *p = params._c_hse_params if params else NULL
 
         cdef hse_err_t err = hse_kvdb_kvs_make(self._c_hse_kvdb, <char *>kvs_name_bytes, p)
@@ -151,7 +151,7 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.kvs_drop.__doc__
         """
-        cdef kvs_name_bytes = kvs_name.encode()
+        kvs_name_bytes = kvs_name.encode()
         cdef hse_err_t err = hse_kvdb_kvs_drop(self._c_hse_kvdb, <char *>kvs_name_bytes)
         if err != 0:
             raise KvdbException(err)
@@ -161,7 +161,7 @@ cdef class Kvdb:
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
         cdef hse_params *p = params._c_hse_params if params else NULL
-        cdef kvs_name_bytes = kvs_name.encode()
+        kvs_name_bytes = kvs_name.encode()
 
         kvs: Kvs = Kvs()
 
@@ -259,7 +259,7 @@ cdef class Kvs:
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         cdef const void *value_addr = NULL
-        cdef value_len = 0
+        cdef size_t value_len = 0
         if key is not None and len(key) > 0:
             key_addr = &key[0]
             key_len = len(key)
@@ -584,7 +584,7 @@ cdef class KvsCursor:
         if not found:
             return None
 
-        return bytes((<char *>found)[:found_len])
+        return (<char *>found)[:found_len]
 
     def seek_range(self, const unsigned char [:]filt_min, const unsigned char [:]filt_max) -> Optional[bytes]:
         """
