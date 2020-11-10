@@ -177,7 +177,9 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
-        cdef hse_err_t err = hse_kvdb_sync(self._c_hse_kvdb)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_sync(self._c_hse_kvdb)
         if err != 0:
             raise KvdbException(err)
 
@@ -185,7 +187,9 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.flush.__doc__
         """
-        cdef hse_err_t err = hse_kvdb_flush(self._c_hse_kvdb)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_flush(self._c_hse_kvdb)
         if err != 0:
             raise KvdbException(err)
 
@@ -199,7 +203,9 @@ cdef class Kvdb:
         if samp_lwm:
             flags |= HSE_KVDB_COMP_FLAG_SAMP_LWM
 
-        cdef hse_err_t err = hse_kvdb_compact(self._c_hse_kvdb, flags)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_compact(self._c_hse_kvdb, flags)
         if err != 0:
             raise KvdbException(err)
 
@@ -209,7 +215,9 @@ cdef class Kvdb:
         @SUB@ hse.Kvdb.compact_status.__doc__
         """
         status: KvdbCompactStatus = KvdbCompactStatus()
-        cdef hse_err_t err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
         if err != 0:
             raise KvdbException(err)
         return status
@@ -269,7 +277,8 @@ cdef class Kvs:
 
         cdef hse_err_t err = 0
         try:
-            err = hse_kvs_put(self._c_hse_kvs, opspec, key_addr, key_len, value_addr, value_len)
+            with nogil:
+                err = hse_kvs_put(self._c_hse_kvs, opspec, key_addr, key_len, value_addr, value_len)
             if err != 0:
                 raise KvdbException(err)
         finally:
@@ -307,7 +316,8 @@ cdef class Kvs:
         cdef size_t value_len = 0
         cdef hse_err_t err = 0
         try:
-            err = hse_kvs_get(self._c_hse_kvs, opspec, key_addr, key_len, &found, buf_addr, buf_len, &value_len)
+            with nogil:
+                err = hse_kvs_get(self._c_hse_kvs, opspec, key_addr, key_len, &found, buf_addr, buf_len, &value_len)
             if err != 0:
                 raise KvdbException(err)
             if not found:
@@ -336,7 +346,8 @@ cdef class Kvs:
 
         cdef hse_err_t err = 0
         try:
-            err = hse_kvs_delete(self._c_hse_kvs, opspec, key_addr, key_len)
+            with nogil:
+                err = hse_kvs_delete(self._c_hse_kvs, opspec, key_addr, key_len)
             if err != 0:
                 raise KvdbException(err)
         finally:
@@ -360,7 +371,8 @@ cdef class Kvs:
 
         cdef hse_err_t err = 0
         try:
-            err = hse_kvs_prefix_delete(self._c_hse_kvs, opspec, filt_addr, filt_len, NULL)
+            with nogil:
+                err = hse_kvs_prefix_delete(self._c_hse_kvs, opspec, filt_addr, filt_len, NULL)
             if err != 0:
                 raise KvdbException(err)
         finally:
@@ -551,7 +563,8 @@ cdef class KvsCursor:
 
         cdef hse_err_t err = 0
         try:
-            err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, opspec)
+            with nogil:
+                err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, opspec)
             if err != 0:
                 raise KvdbException(err)
         finally:
@@ -570,14 +583,16 @@ cdef class KvsCursor:
 
         cdef const void *found = NULL
         cdef size_t found_len = 0
-        cdef hse_err_t err = hse_kvs_cursor_seek(
-            self._c_hse_kvs_cursor,
-            NULL,
-            key_addr,
-            key_len,
-            &found,
-            &found_len
-        )
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_cursor_seek(
+                self._c_hse_kvs_cursor,
+                NULL,
+                key_addr,
+                key_len,
+                &found,
+                &found_len
+            )
         if err != 0:
             raise KvdbException(err)
 
@@ -603,16 +618,18 @@ cdef class KvsCursor:
 
         cdef const void *found = NULL
         cdef size_t found_len = 0
-        cdef hse_err_t err = hse_kvs_cursor_seek_range(
-            self._c_hse_kvs_cursor,
-            NULL,
-            filt_min_addr,
-            filt_min_len,
-            filt_max_addr,
-            filt_max_len,
-            &found,
-            &found_len
-        )
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_cursor_seek_range(
+                self._c_hse_kvs_cursor,
+                NULL,
+                filt_min_addr,
+                filt_min_len,
+                filt_max_addr,
+                filt_max_len,
+                &found,
+                &found_len
+            )
         if err != 0:
             raise KvdbException(err)
 
@@ -630,15 +647,17 @@ cdef class KvsCursor:
         cdef size_t key_len = 0
         cdef size_t value_len = 0
         cdef cbool eof = False
-        cdef hse_err_t err = hse_kvs_cursor_read(
-            self._c_hse_kvs_cursor,
-            NULL,
-            &key,
-            &key_len,
-            &value,
-            &value_len,
-            &eof
-        )
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_cursor_read(
+                self._c_hse_kvs_cursor,
+                NULL,
+                &key,
+                &key_len,
+                &value,
+                &value_len,
+                &eof
+            )
         if err != 0:
             raise KvdbException(err)
 

@@ -31,19 +31,12 @@ cdef extern from "hse/hse.h":
     cdef int HSE_KVDB_KOP_FLAG_STATIC_VIEW
     cdef int HSE_KVDB_KOP_FLAG_PRIORITY
 
-    cdef int hse_err_to_errno(hse_err_t err)
-
     hse_err_t hse_kvdb_init()
     void hse_kvdb_fini()
-    const char *hse_kvdb_version_string()
-    const char *hse_kvdb_version_tag()
-    const char *hse_kvdb_version_sha()
 
     hse_err_t hse_kvdb_make(const char *mp_name, const hse_params *params)
     hse_err_t hse_kvdb_open(const char *mp_name, const hse_params *params, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
-    hse_err_t hse_kvdb_get_names(hse_kvdb *kvdb, unsigned int *count, char ***kvs_list)
-    void hse_kvdb_free_names(hse_kvdb *kvdb, char **kvs_list)
 
     hse_err_t hse_kvdb_kvs_make(hse_kvdb *kvdb, const char *kvs_name, const hse_params *params)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
@@ -54,33 +47,57 @@ cdef extern from "hse/hse.h":
         hse_kvs            **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
+    hse_err_t hse_params_create(hse_params **params)
+    void hse_params_destroy(hse_params *params)
+    hse_err_t hse_params_from_file(hse_params *params, const char *path)
+    hse_err_t hse_params_from_string(hse_params *params, const char *input)
+    hse_err_t hse_params_set(hse_params *params, const char *key, const char *val)
+    char *hse_params_get(
+        const hse_params 	*params,
+        const char          *key,
+        char                *buf,
+        size_t               buf_len,
+        size_t              *param_len)
+
+
+cdef extern from "hse/hse.h" nogil:
+
+    cdef int hse_err_to_errno(hse_err_t err)
+
+    const char *hse_kvdb_version_string()
+    const char *hse_kvdb_version_tag()
+    const char *hse_kvdb_version_sha()
+
+    hse_err_t hse_kvdb_get_names(hse_kvdb *kvdb, unsigned int *count, char ***kvs_list)
+    void hse_kvdb_free_names(hse_kvdb *kvdb, char **kvs_list)
+
     hse_err_t hse_kvs_put(
-        hse_kvs *        kvs,
+        hse_kvs         *kvs,
         hse_kvdb_opspec *opspec,
-        const void *     key,
+        const void      *key,
         size_t           key_len,
-        const void *     val,
+        const void      *val,
         size_t           val_len)
     hse_err_t hse_kvs_get(
-        hse_kvs *        kvs,
+        hse_kvs         *kvs,
         hse_kvdb_opspec *opspec,
-        const void *     key,
+        const void      *key,
         size_t           key_len,
-        cbool *           found,
-        void *           buf,
+        cbool           *found,
+        void            *buf,
         size_t           buf_len,
-        size_t *         val_len)
+        size_t          *val_len)
     hse_err_t hse_kvs_delete(
-        hse_kvs *        kvs,
+        hse_kvs         *kvs,
         hse_kvdb_opspec *opspec,
-        const void *     key,
+        const void      *key,
         size_t           key_len)
     hse_err_t hse_kvs_prefix_delete(
-        hse_kvs *        kvs,
+        hse_kvs         *kvs,
         hse_kvdb_opspec *opspec,
-        const void *     filt,
+        const void      *filt,
         size_t           filt_len,
-        size_t *         kvs_pfx_len)
+        size_t          *kvs_pfx_len)
 
     cdef enum hse_kvdb_txn_state:
         HSE_KVDB_TXN_INVALID,
@@ -113,49 +130,37 @@ cdef extern from "hse/hse.h":
     hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn)
 
     hse_err_t hse_kvs_cursor_create(
-        hse_kvs *        kvs,
+        hse_kvs         *kvs,
         hse_kvdb_opspec *opspec,
-        const void *     filt,
+        const void      *filt,
         size_t           filt_len,
         hse_kvs_cursor **cursor)
     hse_err_t hse_kvs_cursor_update(hse_kvs_cursor *cursor, hse_kvdb_opspec *opspec)
     hse_err_t hse_kvs_cursor_seek(
-        hse_kvs_cursor * cursor,
+        hse_kvs_cursor  *cursor,
         hse_kvdb_opspec *opspec,
-        const void *     key,
+        const void      *key,
         size_t           key_len,
-        const void **    found,
-        size_t *         found_len)
+        const void     **found,
+        size_t          *found_len)
     hse_err_t hse_kvs_cursor_seek_range(
-        hse_kvs_cursor * cursor,
+        hse_kvs_cursor  *cursor,
         hse_kvdb_opspec *opspec,
-        const void *     filt_min,
+        const void      *filt_min,
         size_t           filt_min_len,
-        const void *     filt_max,
+        const void      *filt_max,
         size_t           filt_max_len,
-        const void **    found,
-        size_t *         found_len)
+        const void     **found,
+        size_t          *found_len)
     hse_err_t hse_kvs_cursor_read(
-        hse_kvs_cursor * cursor,
+        hse_kvs_cursor  *cursor,
         hse_kvdb_opspec *opspec,
-        const void **    key,
-        size_t *         key_len,
-        const void **    val,
-        size_t *         val_len,
-        cbool *           eof)
+        const void     **key,
+        size_t          *key_len,
+        const void     **val,
+        size_t          *val_len,
+        cbool           *eof)
     hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor)
-
-    hse_err_t hse_params_create(hse_params **params)
-    void hse_params_destroy(hse_params *params)
-    hse_err_t hse_params_from_file(hse_params *params, const char *path)
-    hse_err_t hse_params_from_string(hse_params *params, const char *input)
-    hse_err_t hse_params_set(hse_params *params, const char *key, const char *val)
-    char *hse_params_get(
-        const hse_params 	*params,
-        const char          *key,
-        char                *buf,
-        size_t               buf_len,
-        size_t              *param_len)
 
 
 cdef inline hse_kvdb_opspec *HSE_KVDB_OPSPEC_INIT():
