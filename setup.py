@@ -34,7 +34,11 @@ cmdclass: Dict[str, Type[Command]] = {}
 
 if USE_CYTHON:
     from Cython.Build import cythonize
+    from Cython.Compiler import Options
     from Cython.Distutils import build_ext
+
+    # Help tools like Valgrind out
+    Options.generate_cleanup_code = True
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
@@ -53,6 +57,7 @@ if USE_CYTHON:
             compiler_directives={
                 "language_level": "3str",
                 "embedsignature": True,
+                "initializedcheck": False,
                 "profile": True,
                 "infer_types": False,
                 "annotation_typing": True,
