@@ -563,18 +563,6 @@ Args:
 `value` - Target value
 """
 
-[hse.Params.from_dict]
-__doc__ = """
-Parse params from a dictionary
-
-This function takes a dictionary and transforms it, populating the
-supplied params object. This function is not thread safe.
-
-Args:
-
-`params` - Configuration parameters
-"""
-
 [hse.Params.from_file]
 __doc__ = """
 Parse params from a file

@@ -384,12 +384,6 @@ class Params:
         """
         ...
 
-    def from_dict(self, params: Config) -> Params:
-        """
-        @SUB@ hse.Params.from_dict.__doc__
-        """
-        ...
-
     def from_file(self, path: str) -> Params:
         """
         @SUB@ hse.Params.from_file.__doc__

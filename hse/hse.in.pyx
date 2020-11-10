@@ -19,7 +19,6 @@ KVDB_VERSION_SHA:
 
 import errno
 import os
-import yaml
 cimport hse_limits
 from ctypes import c_int
 from enum import Enum
@@ -764,14 +763,6 @@ cdef class Params:
         cdef size_t param_len = 0
         cdef char *param = hse_params_get(self._c_hse_params, key, buf_addr, buf_len, &param_len)
         return param[:param_len] if param else None
-
-    def from_dict(self, params: Config) -> Params:
-        """
-        @SUB@ hse.Params.from_dict.__doc__
-        """
-        input = yaml.dump(params)
-
-        return self.from_string(input)
 
     def from_file(self, path: str) -> Params:
         """
