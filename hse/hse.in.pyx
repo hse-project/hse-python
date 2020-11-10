@@ -737,17 +737,18 @@ cdef class Params:
         if self._c_hse_params:
             hse_params_destroy(self._c_hse_params)
 
-    def __getitem__(self, key: str) -> Optional[str]:
-        return self.get(key)
-
-    def __setitem__(self, key: str, value: str):
-        self.set(key, value)
-
-    def set(self, key: str, value: str) -> None:
+    def set(self, key: str, value: str) -> Params:
         """
         @SUB@ hse.Params.set.__doc__
         """
-        hse_params_set(self._c_hse_params, key.encode(), value.encode())
+        cdef char *value_addr = NULL
+        if value:
+            value_bytes = value.encode()
+            value_addr = value_bytes
+
+        hse_params_set(self._c_hse_params, key.encode(), value_addr)
+
+        return self
 
     # 256 comes from hse_params.c HP_DICT_LET_MAX
     def get(self, key: str, char [:]buf=bytearray(256)) -> Optional[str]:
@@ -764,62 +765,40 @@ cdef class Params:
         cdef char *param = hse_params_get(self._c_hse_params, key, buf_addr, buf_len, &param_len)
         return param[:param_len] if param else None
 
-    @staticmethod
-    def from_dict(params: Config) -> Params:
+    def from_dict(self, params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """
-        input_bytes = yaml.dump(params).encode()
-        cdef char *input_addr = input_bytes
+        input = yaml.dump(params)
 
-        p: Params = Params()
+        return self.from_string(input)
 
-        cdef int err = 0
-        with nogil:
-            err = hse_params_from_string(p._c_hse_params, input_addr)
-        if err == errno.ENOMEM:
-            raise MemoryError()
-        if err != 0:
-            raise KvdbException(err)
-
-        return p
-
-    @staticmethod
-    def from_file(path: str) -> Params:
+    def from_file(self, path: str) -> Params:
         """
         @SUB@ hse.Params.from_file.__doc__
         """
         path_bytes = path.encode()
         cdef char *path_addr = path_bytes
 
-        p: Params = Params()
-
-        cdef int err = 0
-        with nogil:
-            err = hse_params_from_file(p._c_hse_params, path_addr)
+        cdef int err = hse_params_from_file(self._c_hse_params, path_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
             raise KvdbException(err)
 
-        return p
+        return self
 
-    @staticmethod
-    def from_string(input: str) -> Params:
+    def from_string(self, input: str) -> Params:
         """
         @SUB@ hse.Params.from_string.__doc__
         """
         input_bytes = input.encode()
         cdef char *input_addr = input_bytes
 
-        p: Params = Params()
-
-        cdef int err = 0
-        with nogil:
-            err = hse_params_from_string(p._c_hse_params, input_addr)
+        cdef int err = hse_params_from_string(self._c_hse_params, input_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
             raise KvdbException(err)
 
-        return p
+        return self

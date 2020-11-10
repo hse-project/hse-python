@@ -76,7 +76,7 @@ class Kvdb:
     @property
     def names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.get_names.__doc__
+        @SUB@ hse.Kvdb.names.__doc__
         """
         ...
 
@@ -372,40 +372,31 @@ Config = Dict[
 
 
 class Params:
-    def __getitem__(self, key: str) -> Optional[str]:
-        ...
-
-    def __setitem__(self, key: str, value: str) -> None:
-        ...
-
-    def get(self, key: str) -> None:
+    def get(self, key: str) -> Optional[str]:
         """
         @SUB@ hse.Params.get.__doc__
         """
         ...
 
-    def set(self, key: str, value: str) -> None:
+    def set(self, key: str, value: Optional[str]) -> None:
         """
         @SUB@ hse.Params.set.__doc__
         """
         ...
 
-    @staticmethod
-    def from_dict(params: Config) -> Params:
+    def from_dict(self, params: Config) -> Params:
         """
         @SUB@ hse.Params.from_dict.__doc__
         """
         ...
 
-    @staticmethod
-    def from_file(path: str) -> Params:
+    def from_file(self, path: str) -> Params:
         """
         @SUB@ hse.Params.from_file.__doc__
         """
         ...
 
-    @staticmethod
-    def from_string(input: str) -> Params:
+    def from_string(self, input: str) -> Params:
         """
         @SUB@ hse.Params.from_string.__doc__
         """
