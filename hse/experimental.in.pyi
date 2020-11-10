@@ -31,7 +31,7 @@ class KvsPfxProbeCnt(Enum):
     MUL = ...
 
 
-def kvdb_export(kvdb: Kvdb, params: Params, path: str) -> None:
+def kvdb_export(kvdb: Kvdb, path: str, params: Optional[Params] = ...) -> None:
     """
     @SUB@ experimental.kvdb_export.__doc__
     """

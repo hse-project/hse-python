@@ -31,7 +31,7 @@ class KvsPfxProbeCnt(Enum):
     MUL = hse_experimental.HSE_KVS_PFX_FOUND_MUL
 
 
-def kvdb_export(kvdb: hse.Kvdb, params: hse.Params, path: str) -> None:
+def kvdb_export(kvdb: hse.Kvdb, path: str, params: hse.Params=None) -> None:
     """
     @SUB@ experimental.kvdb_export.__doc__
     """
@@ -52,7 +52,7 @@ def kvdb_import(mpool_name: str, path: str) -> None:
         raise hse.KvdbException(err)
 
 
-def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.KvdbTxn txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.KvdbTxn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
     """
@@ -64,7 +64,7 @@ def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]
     )
 
 
-def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.KvdbTxn txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.KvdbTxn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
     """
@@ -92,7 +92,8 @@ def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsi
 
     cdef hse.hse_err_t err = 0
     try:
-        err = hse_experimental.hse_kvs_prefix_probe_exp(kvs._c_hse_kvs, opspec, pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len, val_buf_addr, val_buf_len, &val_len)
+        with nogil:
+            err = hse_experimental.hse_kvs_prefix_probe_exp(kvs._c_hse_kvs, opspec, pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len, val_buf_addr, val_buf_len, &val_len)
         if err != 0:
             raise hse.KvdbException(err)
         if found == hse_experimental.HSE_KVS_PFX_FOUND_ZERO:
@@ -101,11 +102,11 @@ def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsi
         if opspec:
             free(opspec)
 
-    return KvsPfxProbeCnt.ZERO, bytes(key_buf), key_len, bytes(val_buf), val_len
+    return KvsPfxProbeCnt(found), bytes(key_buf), key_len, bytes(val_buf), val_len
 
 
 # 256 is arbitrary
-def params_err(hse.Params params, char [:]buf=bytearray(256)) -> None:
+def params_err(params: hse.Params, char [:]buf=bytearray(256)) -> None:
     """
     @SUB@ experimental.params_err.__doc__
     """
