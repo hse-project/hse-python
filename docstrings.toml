@@ -32,7 +32,7 @@ Raised when HSE encounters an error. Wrapper around `hse_err_t`.
 
 Members:
 
-returncode - Error code returned by HSE
+`returncode` - Error code returned by HSE
 """
 
 [hse.Kvdb.close]
@@ -71,8 +71,8 @@ mpool. This function is not thread safe.
 
 Args:
 
-mp_name - Mpool name in which the KVDB exists\\n
-params - Configuration parameters
+`mp_name` - Mpool name in which the KVDB exists\\n
+`params` - Configuration parameters
 """
 
 [hse.Kvdb.open]
@@ -84,8 +84,8 @@ function is not thread safe.
 
 Args:
 
-mp_name - Mpool name in which the KVDB exists\\n
-params - Configuration parameters
+`mp_name` - Mpool name in which the KVDB exists\\n
+`params` - Configuration parameters
 """
 
 [hse.Kvdb.names]
@@ -107,7 +107,7 @@ if there is already a KVS with the given name.  This function is not thread safe
 
 Args:
 
-kvs_name - KVS name
+`kvs_name` - KVS name
 """
 
 [hse.Kvdb.kvs_drop]
@@ -119,7 +119,7 @@ thread safe.
 
 Args:
 
-kvs_name - KVS name
+`kvs_name` - KVS name
 """
 
 [hse.Kvdb.kvs_open]
@@ -130,8 +130,8 @@ This function is not thread safe.
 
 Args:
 
-kvs_name - KVS name\\n
-params - Parameters that affect how the KVS will function
+`kvs_name` - KVS name\\n
+`params` - Parameters that affect how the KVS will function
 """
 
 [hse.Kvdb.sync]
@@ -164,8 +164,8 @@ See the property `kvdb.compact_status`. This function is thread safe.
 
 Args:
 
-cancel - To cancel an ongoing compaction request for a KVDB\\n
-samp_lwm - To perform compaction to its fullest extent
+`cancel` - To cancel an ongoing compaction request for a KVDB\\n
+`samp_lwm` - To perform compaction to its fullest extent
 """
 
 [hse.Kvdb.compact_status]
@@ -212,10 +212,10 @@ per second marked as PRIORITY is almost certainly fine.
 
 Args:
 
-key - Key to put into KVS\\n
-value - Value associated with key\\n
-priority - Operation won't be throttled\\n
-txn - Transaction context
+`key` - Key to put into KVS\\n
+`value` - Value associated with key\\n
+`priority` - Operation won't be throttled\\n
+`txn` - Transaction context
 """
 
 [hse.Kvs.get]
@@ -228,9 +228,9 @@ function is thread safe.
 
 Args:
 
-key - Key to get from KVS\\n
-txn - Transaction context\\n
-buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`key` - Key to get from KVS\\n
+`txn` - Transaction context\\n
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
 [hse.Kvs.get_with_length]
@@ -243,9 +243,9 @@ handled. This function is thread safe.
 
 Args:
 
-key - Key to get from KVS\\n
-txn - Transaction context\\n
-buf - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`key` - Key to get from KVS\\n
+`txn` - Transaction context\\n
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
 [hse.Kvs.delete]
@@ -258,9 +258,9 @@ function is thread safe.
 
 Args:
 
-key - Key to be deleted from KVS\\n
-priority - Operation won't be throttled\\n
-txn - Transaction context
+`key` - Key to be deleted from KVS\\n
+`priority` - Operation won't be throttled\\n
+`txn` - Transaction context
 """
 
 [hse.Kvs.prefix_delete]
@@ -273,11 +273,17 @@ not an error if no keys exist matching the filter. If there is a filtered iterat
 in progress, then that iteration can fail if `hse.Kvs.prefix_delete()` is called with
 a filter matching the iteration. This function is thread safe.
 
+If `hse.Kvs.prefix_delete()` is called from a transaction context, it affects no
+key-value mutations that are part of the same transaction. Stated differently, for
+KVS commands issued within a transaction, all calls to `hse.Kvs.prefix_delete()` are
+treated as though they were issued serially at the beginning of the transaction
+regardless of the actual order these commands appeared in.
+
 Args:
 
-filt - Filter for keys to delete\\n
-priority - Operation won't be throttled\\n
-txn - Transaction context
+`filt` - Filter for keys to delete\\n
+`priority` - Operation won't be throttled\\n
+`txn` - Transaction context
 """
 
 [hse.Kvs.cursor_create]
@@ -330,11 +336,11 @@ mutations that occurred during the lifespan of the transaction visible as well.
 
 Args:
 
-filt - Iteration limited to keys matching this prefix filter\\n
-reverse - Reverse cursor\\n
-static_view - Bound cursor's view is static\\n
-bind_txn - Cursor bound to transaction\\n
-txn - Transaction context
+`filt` - Iteration limited to keys matching this prefix filter\\n
+`reverse` - Reverse cursor\\n
+`static_view` - Bound cursor's view is static\\n
+`bind_txn` - Cursor bound to transaction\\n
+`txn` - Transaction context
 """
 
 [hse.KvdbTxnState]
@@ -433,7 +439,7 @@ Convenience function to return an iterator over key/values in a KVS
 
 Args:
 
-max_count - Limit for the number of results
+`max_count` - Limit for the number of results
 """
 
 [hse.KvsCursor.update]
@@ -449,9 +455,9 @@ across disparate cursors.
 
 Args:
 
-static_view - Bound cursor's view is static\\n
-bind_txn - Cursor bound to transaction\\n
-txn - Transaction context
+`static_view` - Bound cursor's view is static\\n
+`bind_txn` - Cursor bound to transaction\\n
+`txn` - Transaction context
 """
 
 [hse.KvsCursor.seek]
@@ -463,7 +469,7 @@ thread safe across disparate cursors.
 
 Args:
 
-key - Key to find
+`key` - Key to find
 """
 
 [hse.KvsCursor.seek_range]
@@ -479,8 +485,8 @@ Note: this is only supported for forward cursors.
 
 Args:
 
-filt_min - Filter minimum\\n
-filt_max - Filter maximum
+`filt_min` - Filter minimum\\n
+`filt_max` - Filter maximum
 """
 
 [hse.KvsCursor.read]
@@ -533,7 +539,7 @@ This function is not thread safe.
 
 Args:
 
-key - Target key
+`key` - Target key
 """
 
 [hse.Params.set]
@@ -553,8 +559,8 @@ This function is not thread safe.
 
 Args:
 
-key - Target key\\n
-value - Target value
+`key` - Target key\\n
+`value` - Target value
 """
 
 [hse.Params.from_dict]
@@ -566,7 +572,7 @@ supplied params object. This function is not thread safe.
 
 Args:
 
-params - Configuration parameters
+`params` - Configuration parameters
 """
 
 [hse.Params.from_file]
@@ -579,7 +585,7 @@ fail. This function is not thread safe.
 
 Args:
 
-path - Path to configuration file
+`path` - Path to configuration file
 """
 
 [hse.Params.from_string]
@@ -592,7 +598,7 @@ not thread safe.
 
 Args:
 
-input - Input paramters in YAML format
+`input` - Input paramters in YAML format
 """
 
 [limits]
@@ -641,7 +647,7 @@ Raised when `hse.experimental.params_err()` is called.
 
 Members:
 
-error - Error string
+`error` - Error string
 """
 
 [experimental.KvsPfxProbeCnt]
@@ -655,9 +661,9 @@ Export a kvdb into files
 
 Args:
 
-kvdb: Kvdb instance\\n
-params: Configuration parameters\\n
-path: Export target path
+`kvdb` - Kvdb instance\\n
+`params` - Configuration parameters\\n
+`path` - Export target path
 """
 
 [experimental.kvdb_import]
@@ -666,8 +672,8 @@ Import a kvdb from files
 
 Args:
 
-mpool_name: Name of mpool\\n
-path: Import target path
+`mpool_name` - Mpool name\\n
+`path` - Import target path
 """
 
 [experimental.kvs_prefix_probe]
@@ -678,12 +684,12 @@ Outputs how many matches were encountered - zero, one or multiple.
 
 Args:
 
-kvs: Kvs instance\\n
-opspec: Specification for delete operation\\n
-pfx: Prefix to be probed\\n
-key_buf: Buffer which will be populated with contents of first seen key\\n
-val_buf: Buffer which will be populated with value for `key_buf`\\n
-txn: Transaction context
+`kvs` - Kvs instance\\n
+`opspec` - Specification for delete operation\\n
+`pfx` - Prefix to be probed\\n
+`key_buf` - Buffer which will be populated with contents of first seen key\\n
+`val_buf` - Buffer which will be populated with value for `key_buf`\\n
+`txn` - Transaction context
 """
 
 [experimental.kvs_prefix_probe_with_lengths]
@@ -695,12 +701,12 @@ lengths of key and value in addition to the `bytes` objects.
 
 Args:
 
-kvs: Kvs instance\\n
-opspec: Specification for delete operation\\n
-pfx: Prefix to be probed\\n
-key_buf: Buffer which will be populated with contents of first seen key\\n
-val_buf: Buffer which will be populated with value for `key_buf`\\n
-txn: Transaction context
+`kvs` - Kvs instance\\n
+`opspec` - Specification for delete operation\\n
+`pfx` - Prefix to be probed\\n
+`key_buf` - Buffer which will be populated with contents of first seen key\\n
+`val_buf` - Buffer which will be populated with value for `key_buf`\\n
+`txn` - Transaction context
 """
 
 [experimental.params_err]
