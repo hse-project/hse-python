@@ -780,7 +780,7 @@ cdef class Params:
         path_bytes = path.encode()
         cdef char *path_addr = path_bytes
 
-        cdef int err = hse_params_from_file(self._c_hse_params, path_addr)
+        cdef hse_err_t err = hse_params_from_file(self._c_hse_params, path_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
@@ -794,8 +794,7 @@ cdef class Params:
         """
         input_bytes = input.encode()
         cdef char *input_addr = input_bytes
-
-        cdef int err = hse_params_from_string(self._c_hse_params, input_addr)
+        cdef hse_err_t err = hse_params_from_string(self._c_hse_params, input_addr)
         if err == errno.ENOMEM:
             raise MemoryError()
         if err != 0:
