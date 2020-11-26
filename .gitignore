@@ -10,3 +10,4 @@ typings/
 !*.in.pyx
 *.pyi
 !*.in.pyi
+.pytest_cache/
