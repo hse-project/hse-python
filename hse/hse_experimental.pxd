@@ -14,10 +14,6 @@ cdef extern from "hse/hse_experimental.h":
         HSE_KVS_PFX_FOUND_ONE,
         HSE_KVS_PFX_FOUND_MUL
 
-    char * hse_params_err_exp(const hse_params *params, char *buf, size_t buf_sz)
-
-
-cdef extern from "hse/hse_experimental.h" nogil:
     hse_err_t hse_kvs_prefix_probe_exp(
         hse_kvs *              kvs,
         hse_kvdb_opspec *      os,
@@ -29,4 +25,6 @@ cdef extern from "hse/hse_experimental.h" nogil:
         size_t *               key_len,
         void *                 valbuf,
         size_t                 valbuf_sz,
-        size_t *               val_len)
+        size_t *               val_len) nogil
+
+    char *hse_params_err_exp(const hse_params *params, char *buf, size_t buf_sz)
