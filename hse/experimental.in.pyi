@@ -3,7 +3,7 @@
 # Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
 
 """
-@SUB@ experimental
+@SUB@ experimental.__doc__
 """
 
 
@@ -14,7 +14,7 @@ from enum import Enum
 
 class ParamsException(Exception):
     """
-    @SUB@ experimental.ParamsExcpetion.__doc__
+    @SUB@ experimental.ParamsException.__doc__
     """
 
     def __init__(self, error: str) -> None:
