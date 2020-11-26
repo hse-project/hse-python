@@ -58,7 +58,7 @@ if USE_CYTHON:
                 "language_level": "3str",
                 "embedsignature": True,
                 "initializedcheck": False,
-                "profile": True,
+                "profile": os.environ.get("HSE_PYTHON_PROFILE") != None,
                 "infer_types": False,
                 "annotation_typing": True,
                 "emit_code_comments": True,
@@ -67,6 +67,7 @@ if USE_CYTHON:
                 "warn.unreachable": True,
                 "warn.maybe_uninitialized": True,
                 "warn.multiple_declarators": True,
+                "linetrace": os.environ.get("HSE_PYTHON_COVERAGE") != None,
             },
         )
 
