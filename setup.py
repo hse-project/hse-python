@@ -23,7 +23,7 @@ extensions: List[Extension] = [
     ),
     Extension(
         "hse.experimental",
-        [os.path.join("hse", f"experimental.{SOURCE_EXTENSION}")],
+        [os.path.join("hse", f"hse_experimental.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -48,7 +48,7 @@ if USE_CYTHON:
             docstrings.insert(os.path.join("hse", "hse.in.pyi"))
             docstrings.insert(os.path.join("hse", "hse_limits.in.pyx"))
             docstrings.insert(os.path.join("hse", "limits.in.pyi"))
-            docstrings.insert(os.path.join("hse", "experimental.in.pyx"))
+            docstrings.insert(os.path.join("hse", "hse_experimental.in.pyx"))
             docstrings.insert(os.path.join("hse", "experimental.in.pyi"))
 
         return cythonize(
