@@ -233,7 +233,7 @@ Args:
 `buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
 """
 
-[hse.Kvs.get_with_length]
+[hse.Kvs.get_value_length]
 __doc__ = """
 Retrieve the value and length for a given key from KVS
 
