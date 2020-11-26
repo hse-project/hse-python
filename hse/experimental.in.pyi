@@ -8,7 +8,7 @@
 
 
 from typing import Optional, Tuple
-from hse import Kvdb, Params, Kvs, KvdbTxn
+from hse import Kvdb, Params, Kvs, Transaction
 from enum import Enum
 
 
@@ -50,7 +50,7 @@ def kvs_prefix_probe(
     pfx: bytes,
     key_buf: bytearray = ...,
     val_buf: bytearray = ...,
-    txn: Optional[KvdbTxn] = ...,
+    txn: Optional[Transaction] = ...,
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
@@ -63,7 +63,7 @@ def kvs_prefix_probe_with_lengths(
     pfx: bytes,
     key_buf: bytearray = ...,
     val_buf: bytearray = ...,
-    txn: Optional[KvdbTxn] = ...,
+    txn: Optional[Transaction] = ...,
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__

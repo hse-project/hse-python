@@ -123,9 +123,9 @@ class Kvdb:
         """
         ...
 
-    def txn_alloc(self) -> KvdbTxn:
+    def transaction(self) -> Transaction:
         """
-        @SUB@ hse.Kvdb.txn_alloc.__doc__
+        @SUB@ hse.Kvdb.transaction.__doc__
         """
         ...
 
@@ -142,7 +142,7 @@ class Kvs:
         key: bytes,
         value: Optional[bytes],
         priority: bool = ...,
-        txn: Optional[KvdbTxn] = ...,
+        txn: Optional[Transaction] = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
@@ -152,7 +152,7 @@ class Kvs:
     def get(
         self,
         key: bytes,
-        txn: Optional[KvdbTxn] = ...,
+        txn: Optional[Transaction] = ...,
         buf: bytearray = ...,
     ) -> Optional[bytes]:
         """
@@ -163,7 +163,7 @@ class Kvs:
     def get_value_length(
         self,
         key: bytes,
-        txn: Optional[KvdbTxn] = ...,
+        txn: Optional[Transaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
@@ -172,7 +172,7 @@ class Kvs:
         ...
 
     def delete(
-        self, key: bytes, priority: bool = ..., txn: Optional[KvdbTxn] = ...
+        self, key: bytes, priority: bool = ..., txn: Optional[Transaction] = ...
     ) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
@@ -180,30 +180,30 @@ class Kvs:
         ...
 
     def prefix_delete(
-        self, filt: bytes, priority: bool = ..., txn: Optional[KvdbTxn] = ...
+        self, filt: bytes, priority: bool = ..., txn: Optional[Transaction] = ...
     ) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
         ...
 
-    def cursor_create(
+    def cursor(
         self,
         filt: Optional[bytes] = ...,
         reverse: bool = ...,
         static_view: bool = ...,
         bind_txn: bool = ...,
-        txn: Optional[KvdbTxn] = ...,
-    ) -> KvsCursor:
+        txn: Optional[Transaction] = ...,
+    ) -> Cursor:
         """
-        @SUB@ hse.Kvs.cursor_create.__doc__
+        @SUB@ hse.Kvs.cursor.__doc__
         """
         ...
 
 
-class KvdbTxnState(Enum):
+class TransactionState(Enum):
     """
-    @SUB@ hse.KvdbTxnState.__doc__
+    @SUB@ hse.TransactionState.__doc__
     """
 
     INVALID: int
@@ -212,12 +212,12 @@ class KvdbTxnState(Enum):
     ABORTED: int
 
 
-class KvdbTxn:
+class Transaction:
     """
-    @SUB@ hse.KvdbTxn.__doc__
+    @SUB@ hse.Transaction.__doc__
     """
 
-    def __enter__(self) -> KvdbTxn:
+    def __enter__(self) -> Transaction:
         ...
 
     def __exit__(
@@ -230,37 +230,37 @@ class KvdbTxn:
 
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.begin.__doc__
+        @SUB@ hse.Transaction.begin.__doc__
         """
         ...
 
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.commit.__doc__
+        @SUB@ hse.Transaction.commit.__doc__
         """
         ...
 
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.abort.__doc__
+        @SUB@ hse.Transaction.abort.__doc__
         """
         ...
 
     @property
-    def state(self) -> KvdbTxnState:
+    def state(self) -> TransactionState:
         """
-        @SUB@ hse.KvdbTxn.state.__doc__
+        @SUB@ hse.Transaction.state.__doc__
         """
         ...
 
 
-class KvsCursor:
+class Cursor:
     """
     See the concept and best practices sections on the HSE Wiki at
     https://github.com/hse-project/hse/wiki
     """
 
-    def __enter__(self) -> KvsCursor:
+    def __enter__(self) -> Cursor:
         ...
 
     def __exit__(
@@ -273,7 +273,7 @@ class KvsCursor:
 
     def destroy(self) -> None:
         """
-        @SUB@ hse.KvsCursor.destroy.__doc__
+        @SUB@ hse.Cursor.destroy.__doc__
         """
         ...
 
@@ -281,7 +281,7 @@ class KvsCursor:
         self, max_count: Optional[int] = ...
     ) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
-        @SUB@ hse.KvsCursor.items.__doc__
+        @SUB@ hse.Cursor.items.__doc__
         """
         ...
 
@@ -289,28 +289,28 @@ class KvsCursor:
         self,
         static_view: Optional[bool] = ...,
         bind_txn: Optional[bool] = ...,
-        txn: Optional[KvdbTxn] = ...,
+        txn: Optional[Transaction] = ...,
     ) -> None:
         """
-        @SUB@ hse.KvsCursor.update.__doc__
+        @SUB@ hse.Cursor.update.__doc__
         """
         ...
 
     def seek(self, key: bytes) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek.__doc__
+        @SUB@ hse.Cursor.seek.__doc__
         """
         ...
 
     def seek_range(self, filt_min: bytes, filt_max: bytes) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek_range.__doc__
+        @SUB@ hse.Cursor.seek_range.__doc__
         """
         ...
 
     def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
         """
-        @SUB@ hse.KvsCursor.read.__doc__
+        @SUB@ hse.Cursor.read.__doc__
         """
         ...
 

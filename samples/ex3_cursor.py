@@ -18,7 +18,7 @@ def main() -> int:
     for i in range(15):
         kvs.put(f"key{i:03}".encode(), f"val{i:03}".encode())
 
-    with kvs.cursor_create() as cursor:
+    with kvs.cursor() as cursor:
         eof = False
         while not eof:
             key, val, eof = cursor.read()

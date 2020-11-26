@@ -206,11 +206,11 @@ cdef class Kvdb:
             raise KvdbException(err)
         return status
 
-    def txn_alloc(self) -> KvdbTxn:
+    def transaction(self) -> Transaction:
         """
-        @SUB@ hse.Kvdb.txn_alloc.__doc__
+        @SUB@ hse.Kvdb.transaction.__doc__
         """
-        txn = KvdbTxn(self)
+        txn = Transaction(self)
 
         return txn
 
@@ -241,7 +241,7 @@ cdef class Kvs:
         if err != 0:
             raise KvdbException(err)
 
-    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, txn: KvdbTxn=None) -> None:
+    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, txn: Transaction=None) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
@@ -272,7 +272,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, txn: KvdbTxn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
+    def get(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
@@ -280,7 +280,7 @@ cdef class Kvs:
         return value
 
 
-    def get_value_length(self, const unsigned char [:]key, txn: KvdbTxn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_value_length(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_value_length.__doc__
         """
@@ -321,7 +321,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, priority: bool=False, txn: KvdbTxn=None) -> None:
+    def delete(self, const unsigned char [:]key, priority: bool=False, txn: Transaction=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -346,7 +346,7 @@ cdef class Kvs:
         finally:
             free(opspec)
 
-    def prefix_delete(self, const unsigned char [:]filt, priority: bool=False, txn: KvdbTxn=None) -> int:
+    def prefix_delete(self, const unsigned char [:]filt, priority: bool=False, txn: Transaction=None) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -375,18 +375,18 @@ cdef class Kvs:
 
         return kvs_pfx_len
 
-    def cursor_create(
+    def cursor(
         self,
         const unsigned char [:]filt=None,
         reverse: bool=False,
         static_view: bool=False,
         bind_txn: bool=False,
-        txn: KvdbTxn=None
-    ) -> KvsCursor:
+        txn: Transaction=None
+    ) -> Cursor:
         """
-        @SUB@ hse.Kvs.cursor_create.__doc__
+        @SUB@ hse.Kvs.cursor.__doc__
         """
-        cursor: KvsCursor = KvsCursor(
+        cursor: Cursor = Cursor(
             self,
             filt,
             reverse=reverse,
@@ -397,9 +397,9 @@ cdef class Kvs:
         return cursor
 
 
-class KvdbTxnState(Enum):
+class TransactionState(Enum):
     """
-    @SUB@ hse.KvdbTxnState.__doc__
+    @SUB@ hse.TransactionState.__doc__
     """
     INVALID = HSE_KVDB_TXN_INVALID
     ACTIVE = HSE_KVDB_TXN_ACTIVE
@@ -408,9 +408,9 @@ class KvdbTxnState(Enum):
 
 
 @cython.no_gc_clear
-cdef class KvdbTxn:
+cdef class Transaction:
     """
-    @SUB@ hse.KvdbTxn.__doc__
+    @SUB@ hse.Transaction.__doc__
     """
     def __cinit__(self, Kvdb kvdb):
         self.kvdb = kvdb
@@ -438,14 +438,14 @@ cdef class KvdbTxn:
             self.abort()
             return
 
-        if self.state == KvdbTxnState.ACTIVE:
+        if self.state == TransactionState.ACTIVE:
             self.commit()
 
         hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
 
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.begin.__doc__
+        @SUB@ hse.Transaction.begin.__doc__
         """
         cdef hse_err_t err = hse_kvdb_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
@@ -453,7 +453,7 @@ cdef class KvdbTxn:
 
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.commit.__doc__
+        @SUB@ hse.Transaction.commit.__doc__
         """
         cdef hse_err_t err = hse_kvdb_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
@@ -461,22 +461,22 @@ cdef class KvdbTxn:
 
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTxn.abort.__doc__
+        @SUB@ hse.Transaction.abort.__doc__
         """
         cdef hse_err_t err = hse_kvdb_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
             raise KvdbException(err)
 
     @property
-    def state(self) -> KvdbTxnState:
+    def state(self) -> TransactionState:
         """
-        @SUB@ hse.KvdbTxn.state.__doc__
+        @SUB@ hse.Transaction.state.__doc__
         """
-        return KvdbTxnState(hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn))
+        return TransactionState(hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn))
 
 
 @cython.no_gc_clear
-cdef class KvsCursor:
+cdef class Cursor:
     """
     See the concept and best practices sections on the HSE Wiki at
     https://github.com/hse-project/hse/wiki
@@ -488,7 +488,7 @@ cdef class KvsCursor:
         reverse: bool=False,
         static_view: bool=False,
         bind_txn: bool=False,
-        txn: KvdbTxn=None):
+        txn: Transaction=None):
         self.txn = txn
 
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
@@ -536,7 +536,7 @@ cdef class KvsCursor:
 
     def destroy(self):
         """
-        @SUB@ hse.KvsCursor.destroy.__doc__
+        @SUB@ hse.Cursor.destroy.__doc__
         """
         if self._c_hse_kvs_cursor:
             hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
@@ -544,7 +544,7 @@ cdef class KvsCursor:
 
     def items(self, max_count=None) -> Iterator[Tuple[Optional[bytes], Optional[bytes]]]:
         """
-        @SUB@ hse.KvsCursor.items.__doc__
+        @SUB@ hse.Cursor.items.__doc__
         """
         def _iter():
             count = 0
@@ -562,9 +562,9 @@ cdef class KvsCursor:
 
         return _iter()
 
-    def update(self, static_view: Optional[bool]=None, bind_txn: Optional[bool]=None, txn: KvdbTxn=None) -> None:
+    def update(self, static_view: Optional[bool]=None, bind_txn: Optional[bool]=None, txn: Transaction=None) -> None:
         """
-        @SUB@ hse.KvsCursor.update.__doc__
+        @SUB@ hse.Cursor.update.__doc__
         """
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if static_view is not None or bind_txn is not None or txn is not self.txn else NULL
 
@@ -587,7 +587,7 @@ cdef class KvsCursor:
 
     def seek(self, const unsigned char [:]key) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek.__doc__
+        @SUB@ hse.Cursor.seek.__doc__
         """
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
@@ -617,7 +617,7 @@ cdef class KvsCursor:
 
     def seek_range(self, const unsigned char [:]filt_min, const unsigned char [:]filt_max) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek_range.__doc__
+        @SUB@ hse.Cursor.seek_range.__doc__
         """
         cdef const void *filt_min_addr = NULL
         cdef size_t filt_min_len = 0
@@ -654,7 +654,7 @@ cdef class KvsCursor:
 
     def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
         """
-        @SUB@ hse.KvsCursor.read.__doc__
+        @SUB@ hse.Cursor.read.__doc__
         """
         cdef const void *key = NULL
         cdef const void *value = NULL

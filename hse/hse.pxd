@@ -177,14 +177,14 @@ cdef class Kvs:
     cdef hse_kvs *_c_hse_kvs
 
 
-cdef class KvdbTxn:
+cdef class Transaction:
     cdef hse_kvdb_txn *_c_hse_kvdb_txn
     cdef Kvdb kvdb
 
 
-cdef class KvsCursor:
+cdef class Cursor:
     cdef hse_kvs_cursor *_c_hse_kvs_cursor
-    cdef KvdbTxn txn
+    cdef Transaction txn
 
 
 cdef class KvdbCompactStatus:

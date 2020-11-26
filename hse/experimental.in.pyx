@@ -52,7 +52,7 @@ def kvdb_import(mpool_name: str, path: str) -> None:
         raise hse.KvdbException(err)
 
 
-def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.KvdbTxn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.Transaction=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
     """
@@ -64,7 +64,7 @@ def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]
     )
 
 
-def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.KvdbTxn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.Transaction=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
     """

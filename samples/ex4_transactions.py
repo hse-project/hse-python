@@ -18,7 +18,7 @@ def main() -> int:
     kvs1 = kvdb.kvs_open(KVS1_NAME)
     kvs2 = kvdb.kvs_open(KVS2_NAME)
 
-    with kvdb.txn_alloc() as txn:
+    with kvdb.transaction() as txn:
         kvs1.put(b"k1", b"val1", txn=txn)
         kvs2.put(b"k2", b"val2", txn=txn)
 

@@ -47,7 +47,7 @@ def extract_kv_to_files(kvs: hse.Kvs, files: List[str]) -> None:
         outfile = file + ".out"
         print(f"filename: {outfile}")
         with open(outfile, "rb+") as f:
-            cursor = kvs.cursor_create(f"{file}|".encode())
+            cursor = kvs.cursor(f"{file}|".encode())
             for _, chunk in cursor.items():
                 if chunk:
                     f.write(chunk)
