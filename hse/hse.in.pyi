@@ -378,7 +378,7 @@ class Params:
         """
         ...
 
-    def set(self, key: str, value: Optional[str]) -> None:
+    def set(self, key: str, value: Optional[str]) -> Params:
         """
         @SUB@ hse.Params.set.__doc__
         """
