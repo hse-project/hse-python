@@ -33,3 +33,8 @@ unsegmented key   - A key that is not logically divided into segments
 
 
 from hse.hse import *
+
+from hse import limits
+from hse import experimental
+
+__all__ = ["limits", "experimental"]
