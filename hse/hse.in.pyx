@@ -276,13 +276,13 @@ cdef class Kvs:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
-        value, _ = self.get_value_length(key, txn=txn, buf=buf)
+        value, _ = self.get_with_length(key, txn=txn, buf=buf)
         return value
 
 
-    def get_value_length(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_with_length(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get_value_length.__doc__
+        @SUB@ hse.Kvs.get_with_length.__doc__
         """
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if txn else NULL
         if txn:

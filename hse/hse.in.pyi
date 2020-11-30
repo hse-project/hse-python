@@ -160,14 +160,14 @@ class Kvs:
         """
         ...
 
-    def get_value_length(
+    def get_with_length(
         self,
         key: bytes,
         txn: Optional[Transaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get_value_length.__doc__
+        @SUB@ hse.Kvs.get_with_length.__doc__
         """
         ...
 

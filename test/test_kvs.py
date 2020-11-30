@@ -65,16 +65,16 @@ def test_prefix_delete(kvdb: hse.Kvdb, kvs: hse.Kvs):
     assert kvs.prefix_delete(b"key") == 3
 
 
-def test_get_value_length(kvdb: hse.Kvdb, kvs: hse.Kvs):
+def test_get_with_length(kvdb: hse.Kvdb, kvs: hse.Kvs):
     kvs.put(b"key", b"value")
-    assert kvs.get_value_length(b"key") == (b"value", 5)
-    assert kvs.get_value_length(b"key", buf=None) == (None, 5)
+    assert kvs.get_with_length(b"key") == (b"value", 5)
+    assert kvs.get_with_length(b"key", buf=None) == (None, 5)
     kvs.delete(b"key")
 
     with kvdb.transaction() as txn:
         kvs.put(b"key2", b"value2", txn=txn)
-        assert kvs.get_value_length(b"key2", txn=txn) == (b"value2", 6)
-        assert kvs.get_value_length(b"key2", txn=txn, buf=None) == (None, 6)
+        assert kvs.get_with_length(b"key2", txn=txn) == (b"value2", 6)
+        assert kvs.get_with_length(b"key2", txn=txn, buf=None) == (None, 6)
         txn.abort()
 
 
