@@ -61,8 +61,8 @@ def kvs_prefix_probe(
 def kvs_prefix_probe_with_lengths(
     kvs: Kvs,
     pfx: bytes,
-    key_buf: bytearray = ...,
-    val_buf: bytearray = ...,
+    key_buf: Optional[bytearray] = ...,
+    val_buf: Optional[bytearray] = ...,
     txn: Optional[Transaction] = ...,
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
