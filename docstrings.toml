@@ -673,7 +673,6 @@ Outputs how many matches were encountered - zero, one or multiple.
 Args:
 
 `kvs` - Kvs instance\\n
-`opspec` - Specification for delete operation\\n
 `pfx` - Prefix to be probed\\n
 `key_buf` - Buffer which will be populated with contents of first seen key\\n
 `val_buf` - Buffer which will be populated with value for `key_buf`\\n
@@ -690,7 +689,6 @@ lengths of key and value in addition to the `bytes` objects.
 Args:
 
 `kvs` - Kvs instance\\n
-`opspec` - Specification for delete operation\\n
 `pfx` - Prefix to be probed\\n
 `key_buf` - Buffer which will be populated with contents of first seen key\\n
 `val_buf` - Buffer which will be populated with value for `key_buf`\\n
