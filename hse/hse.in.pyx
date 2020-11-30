@@ -59,8 +59,6 @@ cdef class Kvdb:
         err = hse_kvdb_open(mp_name.encode(), p, &self._c_hse_kvdb)
         if err != 0:
             raise KvdbException(err)
-        if not self._c_hse_kvdb:
-            raise MemoryError()
 
     def __dealloc__(self):
         pass
@@ -93,7 +91,7 @@ cdef class Kvdb:
         hse_kvdb_fini()
 
     @staticmethod
-    def make(mp_name: str, params: Params=None) -> None:
+    def make(str mp_name, Params params=None) -> None:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
@@ -105,7 +103,7 @@ cdef class Kvdb:
             raise KvdbException(err)
 
     @staticmethod
-    def open(mp_name: str, params: Params=None) -> Kvdb:
+    def open(str mp_name, Params params=None) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
@@ -132,7 +130,7 @@ cdef class Kvdb:
 
         return result
 
-    def kvs_make(self, kvs_name: str, params: Params=None) -> None:
+    def kvs_make(self, str kvs_name, Params params=None) -> None:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
@@ -143,7 +141,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def kvs_drop(self, kvs_name: str) -> None:
+    def kvs_drop(self, str kvs_name) -> None:
         """
         @SUB@ hse.Kvdb.kvs_drop.__doc__
         """
@@ -151,7 +149,7 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def kvs_open(self, kvs_name: str, params: Params=None) -> Kvs:
+    def kvs_open(self, str kvs_name, Params params=None) -> Kvs:
         """
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
@@ -224,8 +222,6 @@ cdef class Kvs:
         cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, kvs_name.encode(), p, &self._c_hse_kvs)
         if err != 0:
             raise KvdbException(err)
-        if not self._c_hse_kvs:
-            raise MemoryError()
 
     def __dealloc__(self):
         pass
@@ -241,7 +237,7 @@ cdef class Kvs:
         if err != 0:
             raise KvdbException(err)
 
-    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, txn: Transaction=None) -> None:
+    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, Transaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
@@ -272,7 +268,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
+    def get(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
@@ -280,7 +276,7 @@ cdef class Kvs:
         return value
 
 
-    def get_with_length(self, const unsigned char [:]key, txn: Transaction=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_with_length(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
@@ -321,7 +317,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, priority: bool=False, txn: Transaction=None) -> None:
+    def delete(self, const unsigned char [:]key, priority: bool=False, Transaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -381,7 +377,7 @@ cdef class Kvs:
         reverse: bool=False,
         static_view: bool=False,
         bind_txn: bool=False,
-        txn: Transaction=None
+        Transaction txn=None
     ) -> Cursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
@@ -483,12 +479,12 @@ cdef class Cursor:
     """
     def __cinit__(
         self,
-        kvs: Kvs,
+        Kvs kvs,
         const unsigned char [:]filt=None,
         reverse: bool=False,
         static_view: bool=False,
         bind_txn: bool=False,
-        txn: Transaction=None):
+        Transaction txn=None):
         self.txn = txn
 
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
@@ -542,7 +538,7 @@ cdef class Cursor:
             hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
             self._c_hse_kvs_cursor = NULL
 
-    def items(self, max_count=None) -> Iterator[Tuple[Optional[bytes], Optional[bytes]]]:
+    def items(self, max_count: Optional[int]=None) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
         @SUB@ hse.Cursor.items.__doc__
         """
@@ -742,8 +738,6 @@ cdef class Params:
     """
     def __cinit__(self):
         cdef hse_err_t err = hse_params_create(&self._c_hse_params)
-        if err == errno.ENOMEM:
-            raise MemoryError()
         if err != 0:
             raise KvdbException(err)
 
@@ -751,7 +745,7 @@ cdef class Params:
         if self._c_hse_params:
             hse_params_destroy(self._c_hse_params)
 
-    def set(self, key: str, value: str) -> Params:
+    def set(self, str key, str value) -> Params:
         """
         @SUB@ hse.Params.set.__doc__
         """
@@ -767,7 +761,7 @@ cdef class Params:
         return self
 
     # 256 comes from hse_params.c HP_DICT_LET_MAX
-    def get(self, key: str, char [:]buf=bytearray(256)) -> Optional[str]:
+    def get(self, str key, char [:]buf=bytearray(256)) -> Optional[str]:
         """
         @SUB@ hse.Params.get.__doc__
         """
@@ -780,27 +774,29 @@ cdef class Params:
         cdef size_t param_len = 0
         cdef char *param = hse_params_get(self._c_hse_params, key.encode(), buf_addr, buf_len, &param_len)
 
+        if buf is None:
+            return None
+
+        if len(buf) < param_len:
+            return param[:param_len].decode() if param else None
+
         return param[:param_len].decode() if param else None
 
-    def from_file(self, path: str) -> Params:
+    def from_file(self, str path) -> Params:
         """
         @SUB@ hse.Params.from_file.__doc__
         """
         cdef hse_err_t err = hse_params_from_file(self._c_hse_params, path.encode())
-        if err == errno.ENOMEM:
-            raise MemoryError()
         if err != 0:
             raise KvdbException(err)
 
         return self
 
-    def from_string(self, input: str) -> Params:
+    def from_string(self, str input) -> Params:
         """
         @SUB@ hse.Params.from_string.__doc__
         """
         cdef hse_err_t err = hse_params_from_string(self._c_hse_params, input.encode())
-        if err == errno.ENOMEM:
-            raise MemoryError()
         if err != 0:
             raise KvdbException(err)
 

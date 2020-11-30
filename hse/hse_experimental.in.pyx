@@ -31,40 +31,37 @@ class KvsPfxProbeCnt(Enum):
     MUL = hse_experimental.HSE_KVS_PFX_FOUND_MUL
 
 
-def kvdb_export(kvdb: hse.Kvdb, path: str, params: hse.Params=None) -> None:
+def kvdb_export(hse.Kvdb kvdb, str path, hse.Params params=None) -> None:
     """
     @SUB@ experimental.kvdb_export.__doc__
     """
-    cdef path_bytes = path.encode()
-    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_export_exp(kvdb._c_hse_kvdb, params._c_hse_params, <char *>path_bytes)
+    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_export_exp(kvdb._c_hse_kvdb, params._c_hse_params, path.encode())
     if err != 0:
         raise hse.KvdbException(err)
 
 
-def kvdb_import(mpool_name: str, path: str) -> None:
+def kvdb_import(str mpool_name, str path) -> None:
     """
     @SUB@ experimental.kvdb_import.__doc__
     """
-    cdef mpool_name_bytes = mpool_name.encode()
-    cdef path_bytes = path.encode()
-    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_import_exp(<char *>mpool_name_bytes, <char *>path_bytes)
+    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_import_exp(mpool_name.encode(), path.encode())
     if err != 0:
         raise hse.KvdbException(err)
 
 
-def kvs_prefix_probe(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.Transaction=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+def kvs_prefix_probe(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
     """
     cnt, key, key_len, value, value_len = kvs_prefix_probe_with_lengths(kvs, pfx, key_buf, val_buf, txn)
     return (
         cnt,
-        key[:key_len] if key and len(key) > key_len else key,
-        value[:value_len] if value and len(value) > value_len else value
+        key,
+        value
     )
 
 
-def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), txn: hse.Transaction=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
     """
@@ -102,17 +99,26 @@ def kvs_prefix_probe_with_lengths(kvs: hse.Kvs, const unsigned char [:]pfx, unsi
         if opspec:
             free(opspec)
 
-    return KvsPfxProbeCnt(found), bytes(key_buf), key_len, bytes(val_buf), val_len
+    return (
+        KvsPfxProbeCnt(found),
+        bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
+        key_len,
+        bytes(val_buf)[:val_len] if val_buf is not None and val_len < len(val_buf) else val_buf,
+        val_len
+    )
 
 
 # 256 is arbitrary
-def params_err(params: hse.Params, char [:]buf=bytearray(256)) -> None:
+def params_err(hse.Params params, char [:]buf=bytearray(256)) -> None:
     """
     @SUB@ experimental.params_err.__doc__
     """
+    cdef char *buf_addr = NULL
+    cdef size_t buf_len = 0
     if buf is not None:
-        raise ParamsException("No error string output buffer provided")
+        buf_addr = &buf[0]
+        buf_len = len(buf)
 
-    cdef char *err = hse_experimental.hse_params_err_exp(params._c_hse_params, &buf[0], len(buf))
+    cdef char *err = hse_experimental.hse_params_err_exp(params._c_hse_params, buf_addr, buf_len)
     if err:
         raise ParamsException(err)
