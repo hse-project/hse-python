@@ -287,8 +287,9 @@ class Cursor:
 
     def update(
         self,
-        static_view: Optional[bool] = ...,
-        bind_txn: Optional[bool] = ...,
+        reverse: bool = ...,
+        static_view: bool = ...,
+        bind_txn: bool = ...,
         txn: Optional[Transaction] = ...,
     ) -> None:
         """

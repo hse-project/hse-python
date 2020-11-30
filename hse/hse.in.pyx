@@ -417,7 +417,7 @@ cdef class Transaction:
             raise MemoryError()
 
     def __dealloc__(self):
-        if not self._c_hse_kvdb:
+        if not self.kvdb._c_hse_kvdb:
             return
         if not self._c_hse_kvdb_txn:
             return
@@ -521,8 +521,7 @@ cdef class Cursor:
                 free(opspec)
 
     def __dealloc__(self):
-        if self._c_hse_kvs_cursor:
-            hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
+        self.destroy()
 
     def __enter__(self):
         return self
@@ -558,7 +557,7 @@ cdef class Cursor:
 
         return _iter()
 
-    def update(self, static_view: Optional[bool]=None, bind_txn: Optional[bool]=None, txn: Transaction=None) -> None:
+    def update(self, reverse: bool=False, static_view: bool=False, bind_txn: bool=False, txn: Transaction=None) -> None:
         """
         @SUB@ hse.Cursor.update.__doc__
         """
