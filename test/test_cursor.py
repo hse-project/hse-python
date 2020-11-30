@@ -23,11 +23,16 @@ def kvs(kvdb: hse.Kvdb):
     kvdb.kvs_drop("cursor-test")
 
 
-@pytest.mark.parametrize("filter", [(None), (b"key")])
-def test_seek(kvs: hse.Kvs, filter: Optional[bytes]):
+@pytest.fixture(scope="function", autouse=True)
+def kvs_setup(kvs: hse.Kvs):
     for i in range(5):
         kvs.put(f"key{i}".encode(), f"value{i}".encode())
+    yield
+    kvs.prefix_delete(b"key")
 
+
+@pytest.mark.parametrize("filter", [(None), (b"key")])
+def test_seek(kvs: hse.Kvs, filter: Optional[bytes]):
     with kvs.cursor(filter) as cursor:
         found = cursor.seek(b"key3")
         assert found == b"key3"
@@ -38,14 +43,9 @@ def test_seek(kvs: hse.Kvs, filter: Optional[bytes]):
         *_, eof = cursor.read()
         assert eof
 
-    kvs.prefix_delete(b"key")
-
 
 @pytest.mark.parametrize("filter", [(None), (b"key")])
 def test_seek_range(kvs: hse.Kvs, filter: Optional[bytes]):
-    for i in range(5):
-        kvs.put(f"key{i}".encode(), f"value{i}".encode())
-
     with kvs.cursor(filter) as cursor:
         found = cursor.seek_range(b"key0", b"key3")
         assert found == b"key0"
@@ -58,13 +58,8 @@ def test_seek_range(kvs: hse.Kvs, filter: Optional[bytes]):
         *_, eof = cursor.read()
         assert eof
 
-    kvs.prefix_delete(b"key")
-
 
 def test_update(kvs: hse.Kvs):
-    for i in range(5):
-        kvs.put(f"key{i}".encode(), f"value{i}".encode())
-
     with kvs.cursor() as cursor:
         kvs.put(b"key5", b"value5")
 
@@ -78,15 +73,58 @@ def test_update(kvs: hse.Kvs):
         *_, eof = cursor.read()
         assert eof
 
-    kvs.prefix_delete(b"key")
-
 
 def test_reverse(kvs: hse.Kvs):
-    for i in range(5):
-        kvs.put(f"key{i}".encode(), f"value{i}".encode())
-
     with kvs.cursor(reverse=True) as cursor:
         for i in reversed(range(5)):
             assert cursor.read() == (f"key{i}".encode(), f"value{i}".encode(), False)
 
-    kvs.prefix_delete(b"key")
+
+def test_type2(kvdb: hse.Kvdb, kvs: hse.Kvs):
+    with kvdb.transaction() as txn:
+        kvs.put(b"key5", b"value5")
+        kvs.put(b"key6", b"value6", txn=txn)
+        with kvs.cursor(txn=txn) as cursor:
+            for _ in range(5):
+                cursor.read()
+            *_, eof = cursor.read()
+            assert eof
+
+
+def test_update_to_type2(kvdb: hse.Kvdb, kvs: hse.Kvs):
+    with kvdb.transaction() as txn:
+        kvs.put(b"key5", b"value5")
+        kvs.put(b"key6", b"value6", txn=txn)
+        with kvs.cursor() as cursor:
+            cursor.update(txn=txn)
+            for _ in range(5):
+                cursor.read()
+            *_, eof = cursor.read()
+            assert eof
+
+
+def test_type3(kvdb: hse.Kvdb, kvs: hse.Kvs):
+    with kvdb.transaction() as txn:
+        kvs.put(b"key5", b"value5")
+        kvs.put(b"key6", b"value6", txn=txn)
+        with kvs.cursor(bind_txn=True, txn=txn) as cursor:
+            for _ in range(5):
+                cursor.read()
+            *kv, _ = cursor.read()
+            assert kv == [b"key6", b"value6"]
+            *_, eof = cursor.read()
+            assert eof
+
+
+def test_update_to_type3(kvdb: hse.Kvdb, kvs: hse.Kvs):
+    with kvdb.transaction() as txn:
+        kvs.put(b"key5", b"value5")
+        kvs.put(b"key6", b"value6", txn=txn)
+        with kvs.cursor() as cursor:
+            cursor.update(bind_txn=True, txn=txn)
+            for _ in range(5):
+                cursor.read()
+            *kv, _ = cursor.read()
+            assert kv == [b"key6", b"value6"]
+            *_, eof = cursor.read()
+            assert eof
