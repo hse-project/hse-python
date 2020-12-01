@@ -61,7 +61,7 @@ cdef class Kvdb:
             raise KvdbException(err)
 
     def __dealloc__(self):
-        pass
+        self.close()
 
     def close(self) -> None:
         """
@@ -73,6 +73,7 @@ cdef class Kvdb:
         cdef hse_err_t err = hse_kvdb_close(self._c_hse_kvdb)
         if err != 0:
             raise KvdbException(err)
+        self._c_hse_kvdb = NULL
 
     @staticmethod
     def init() -> None:
@@ -224,7 +225,7 @@ cdef class Kvs:
             raise KvdbException(err)
 
     def __dealloc__(self):
-        pass
+        self.close()
 
     def close(self) -> None:
         """
@@ -236,6 +237,7 @@ cdef class Kvs:
         cdef hse_err_t err = hse_kvdb_kvs_close(self._c_hse_kvs)
         if err != 0:
             raise KvdbException(err)
+        self._c_hse_kvs = NULL
 
     def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, Transaction txn=None) -> None:
         """
@@ -423,6 +425,7 @@ cdef class Transaction:
             return
 
         hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        self._c_hse_kvdb_txn = NULL
 
     def __enter__(self):
         self.begin()
