@@ -20,4 +20,5 @@ def kvdb() -> Generator[hse.Kvdb, None, None]:
 
     yield kvdb
 
+    kvdb.close()
     hse.Kvdb.fini()
