@@ -441,6 +441,7 @@ cdef class Transaction:
             self.commit()
 
         hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        self._c_hse_kvdb_txn = NULL
 
     def begin(self) -> None:
         """
