@@ -11,3 +11,4 @@ typings/
 *.pyi
 !*.in.pyi
 .pytest_cache/
+hse/*.html
