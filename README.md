@@ -38,7 +38,12 @@ In the case you are bootstrapping your build, such as from a fresh clone, you
 will want to define an environment variable called `USE_CYTHON`. What it is
 defined as is unimportant. If you are building from a source distribution, then
 `USE_CYTHON` is unimportant. The Cython generated `.c` files are distributed in
-the source distribution.
+the source distribution. This is off by default.
+
+If you are interested in more contextual error messages that the C API is
+bubbling up, then you can define the environment variable `HSE_PYTHON_DEBUG`.
+This will provide the C file and line number where the error originated. This is
+off by default.
 
 ```shell
 python setup.py build_ext -i
