@@ -44,7 +44,11 @@ class KvdbException(Exception):
     """
     def __init__(self, hse_err_t returncode):
         self.returncode = hse_err_to_errno(returncode)
-        self.message = os.strerror(self.returncode)
+        IF HSE_PYTHON_DEBUG != 0:
+            cdef char buf[256]
+            self.message = hse_err_to_string(returncode, buf, 256, NULL).decode()
+        ELSE:
+            self.message = os.strerror(self.returncode)
 
     def __str__(self):
         return self.message
