@@ -6,20 +6,16 @@
 @SUB@ experimental.__doc__
 """
 
-
 from typing import Optional, Tuple
 from hse import Kvdb, Params, Kvs, Transaction
 from enum import Enum
-
 
 class ParamsException(Exception):
     """
     @SUB@ experimental.ParamsException.__doc__
     """
 
-    def __init__(self, error: str) -> None:
-        ...
-
+    def __init__(self, error: str) -> None: ...
 
 class KvsPfxProbeCnt(Enum):
     """
@@ -30,13 +26,11 @@ class KvsPfxProbeCnt(Enum):
     ONE = ...
     MUL = ...
 
-
 def kvdb_export(kvdb: Kvdb, path: str, params: Optional[Params] = ...) -> None:
     """
     @SUB@ experimental.kvdb_export.__doc__
     """
     ...
-
 
 def kvdb_import(mpool_name: str, path: str) -> None:
     """
@@ -44,12 +38,11 @@ def kvdb_import(mpool_name: str, path: str) -> None:
     """
     ...
 
-
 def kvs_prefix_probe(
     kvs: Kvs,
     pfx: bytes,
     key_buf: bytearray = ...,
-    val_buf: bytearray = ...,
+    value_buf: bytearray = ...,
     txn: Optional[Transaction] = ...,
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
@@ -57,19 +50,17 @@ def kvs_prefix_probe(
     """
     ...
 
-
 def kvs_prefix_probe_with_lengths(
     kvs: Kvs,
     pfx: bytes,
-    key_buf: Optional[bytearray] = ...,
-    val_buf: Optional[bytearray] = ...,
+    key_buf: bytearray = ...,
+    value_buf: Optional[bytearray] = ...,
     txn: Optional[Transaction] = ...,
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
     """
     ...
-
 
 def params_err(params: Params, buf: bytearray = ...) -> None:
     """

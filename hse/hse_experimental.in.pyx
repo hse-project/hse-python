@@ -49,11 +49,11 @@ def kvdb_import(str mpool_name, str path) -> None:
         raise hse.KvdbException(err)
 
 
-def kvs_prefix_probe(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+def kvs_prefix_probe(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]value_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
     """
-    cnt, key, key_len, value, value_len = kvs_prefix_probe_with_lengths(kvs, pfx, key_buf, val_buf, txn)
+    cnt, key, _, value, _ = kvs_prefix_probe_with_lengths(kvs, pfx, key_buf, value_buf, txn)
     return (
         cnt,
         key,
@@ -61,7 +61,7 @@ def kvs_prefix_probe(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]k
     )
 
 
-def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]val_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(hse_limits.HSE_KVS_KLEN_MAX), unsigned char [:]value_buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
     """
@@ -71,18 +71,18 @@ def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsig
     cdef void *key_buf_addr = NULL
     cdef size_t key_buf_len = 0
     cdef size_t key_len = 0
-    cdef void *val_buf_addr = NULL
-    cdef size_t val_buf_len = 0
-    cdef size_t val_len = 0
+    cdef void *value_buf_addr = NULL
+    cdef size_t value_buf_len = 0
+    cdef size_t value_len = 0
     if pfx is not None and len(pfx) > 0:
         pfx_addr = &pfx[0]
         pfx_len = len(pfx)
     if key_buf is not None and len(key_buf) > 0:
         key_buf_addr = &key_buf[0]
         key_buf_len = len(key_buf)
-    if val_buf is not None and len(val_buf) > 0:
-        val_buf_addr = &val_buf[0]
-        val_buf_len = len(val_buf)
+    if value_buf is not None and len(value_buf) > 0:
+        value_buf_addr = &value_buf[0]
+        value_buf_len = len(value_buf)
     cdef hse.hse_kvdb_opspec *opspec = hse.HSE_KVDB_OPSPEC_INIT() if txn else NULL
     if txn:
         opspec.kop_txn = txn._c_hse_kvdb_txn
@@ -90,7 +90,7 @@ def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsig
     cdef hse.hse_err_t err = 0
     try:
         with nogil:
-            err = hse_experimental.hse_kvs_prefix_probe_exp(kvs._c_hse_kvs, opspec, pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len, val_buf_addr, val_buf_len, &val_len)
+            err = hse_experimental.hse_kvs_prefix_probe_exp(kvs._c_hse_kvs, opspec, pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len, value_buf_addr, value_buf_len, &value_len)
         if err != 0:
             raise hse.KvdbException(err)
         if found == hse_experimental.HSE_KVS_PFX_FOUND_ZERO:
@@ -103,8 +103,8 @@ def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsig
         KvsPfxProbeCnt(found),
         bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
         key_len,
-        bytes(val_buf)[:val_len] if val_buf is not None and val_len < len(val_buf) else val_buf,
-        val_len
+        bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
+        value_len
     )
 
 
