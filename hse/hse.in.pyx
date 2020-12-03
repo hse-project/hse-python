@@ -428,8 +428,9 @@ cdef class Transaction:
         if not self._c_hse_kvdb_txn:
             return
 
-        hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-        self._c_hse_kvdb_txn = NULL
+        with nogil:
+            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            self._c_hse_kvdb_txn = NULL
 
     def __enter__(self):
         self.begin()
@@ -444,14 +445,17 @@ cdef class Transaction:
         if self.state == TransactionState.ACTIVE:
             self.commit()
 
-        hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-        self._c_hse_kvdb_txn = NULL
+        with nogil:
+            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            self._c_hse_kvdb_txn = NULL
 
     def begin(self) -> None:
         """
         @SUB@ hse.Transaction.begin.__doc__
         """
-        cdef hse_err_t err = hse_kvdb_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
             raise KvdbException(err)
 
@@ -459,7 +463,9 @@ cdef class Transaction:
         """
         @SUB@ hse.Transaction.commit.__doc__
         """
-        cdef hse_err_t err = hse_kvdb_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
             raise KvdbException(err)
 
@@ -467,7 +473,9 @@ cdef class Transaction:
         """
         @SUB@ hse.Transaction.abort.__doc__
         """
-        cdef hse_err_t err = hse_kvdb_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
             raise KvdbException(err)
 
@@ -476,7 +484,10 @@ cdef class Transaction:
         """
         @SUB@ hse.Transaction.state.__doc__
         """
-        return TransactionState(hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn))
+        cdef hse_kvdb_txn_state = HSE_KVDB_TXN_INVALID
+        with nogil:
+            state = hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+        return TransactionState(state)
 
 
 @cython.no_gc_clear
@@ -542,7 +553,8 @@ cdef class Cursor:
         @SUB@ hse.Cursor.destroy.__doc__
         """
         if self._c_hse_kvs_cursor:
-            hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
+            with nogil:
+                hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
             self._c_hse_kvs_cursor = NULL
 
     def items(self, max_count: Optional[int]=None) -> Iterator[Tuple[bytes, Optional[bytes]]]:

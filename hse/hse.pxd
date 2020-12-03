@@ -107,7 +107,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
 
     hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
-    void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn)
+    void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_commit(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
@@ -144,7 +144,7 @@ cdef extern from "hse/hse.h":
         const void     **val,
         size_t          *val_len,
         cbool           *eof) nogil
-    hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor)
+    hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor) nogil
 
     hse_err_t hse_params_create(hse_params **params)
     void hse_params_destroy(hse_params *params)

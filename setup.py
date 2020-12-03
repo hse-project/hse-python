@@ -10,6 +10,7 @@ from setuptools import Command, setup, Extension
 USE_CYTHON = os.environ.get("USE_CYTHON")
 SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 
+
 extensions: List[Extension] = [
     Extension(
         "hse.hse",
@@ -39,6 +40,9 @@ if USE_CYTHON:
 
     # Help tools like Valgrind out
     Options.generate_cleanup_code = True
+    Options.default_options["compile_time_env"] = {
+        "HSE_PYTHON_DEBUG": 1 if os.environ.get('HSE_PYTHON_DEBUG') != None else 0,
+    }
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
@@ -53,6 +57,7 @@ if USE_CYTHON:
 
         return cythonize(
             modules,
+            annotate=True,
             include_path=["hse"],
             compiler_directives={
                 "boundscheck": False,
