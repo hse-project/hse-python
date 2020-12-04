@@ -12,3 +12,4 @@ typings/
 !*.in.pyi
 .pytest_cache/
 hse/*.html
+test/kvdb-export/
