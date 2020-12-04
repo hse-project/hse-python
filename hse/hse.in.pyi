@@ -254,7 +254,7 @@ class Cursor:
         @SUB@ hse.Cursor.update.__doc__
         """
         ...
-    def seek(self, key: bytes) -> Optional[bytes]:
+    def seek(self, key: Optional[bytes]) -> Optional[bytes]:
         """
         @SUB@ hse.Cursor.seek.__doc__
         """
