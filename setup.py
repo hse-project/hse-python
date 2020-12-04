@@ -82,6 +82,10 @@ if USE_CYTHON:
     cmdclass["build_ext"] = build_ext
 
 
+with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
+    long_description = fh.read()
+
+
 setup(
     name="hse",
     version="1.9",
@@ -94,6 +98,8 @@ setup(
     "Software-Defined Storage (SDS), High-Performance Computing (HPC), "
     "Big Data, Internet of Things (IoT), and Artificial Intelligence (AI) "
     "solutions.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     license="Apache-2.0",
     url="https://github.com/hse-project",
     ext_modules=extensions,
