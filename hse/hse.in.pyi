@@ -259,7 +259,7 @@ class Cursor:
         @SUB@ hse.Cursor.seek.__doc__
         """
         ...
-    def seek_range(self, filt_min: bytes, filt_max: bytes) -> Optional[bytes]:
+    def seek_range(self, filt_min: Optional[bytes], filt_max: Optional[bytes]) -> Optional[bytes]:
         """
         @SUB@ hse.Cursor.seek_range.__doc__
         """
