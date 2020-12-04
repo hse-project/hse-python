@@ -41,7 +41,7 @@ if USE_CYTHON:
     # Help tools like Valgrind out
     Options.generate_cleanup_code = True
     Options.default_options["compile_time_env"] = {
-        "HSE_PYTHON_DEBUG": 1 if os.environ.get('HSE_PYTHON_DEBUG') != None else 0,
+        "HSE_PYTHON_DEBUG": 1 if os.environ.get("HSE_PYTHON_DEBUG") != None else 0,
     }
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
