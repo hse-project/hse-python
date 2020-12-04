@@ -59,3 +59,45 @@ def test_prefix_probe_with_lengths(
     assert value_len == 6
 
     kvs.prefix_delete(b"key")
+
+
+# def test_export():
+#     try:
+#         hse.Kvdb.make("hse-python-export")
+#     except hse.KvdbException as e:
+#         if e.returncode == errno.EEXIST:
+#             pass
+#         else:
+#             raise e
+#     export_kvdb = hse.Kvdb.open("hse-python-export")
+#     try:
+#         export_kvdb.kvs_make("kvs1")
+#     except hse.KvdbException as e:
+#         if e.returncode == errno.EEXIST:
+#             pass
+#         else:
+#             raise e
+#     kvs1 = export_kvdb.kvs_open("kvs1")
+#     kvs1.put(b"key", b"value")
+#     kvs1.close()
+
+#     print("WORLD")
+#     hse.experimental.kvdb_export(export_kvdb, "test/kvdb-export")
+#     print("HELLO")
+
+#     export_kvdb.close()
+
+# def test_import():
+#     hse.experimental.kvdb_import("hse-python-import", "test/kvdb-export")
+
+#     kvdb = hse.Kvdb.open("hse-python-export")
+#     try:
+#         kvdb.kvs_make("kvs1")
+#     except hse.KvdbException as e:
+#         if e.returncode == errno.EEXIST:
+#             pass
+#         else:
+#             raise e
+#     kvs = kvdb.kvs_open("kvs1")
+#     assert kvs.get(b"key") == b"value"
+#     kvs.close()
