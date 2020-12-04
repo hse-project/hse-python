@@ -35,7 +35,8 @@ def kvdb_export(hse.Kvdb kvdb, str path, hse.Params params=None) -> None:
     """
     @SUB@ experimental.kvdb_export.__doc__
     """
-    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_export_exp(kvdb._c_hse_kvdb, params._c_hse_params, path.encode())
+    cdef hse.hse_params *p = params._c_hse_params if params else NULL
+    cdef hse.hse_err_t err = hse_experimental.hse_kvdb_export_exp(kvdb._c_hse_kvdb, p, path.encode())
     if err != 0:
         raise hse.KvdbException(err)
 
@@ -113,12 +114,14 @@ def params_err(hse.Params params, char [:]buf=bytearray(256)) -> None:
     """
     @SUB@ experimental.params_err.__doc__
     """
+    cdef hse.hse_params *p = params._c_hse_params if params else NULL
+
     cdef char *buf_addr = NULL
     cdef size_t buf_len = 0
     if buf is not None:
         buf_addr = &buf[0]
         buf_len = len(buf)
 
-    cdef char *err = hse_experimental.hse_params_err_exp(params._c_hse_params, buf_addr, buf_len)
+    cdef char *err = hse_experimental.hse_params_err_exp(p, buf_addr, buf_len)
     if err:
         raise ParamsException(err)
