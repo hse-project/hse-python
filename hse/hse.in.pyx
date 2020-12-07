@@ -23,7 +23,7 @@ cimport cython
 cimport hse_limits
 from enum import Enum
 from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Any, Iterator, Type, Union, Iterable
+from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable
 from libc.stdlib cimport free
 
 
@@ -545,7 +545,7 @@ cdef class Cursor:
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]):
+    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Exception], exc_tb: Optional[TracebackType]):
         self.destroy()
 
     def destroy(self):
