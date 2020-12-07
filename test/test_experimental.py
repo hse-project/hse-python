@@ -1,11 +1,15 @@
-from typing import Optional
+from typing import Generator, Optional
 import hse
 import pytest
 import errno
+from pathlib import Path
+
+
+KVDB_EXPORT = Path("test", "kvdb-export").resolve()
 
 
 @pytest.fixture(scope="module")
-def kvs(kvdb: hse.Kvdb):
+def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     p = hse.Params().set("kvs.pfx_len", "3").set("kvs.sfx_len", "1")
 
     try:
@@ -81,14 +85,13 @@ def test_prefix_probe_with_lengths(
 #     kvs1.put(b"key", b"value")
 #     kvs1.close()
 
-#     print("WORLD")
-#     hse.experimental.kvdb_export(export_kvdb, "test/kvdb-export")
-#     print("HELLO")
+#     hse.experimental.kvdb_export(export_kvdb, str(KVDB_EXPORT))
 
 #     export_kvdb.close()
 
+
 # def test_import():
-#     hse.experimental.kvdb_import("hse-python-import", "test/kvdb-export")
+#     hse.experimental.kvdb_import("hse-python-import", str(KVDB_EXPORT))
 
 #     kvdb = hse.Kvdb.open("hse-python-export")
 #     try:
@@ -101,3 +104,6 @@ def test_prefix_probe_with_lengths(
 #     kvs = kvdb.kvs_open("kvs1")
 #     assert kvs.get(b"key") == b"value"
 #     kvs.close()
+
+#     for dir in KVDB_EXPORT.iterdir():
+#         dir.rmdir()

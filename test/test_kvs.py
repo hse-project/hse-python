@@ -1,10 +1,11 @@
 import errno
+from typing import Generator
 import hse
 import pytest
 
 
 @pytest.fixture(scope="module")
-def kvs(kvdb: hse.Kvdb):
+def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     p = hse.Params().set("kvs.pfx_len", "3")
 
     try:
