@@ -563,9 +563,6 @@ cdef class Cursor:
         """
         def _iter():
             while True:
-                if max_count and count > max_count:
-                    return
-
                 key, val, eof = self.read()
                 if not eof:
                     yield key, val
