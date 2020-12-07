@@ -236,9 +236,7 @@ class Cursor:
         @SUB@ hse.Cursor.destroy.__doc__
         """
         ...
-    def items(
-        self, max_count: Optional[int] = ...
-    ) -> Iterator[Tuple[bytes, Optional[bytes]]]:
+    def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
         @SUB@ hse.Cursor.items.__doc__
         """

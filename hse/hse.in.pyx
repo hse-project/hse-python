@@ -557,18 +557,15 @@ cdef class Cursor:
                 hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
             self._c_hse_kvs_cursor = NULL
 
-    def items(self, max_count: Optional[int]=None) -> Iterator[Tuple[bytes, Optional[bytes]]]:
+    def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
         @SUB@ hse.Cursor.items.__doc__
         """
         def _iter():
-            count = 0
-
             while True:
                 if max_count and count > max_count:
                     return
 
-                count += 1
                 key, val, eof = self.read()
                 if not eof:
                     yield key, val
@@ -577,7 +574,7 @@ cdef class Cursor:
 
         return _iter()
 
-    def update(self, reverse: bool=False, static_view: bool=False, bind_txn: bool=False, txn: Transaction=None) -> None:
+    def update(self, reverse: bool=False, static_view: bool=False, bind_txn: bool=False, Transaction txn=None) -> None:
         """
         @SUB@ hse.Cursor.update.__doc__
         """
