@@ -1,6 +1,11 @@
 import os
+import pathlib
 from typing import Any, Dict, List, Type
-from setuptools import Command, setup, Extension
+from setuptools import Command, find_packages, setup, Extension
+
+
+HERE = pathlib.Path(__file__).parent
+HSE_PACKAGE = HERE / "hse"
 
 
 # Distribute the generated C source files so that consumers don't necessarily
@@ -14,17 +19,17 @@ SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 extensions: List[Extension] = [
     Extension(
         "hse.hse",
-        [os.path.join("hse", f"hse.{SOURCE_EXTENSION}")],
+        [HSE_PACKAGE / f"hse.{SOURCE_EXTENSION}"],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.limits",
-        [os.path.join("hse", f"hse_limits.{SOURCE_EXTENSION}")],
+        [HSE_PACKAGE / f"hse_limits.{SOURCE_EXTENSION}"],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.experimental",
-        [os.path.join("hse", f"hse_experimental.{SOURCE_EXTENSION}")],
+        [HSE_PACKAGE / f"hse_experimental.{SOURCE_EXTENSION}"],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -48,12 +53,12 @@ if USE_CYTHON:
         if USE_CYTHON:
             import docstrings
 
-            docstrings.insert(os.path.join("hse", "hse.in.pyx"))
-            docstrings.insert(os.path.join("hse", "hse.in.pyi"))
-            docstrings.insert(os.path.join("hse", "hse_limits.in.pyx"))
-            docstrings.insert(os.path.join("hse", "limits.in.pyi"))
-            docstrings.insert(os.path.join("hse", "hse_experimental.in.pyx"))
-            docstrings.insert(os.path.join("hse", "experimental.in.pyi"))
+            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyx"))
+            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyi"))
+            docstrings.insert(str(HSE_PACKAGE / "hse_limits.in.pyx"))
+            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyi"))
+            docstrings.insert(str(HSE_PACKAGE / "hse_experimental.in.pyx"))
+            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyi"))
 
         return cythonize(
             modules,
@@ -66,7 +71,6 @@ if USE_CYTHON:
                 "language_level": "3str",
                 "embedsignature": True,
                 "initializedcheck": False,
-                "profile": os.environ.get("HSE_PYTHON_PROFILE") != None,
                 "annotation_typing": True,
                 "emit_code_comments": True,
                 "optimize.use_switch": True,
@@ -74,7 +78,6 @@ if USE_CYTHON:
                 "warn.unreachable": True,
                 "warn.maybe_uninitialized": True,
                 "warn.multiple_declarators": True,
-                "linetrace": os.environ.get("HSE_PYTHON_COVERAGE") != None,
             },
         )
 
@@ -82,14 +85,10 @@ if USE_CYTHON:
     cmdclass["build_ext"] = build_ext
 
 
-with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as fh:
-    long_description = fh.read()
-
-
 setup(
     name="hse",
     version="1.9",
-    maintainer="Micron Technology",
+    maintainer="Micron Technology, Inc.",
     description="Python bindings to HSE's C API. "
     "HSE is an embeddable key-value store designed for SSDs based on NAND "
     "flash or persistent memory. HSE optimizes performance and endurance by "
@@ -98,19 +97,16 @@ setup(
     "Software-Defined Storage (SDS), High-Performance Computing (HPC), "
     "Big Data, Internet of Things (IoT), and Artificial Intelligence (AI) "
     "solutions.",
-    long_description=long_description,
+    long_description=(HERE / "README.md").read_text(),
     long_description_content_type="text/markdown",
     license="Apache-2.0",
-    url="https://github.com/hse-project",
+    url="https://github.com/hse-project/hse-python",
     ext_modules=extensions,
-    packages=["hse"],
+    packages=find_packages(),
     cmdclass=cmdclass,
-    package_dir={
-        "hse": "hse",
-    },
-    zip_safe=False,
     package_data={"hse": ["*.pyi", "py.typed"]},
     exclude_package_data={"hse": ["*.in.pyi"]},
+    zip_safe=False,
     keywords=[
         "micron",
         "hse",
@@ -134,4 +130,8 @@ setup(
         "Topic :: Database :: Database Engines/Servers",
         "Typing :: Typed",
     ],
+    project_urls={
+        "HSE": "https://github.com/hse-project/hse",
+        "HSE Wiki": "https://github.com/hse-project/hse/wiki"
+    }
 )
