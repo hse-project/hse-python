@@ -35,10 +35,19 @@ def test_params_err():
 
 def test_prefix_probe(kvs: hse.Kvs):
     kvs.put(b"key1", b"value1")
+    kvs.put(b"abc1", b"value1")
+    kvs.put(b"abc2", b"value2")
 
     cnt, *kv = hse.experimental.kvs_prefix_probe(kvs, b"key")
     assert cnt == hse.experimental.KvsPfxProbeCnt.ONE
     assert kv == [b"key1", b"value1"]
+
+    cnt, *kv = hse.experimental.kvs_prefix_probe(kvs, b"abc")
+    assert cnt == hse.experimental.KvsPfxProbeCnt.MUL
+    assert kv == [b"abc1", b"value1"]
+
+    cnt, *_ = hse.experimental.kvs_prefix_probe(kvs, b"xyz")
+    assert cnt == hse.experimental.KvsPfxProbeCnt.ZERO
 
     kvs.prefix_delete(b"key")
 
@@ -51,7 +60,7 @@ def test_prefix_probe(kvs: hse.Kvs):
     ],
 )
 def test_prefix_probe_with_lengths(
-    kvs: hse.Kvs, key_buf: Optional[bytearray], value_buf: Optional[bytearray]
+    kvs: hse.Kvs, key_buf: bytearray, value_buf: Optional[bytearray]
 ):
     kvs.put(b"key1", b"value1")
 
