@@ -10,9 +10,11 @@ runtime and build dependency.
 
 * **HSE**, cloned locally and built, or installed on your system including the
 development package
-* `Cython >= 3.0` (optional unless `USE_CYTHON` is defined)
+* [`Cython`](https://pypi.org/project/Cython) (optional unless `USE_CYTHON` is defined)
 * [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
 defined)
+* [`pytest`](https://pypi.org/project/pytest)
+* [`black`](https://pypi.org/project/black)
 
 ## Installation
 
