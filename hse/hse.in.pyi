@@ -264,7 +264,7 @@ class Cursor:
         @SUB@ hse.Cursor.seek_range.__doc__
         """
         ...
-    def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
+    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
         @SUB@ hse.Cursor.read.__doc__
         """
