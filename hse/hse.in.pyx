@@ -490,7 +490,6 @@ cdef class Transaction:
         return TransactionState(state)
 
 
-@cython.no_gc_clear
 cdef class Cursor:
     """
     See the concept and best practices sections on the HSE Wiki at
@@ -504,7 +503,6 @@ cdef class Cursor:
         static_view: bool=False,
         bind_txn: bool=False,
         Transaction txn=None):
-        self.txn = txn
         self._eof = False
 
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
@@ -576,13 +574,15 @@ cdef class Cursor:
         """
         @SUB@ hse.Cursor.update.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if static_view is not None or bind_txn is not None or txn is not self.txn else NULL
+        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
 
+        if reverse:
+            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_REVERSE
         if static_view:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_STATIC_VIEW
         if bind_txn:
             opspec.kop_flags |= HSE_KVDB_KOP_FLAG_BIND_TXN
-        if txn is not self.txn:
+        if txn:
             opspec.kop_txn = txn._c_hse_kvdb_txn
 
         cdef hse_err_t err = 0
