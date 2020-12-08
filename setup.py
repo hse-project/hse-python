@@ -19,17 +19,17 @@ SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 extensions: List[Extension] = [
     Extension(
         "hse.hse",
-        [HSE_PACKAGE / f"hse.{SOURCE_EXTENSION}"],
+        [str(HSE_PACKAGE / f"hse.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.limits",
-        [HSE_PACKAGE / f"hse_limits.{SOURCE_EXTENSION}"],
+        [str(HSE_PACKAGE / f"hse_limits.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.experimental",
-        [HSE_PACKAGE / f"hse_experimental.{SOURCE_EXTENSION}"],
+        [str(HSE_PACKAGE / f"hse_experimental.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -132,6 +132,6 @@ setup(
     ],
     project_urls={
         "HSE": "https://github.com/hse-project/hse",
-        "HSE Wiki": "https://github.com/hse-project/hse/wiki"
-    }
+        "HSE Wiki": "https://github.com/hse-project/hse/wiki",
+    },
 )
