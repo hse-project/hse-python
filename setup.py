@@ -62,7 +62,6 @@ if USE_CYTHON:
 
         return cythonize(
             modules,
-            annotate=True,
             include_path=["hse"],
             compiler_directives={
                 "boundscheck": False,
