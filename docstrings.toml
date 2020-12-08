@@ -496,8 +496,8 @@ Iteratively access the elements pointed to by the cursor
 
 Read a KV pair from the cursor, advancing the cursor past its current location. If
 the cursor is at EOF, attempts to read from it will not change the state of the
-cursor. The returned key will be `None` in the event that the cursor is at EOF.
-This function is thread safe across disparate cursors.
+cursor. The returned key and value will be `None` in the event that the cursor is
+at EOF. This function is thread safe across disparate cursors.
 """
 
 [hse.Cursor.eof]
