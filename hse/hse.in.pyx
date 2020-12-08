@@ -436,7 +436,7 @@ cdef class Transaction:
         self.begin()
         return self
 
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Any], exc_tb: Optional[TracebackType]):
+    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Exception], exc_tb: Optional[TracebackType]):
         # PEP-343: If exception occurred in with statement, abort transaction
         if exc_tb:
             self.abort()

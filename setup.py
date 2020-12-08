@@ -14,6 +14,9 @@ HSE_PACKAGE = HERE / "hse"
 
 USE_CYTHON = os.environ.get("USE_CYTHON")
 SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
+COMPILE_TIME_ENV = {
+    "HSE_PYTHON_DEBUG": 1 if os.environ.get("HSE_PYTHON_DEBUG") != None else 0,
+}
 
 
 extensions: List[Extension] = [
@@ -45,9 +48,6 @@ if USE_CYTHON:
 
     # Help tools like Valgrind out
     Options.generate_cleanup_code = True
-    Options.default_options["compile_time_env"] = {
-        "HSE_PYTHON_DEBUG": 1 if os.environ.get("HSE_PYTHON_DEBUG") != None else 0,
-    }
 
     def docstring_cythonize(modules: List[Extension]) -> List[Any]:
         if USE_CYTHON:
@@ -78,6 +78,7 @@ if USE_CYTHON:
                 "warn.maybe_uninitialized": True,
                 "warn.multiple_declarators": True,
             },
+            compile_time_env=COMPILE_TIME_ENV
         )
 
     extensions = docstring_cythonize(extensions)
