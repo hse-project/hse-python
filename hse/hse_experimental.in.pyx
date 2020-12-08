@@ -95,7 +95,7 @@ def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsig
         if err != 0:
             raise hse.KvdbException(err)
         if found == hse_experimental.HSE_KVS_PFX_FOUND_ZERO:
-            return found, None, 0, None, 0
+            return KvsPfxProbeCnt.ZERO, None, 0, None, 0
     finally:
         if opspec:
             free(opspec)
