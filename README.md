@@ -54,9 +54,10 @@ CFLAGS="-Ipath/to/include" LDFLAGS="-Lpath/to/search" python setup.py build_ext 
 ## Testing
 
 Export the `PYTHONPATH` environment variable to the root of this repository.
-From there you should be able to run `pytest"` without error.
+From there you should be able to run `pytest` without error.
 
-You can skip the export of the environment variable by running `python -m pytest` instead.
+You can skip the export of the environment variable by running
+`python -m pytest` instead.
 
 In the case you need to tell Python where the HSE library is, you can use
 the `LD_LIBRARY_PATH` environment variable.
