@@ -435,7 +435,7 @@ This function is thread safe.
 
 [hse.Cursor.items]
 __doc__ = """
-Convenience function to return an iterator over key/values in a KVS
+Convenience function to return an iterator over key/values in a cursor's view
 
 Args:
 
