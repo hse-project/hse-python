@@ -185,6 +185,7 @@ cdef class Transaction:
 cdef class Cursor:
     cdef hse_kvs_cursor *_c_hse_kvs_cursor
     cdef Transaction txn
+    cdef cbool _eof
 
 
 cdef class KvdbCompactStatus:

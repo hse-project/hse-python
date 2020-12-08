@@ -505,6 +505,7 @@ cdef class Cursor:
         bind_txn: bool=False,
         Transaction txn=None):
         self.txn = txn
+        self._eof = False
 
         cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
 
@@ -563,8 +564,8 @@ cdef class Cursor:
         """
         def _iter():
             while True:
-                key, val, eof = self.read()
-                if not eof:
+                key, val = self.read()
+                if not self._eof:
                     yield key, val
                 else:
                     return
@@ -661,7 +662,7 @@ cdef class Cursor:
 
         return (<char *>found)[:found_len]
 
-    def read(self) -> Tuple[Optional[bytes], Optional[bytes], bool]:
+    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
         @SUB@ hse.Cursor.read.__doc__
         """
@@ -684,10 +685,15 @@ cdef class Cursor:
         if err != 0:
             raise KvdbException(err)
 
+        self._eof = eof
         if eof:
-            return None, None, True
+            return None, None
         else:
-            return (<char*>key)[:key_len], (<char*>value)[:value_len] if value else None, False
+            return (<char *>key)[:key_len], (<char *>value)[:value_len] if value else None
+
+    @property
+    def eof(self) -> bool:
+        return self._eof
 
 
 cdef class KvdbCompactStatus:

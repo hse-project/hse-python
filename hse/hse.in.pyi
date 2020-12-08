@@ -269,6 +269,12 @@ class Cursor:
         @SUB@ hse.Cursor.read.__doc__
         """
         ...
+    @property
+    def eof(self) -> bool:
+        """
+        @SUB@ hse.Cursor.eof.__doc__
+        """
+        ...
 
 class KvdbCompactStatus:
     """

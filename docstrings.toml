@@ -499,6 +499,11 @@ cursor. The returned key will be `None` in the event that the cursor is at EOF.
 This function is thread safe across disparate cursors.
 """
 
+[hse.Cursor.eof]
+__doc__ = """
+Flag for determining if the cursor has more data to read
+"""
+
 [hse.KvdbCompactStatus]
 __doc__ = """
 Contains infomation about the Kvdb's current compaction status including
