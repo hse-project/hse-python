@@ -59,17 +59,21 @@ def test_seek_range(kvs: hse.Kvs, filter: Optional[bytes]):
         assert cursor.eof
 
 
-def test_update(kvs: hse.Kvs):
-    with kvs.cursor() as cursor:
+@pytest.mark.parametrize("reverse", [(True), (False)])
+def test_update(kvs: hse.Kvs, reverse: bool):
+    with kvs.cursor(reverse=reverse) as cursor:
         kvs.put(b"key5", b"value5")
 
         assert sum(1 for _ in cursor.items()) == 5
         assert cursor.read() == (None, None)
 
-        cursor.update()
+        cursor.update(reverse=reverse)
 
         kv = cursor.read()
-        assert kv == (b"key5", b"value5")
+        if not reverse:
+            assert kv == (b"key5", b"value5")
+        else:
+            assert cursor.eof
         cursor.read()
         assert cursor.eof
 
