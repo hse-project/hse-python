@@ -4,18 +4,18 @@ env = environment({
 	'PYTHONPATH': meson.project_build_root(),
 })
 
-suites = [
-	'cursor',
-	'experimental',
-	'hse',
-	'kvdb',
-	'kvs',
-	'limits',
-	'params',
-	'transaction',
-]
+suites = {
+	'cursor': false,
+	'experimental': false,
+	'hse': false,
+	'kvdb': false,
+	'kvs': false,
+	'limits': true,
+	'params': false,
+	'transaction': false,
+}
 
-foreach s : suites
+foreach s, is_parallel : suites
 	test(
 		'pytest',
 		pytest,
@@ -27,6 +27,6 @@ foreach s : suites
 		suite: ['unit', s],
 		protocol: 'tap',
 		# Kvdbs can only be accessed once at a time
-		is_parallel: false,
+		is_parallel: is_parallel,
 	)
 endforeach
