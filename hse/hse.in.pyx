@@ -20,7 +20,7 @@ KVDB_VERSION_SHA:
 import errno
 import os
 cimport cython
-cimport hse_limits
+cimport limits
 from enum import Enum
 from types import TracebackType
 from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable
@@ -274,7 +274,7 @@ cdef class Kvs:
             if opspec:
                 free(opspec)
 
-    def get(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
+    def get(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
@@ -282,7 +282,7 @@ cdef class Kvs:
         return value
 
 
-    def get_with_length(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(hse_limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_with_length(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
@@ -763,6 +763,7 @@ cdef class Params:
     def __dealloc__(self):
         if self._c_hse_params:
             hse_params_destroy(self._c_hse_params)
+        self._c_hse_params = NULL
 
     def set(self, str key, str value) -> Params:
         """

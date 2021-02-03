@@ -1,0 +1,6 @@
+[wrap-git]
+url = ssh://git@bitbucket.micron.com/hse/hse.git
+revision = updates/NFSE-4592-meson-build-system-improvements
+
+[provide]
+dependency_names = hse-1

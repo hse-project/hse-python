@@ -1,6 +1,5 @@
 *.c
 *.so
-build*/
 dist/
 *.egg-info/
 __pycache__
@@ -13,3 +12,7 @@ typings/
 .pytest_cache/
 hse/*.html
 test/kvdb-export/
+subprojects/*
+!subprojects/packagefiles
+*build*/
+!subprojects/hse.wrap

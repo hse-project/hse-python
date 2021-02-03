@@ -27,12 +27,12 @@ extensions: List[Extension] = [
     ),
     Extension(
         "hse.limits",
-        [str(HSE_PACKAGE / f"hse_limits.{SOURCE_EXTENSION}")],
+        [str(HSE_PACKAGE / f"limits.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
     Extension(
         "hse.experimental",
-        [str(HSE_PACKAGE / f"hse_experimental.{SOURCE_EXTENSION}")],
+        [str(HSE_PACKAGE / f"experimental.{SOURCE_EXTENSION}")],
         libraries=["hse_kvdb"],
     ),
 ]
@@ -53,12 +53,12 @@ if USE_CYTHON:
         if USE_CYTHON:
             import docstrings
 
-            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyx"))
-            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyi"))
-            docstrings.insert(str(HSE_PACKAGE / "hse_limits.in.pyx"))
-            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyi"))
-            docstrings.insert(str(HSE_PACKAGE / "hse_experimental.in.pyx"))
-            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyi"))
+            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyx"), str(HSE_PACKAGE / "hse.pyx"), "docstrings.toml")
+            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyi"), str(HSE_PACKAGE / "hse.pyi"), "docstrings.toml")
+            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyx"), str(HSE_PACKAGE / "limits.pyx"), "docstrings.toml")
+            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyi"), str(HSE_PACKAGE / "limits.pyi"), "docstrings.toml")
+            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyx"), str(HSE_PACKAGE / "experimental.pyx"), "docstrings.toml")
+            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyi"), str(HSE_PACKAGE / "experimental.pyi"), "docstrings.toml")
 
         return cythonize(
             modules,
@@ -78,7 +78,8 @@ if USE_CYTHON:
                 "warn.maybe_uninitialized": True,
                 "warn.multiple_declarators": True,
             },
-            compile_time_env=COMPILE_TIME_ENV
+            compile_time_env=COMPILE_TIME_ENV,
+            verbose=True,
         )
 
     extensions = docstring_cythonize(extensions)

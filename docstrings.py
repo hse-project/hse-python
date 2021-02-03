@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script exists because Python/Cython tooling is absolutely horrible. In
 # what world do 2 copies of the same docstring have to be kept in a pyx file
@@ -11,7 +11,7 @@
 import re
 import toml
 import sys
-import os
+import argparse
 from typing import Any, Dict, MutableMapping, cast
 from io import StringIO
 
@@ -35,12 +35,7 @@ def __flatten(
     return dict(items)
 
 
-__HSE_DOCSTRINGS = __flatten(toml.load("docstrings.toml"))
-__DOCSTRINGS_TOML_MDATE = os.path.getmtime("docstrings.toml")
-__SCRIPT_MTIME = os.path.getmtime(__file__)
-
-
-def insert(input_file: str) -> None:
+def insert(input_file: str, output_file: str, docstrings_toml: str) -> None:
     """
     Insert docstrings into a file out of place. `file.py.in` will output to
     `file.py`. If the input file has an older modified time than the previously
@@ -64,19 +59,10 @@ def insert(input_file: str) -> None:
     Args:
 
     input_file - Path to file to insert docstrings into
+    output_file - TODO
+    docstrings_toml - TODO
     """
-    assert input_file.find(".in.") != -1
-
-    input_file_mtime = os.path.getmtime(input_file)
-    output_file = input_file.replace(".in", "")
-    if os.path.exists(output_file):
-        output_file_mtime = os.path.getmtime(output_file)
-        if (
-            input_file_mtime < output_file_mtime
-            and __DOCSTRINGS_TOML_MDATE < output_file_mtime
-            and __SCRIPT_MTIME < output_file_mtime
-        ):
-            return
+    HSE_DOCSTRINGS = __flatten(toml.load(docstrings_toml))
 
     with open(input_file, "r") as input:
         output_lines = []
@@ -87,8 +73,8 @@ def insert(input_file: str) -> None:
                 continue
             indents = int(len(match.group(1)) / 4)
             key = match.group(2)
-            if key in __HSE_DOCSTRINGS.keys():
-                with StringIO(__HSE_DOCSTRINGS[key].lstrip()) as docstring:
+            if key in HSE_DOCSTRINGS.keys():
+                with StringIO(HSE_DOCSTRINGS[key].lstrip()) as docstring:
                     output_lines.extend(
                         map(
                             lambda s: __INDENT * indents + s if not s.isspace() else s,
@@ -96,16 +82,20 @@ def insert(input_file: str) -> None:
                         )
                     )
 
-        # Remove the .in suffix
         with open(output_file, "w") as output:
             for line in output_lines:
                 output.write(line)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <file1> [<file2>...<fileN>]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Insert docstrings into input files")
+    parser.add_argument("-o", "--output", nargs=1, required=True, help="Output file")
+    parser.add_argument("-d", "--docstrings", nargs=1, required=True, help="Path to docstrings.toml file")
+    parser.add_argument("-f", "--file", nargs=1, required=True, help="Files to manipulate")
+    ns = parser.parse_args(sys.argv[1:])
 
-    for file in sys.argv[1:]:
-        insert(sys.argv[1])
+    output = ns.output[0]
+    docstrings_toml = ns.docstrings[0]
+    file = ns.file[0]
+
+    insert(file, output, docstrings_toml)
