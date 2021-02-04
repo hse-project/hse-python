@@ -1,4 +1,2 @@
 option('tests', type: 'boolean', value: true,
 	description: 'Build tests')
-option('hse-lib-dir', type: 'string', value: '',
-	description: 'Directory containing the HSE shared library (Only useful for the hse repository)')
