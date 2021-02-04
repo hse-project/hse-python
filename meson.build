@@ -30,6 +30,8 @@ endif
 
 subdir('hse')
 
+project_build_root = meson.project_build_root()
+
 if get_option('tests')
 	subdir('test')
 endif
