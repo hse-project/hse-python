@@ -4,6 +4,8 @@ env = environment({
 	'PYTHONPATH': meson.project_build_root(),
 })
 
+# Name of suite with whether or not it can be parallel. KVDBs can only be
+# opened one at a time.
 suites = {
 	'cursor': false,
 	'experimental': false,
@@ -26,7 +28,6 @@ foreach s, is_parallel : suites
 		env: env,
 		suite: ['unit', s],
 		protocol: 'tap',
-		# Kvdbs can only be accessed once at a time
 		is_parallel: is_parallel,
 	)
 endforeach
