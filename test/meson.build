@@ -19,14 +19,14 @@ suites = {
 
 foreach s, is_parallel : suites
 	test(
-		'pytest',
+		'@0@'.format(s),
 		pytest,
 		args: [
 			'--tap-stream',
 			meson.current_source_dir() / 'test_@0@.py'.format(s),
 		],
 		env: env,
-		suite: ['unit', s],
+		suite: ['unit'],
 		protocol: 'tap',
 		is_parallel: is_parallel,
 	)
