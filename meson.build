@@ -6,7 +6,7 @@ project(
 pymod = import('python')
 
 docstrings = find_program('docstrings.py', required: true)
-cython = find_program('cython', required: get_option('use-cython'))
+cython = find_program('cython', required: true)
 python = pymod.find_installation(
 	'python',
 	required: true,
