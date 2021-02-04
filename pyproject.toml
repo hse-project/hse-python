@@ -4,6 +4,7 @@ build-backend = "mesonpep517.buildapi"
 
 [tool.mesonpep517.metadata]
 author = "Micron Technology, Inc."
+author-email = "workaround@example.com"
 summary = "Fast key-value storage for SSDs and persistent memory"
 description = """\
 	Python bindings to HSE's C API. \
@@ -25,7 +26,7 @@ classifiers = [
 	"Typing :: Typed",
 ]
 requires-python = ">=3.6"
-homepage = "https://github.com/hse-project/hse-python"
+home-page = "https://github.com/hse-project/hse-python"
 project-urls = [
 	"HSE, https://github.com/hse-project/hse",
 	"Issue Tracker, https://github.com/hse-project/hse-python",
