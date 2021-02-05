@@ -53,6 +53,13 @@ python setup.py build_ext -i
 CFLAGS="-Ipath/to/include" LDFLAGS="-Lpath/to/search" python setup.py build_ext -i
 ```
 
+### Working the HSE Repository
+
+If you are working on a feature or bug that requires work in both `hse` and
+`hse-python`, then make `subprojects/hse` a symlink to the `hse` repository on
+your system. Then in the event you edit `hse`, `hse-python` will see the
+changes as well and re-build/re-link appropriately.
+
 ## Testing
 
 Export the `PYTHONPATH` environment variable to the root of this repository.
