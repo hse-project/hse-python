@@ -75,7 +75,6 @@ foreach m : modules
 		output: '@0@.pyx'.format(m),
 	)
 
-
 	# HACK: cython needs pxds next to pyxs for whatever reasons and generators are dumb
 	pxd = custom_target(
 		'@0@-pxd'.format(m),
@@ -96,14 +95,14 @@ foreach m : modules
 		command: [
 			cython,
 			'@INPUT@',
-			'-o',
+			'--output-file',
 			'@OUTPUT@',
-			'-X',
+			'--directive',
 			','.join(compiler_directives),
-			'-E',
+			'--compile-time-env',
 			','.join(compile_time_env),
-			'-I',
-			meson.current_source_dir(),
+			'--include-dir',
+			meson.current_build_dir(),
 			extra_cython_args,
 		],
 		output: '@0@.c'.format(m),
