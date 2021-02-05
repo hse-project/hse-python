@@ -23,17 +23,17 @@ extensions: List[Extension] = [
     Extension(
         "hse.hse",
         [str(HSE_PACKAGE / f"hse.{SOURCE_EXTENSION}")],
-        libraries=["hse_kvdb"],
+        libraries=["hse-1"],
     ),
     Extension(
         "hse.limits",
         [str(HSE_PACKAGE / f"limits.{SOURCE_EXTENSION}")],
-        libraries=["hse_kvdb"],
+        libraries=["hse-1"],
     ),
     Extension(
         "hse.experimental",
         [str(HSE_PACKAGE / f"experimental.{SOURCE_EXTENSION}")],
-        libraries=["hse_kvdb"],
+        libraries=["hse-1"],
     ),
 ]
 
@@ -88,7 +88,7 @@ if USE_CYTHON:
 
 setup(
     name="hse",
-    version="1.9",
+    version="1.0.0",
     maintainer="Micron Technology, Inc.",
     description="Python bindings to HSE's C API. "
     "HSE is an embeddable key-value store designed for SSDs based on NAND "
@@ -122,7 +122,6 @@ setup(
         "engine",
     ],
     classifiers=[
-        "Development Status :: 1 - Planning",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Cython",
