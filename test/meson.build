@@ -1,7 +1,7 @@
 pytest = find_program('pytest', required: true)
 
 env = environment({
-	'PYTHONPATH': project_build_root,
+	'PYTHONPATH': meson.project_build_root(),
 })
 
 # Name of suite with whether or not it can be parallel. KVDBs can only be
