@@ -1,6 +1,9 @@
 project(
 	'hse-python',
-	version: '1.10.0',
+	version: '1.0.0',
+	default_options: [
+		'buildtype=debugoptimized',
+	],
 )
 
 pymod = import('python')
