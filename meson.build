@@ -10,7 +10,7 @@ pymod = import('python')
 
 docstrings = find_program('docstrings.py', required: true)
 cython = find_program('cython', required: true)
-python = pymod.find_installation('python', required: true)
+python = pymod.find_installation('python3', required: true)
 
 hse_dep = dependency(
 	'hse-1',
