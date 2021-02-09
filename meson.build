@@ -12,6 +12,9 @@ docstrings = find_program('docstrings.py', required: true)
 cython = find_program('cython', required: true)
 python = pymod.find_installation('python3', required: true)
 
+# Exported for usage in hse.
+project_build_root = meson.project_build_root()
+
 hse_dep = dependency(
 	'hse-1',
 	version: '>=1.10',
