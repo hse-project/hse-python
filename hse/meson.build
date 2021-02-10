@@ -32,6 +32,24 @@ modules = [
 	'experimental',
 ]
 
+pxds = []
+foreach m : modules
+	# HACK: cython needs pxds next to pyxs for whatever reasons and generators are dumb
+	pxd = custom_target(
+		'@0@-pxd'.format(m),
+		build_by_default: true,
+		input: '@0@.pxd'.format(m),
+		command: [
+			'cp',
+			'@INPUT@',
+			'@OUTPUT@',
+		],
+		output: '@0@.pxd'.format(m),
+	)
+
+	pxds += pxd
+endforeach
+
 foreach m : modules
 	pyi = custom_target(
 		'@0@-pyi'.format(m),
@@ -75,19 +93,6 @@ foreach m : modules
 		output: '@0@.pyx'.format(m),
 	)
 
-	# HACK: cython needs pxds next to pyxs for whatever reasons and generators are dumb
-	pxd = custom_target(
-		'@0@-pxd'.format(m),
-		build_by_default: true,
-		input: '@0@.pxd'.format(m),
-		command: [
-			'cp',
-			'@INPUT@',
-			'@OUTPUT@',
-		],
-		output: '@0@.pxd'.format(m),
-	)
-
 	c = custom_target(
 		'@0@-c'.format(m),
 		build_by_default: true,
@@ -107,7 +112,7 @@ foreach m : modules
 		],
 		output: '@0@.c'.format(m),
 		depends: [
-			pxd,
+			pxds,
 		],
 	)
 
