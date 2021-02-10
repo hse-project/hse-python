@@ -144,6 +144,7 @@ init_py = custom_target(
 	output: '__init__.py',
 )
 
+# HACK: for easy interpreter integration cp the __init__.py over to the analogous build dir
 py_typed = custom_target(
 	'py-typed',
 	build_by_default: true,
