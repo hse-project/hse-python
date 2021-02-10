@@ -3,6 +3,7 @@ project(
 	version: '1.0.0',
 	default_options: [
 		'buildtype=debugoptimized',
+		'warning_level=2',
 	],
 )
 
