@@ -50,6 +50,7 @@ foreach m : modules
 	pxds += pxd
 endforeach
 
+extension_modules = []
 foreach m : modules
 	pyi = custom_target(
 		'@0@-pyi'.format(m),
@@ -116,7 +117,7 @@ foreach m : modules
 		],
 	)
 
-	python.extension_module(
+	extension_module = python.extension_module(
 		'@0@'.format(m),
 		c,
 		dependencies: [
@@ -126,6 +127,8 @@ foreach m : modules
 		subdir: 'hse',
 		install: true,
 	)
+
+	extension_modules += extension_module
 endforeach
 
 # HACK: for easy interpreter integration cp the __init__.py over to the analogous build dir
@@ -141,5 +144,20 @@ init_py = custom_target(
 	output: '__init__.py',
 )
 
-python.install_sources('__init__.py', subdir: 'hse')
-python.install_sources('py.typed', subdir: 'hse')
+py_typed = custom_target(
+	'py-typed',
+	build_by_default: true,
+	input: 'py.typed',
+	command: [
+		'cp',
+		'@INPUT@',
+		'@OUTPUT@',
+	],
+	output: 'py.typed',
+)
+
+python.install_sources(
+	'__init__.py',
+	'py.typed',
+	subdir: 'hse'
+)

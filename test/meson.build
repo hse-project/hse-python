@@ -29,5 +29,8 @@ foreach s, is_parallel : suites
 		suite: ['unit'],
 		protocol: 'tap',
 		is_parallel: is_parallel,
+		depends: [
+			extension_modules,
+		],
 	)
 endforeach
