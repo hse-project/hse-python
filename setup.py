@@ -53,12 +53,36 @@ if USE_CYTHON:
         if USE_CYTHON:
             import docstrings
 
-            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyx"), str(HSE_PACKAGE / "hse.pyx"), "docstrings.toml")
-            docstrings.insert(str(HSE_PACKAGE / "hse.in.pyi"), str(HSE_PACKAGE / "hse.pyi"), "docstrings.toml")
-            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyx"), str(HSE_PACKAGE / "limits.pyx"), "docstrings.toml")
-            docstrings.insert(str(HSE_PACKAGE / "limits.in.pyi"), str(HSE_PACKAGE / "limits.pyi"), "docstrings.toml")
-            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyx"), str(HSE_PACKAGE / "experimental.pyx"), "docstrings.toml")
-            docstrings.insert(str(HSE_PACKAGE / "experimental.in.pyi"), str(HSE_PACKAGE / "experimental.pyi"), "docstrings.toml")
+            docstrings.insert(
+                str(HSE_PACKAGE / "hse.in.pyx"),
+                str(HSE_PACKAGE / "hse.pyx"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "hse.in.pyi"),
+                str(HSE_PACKAGE / "hse.pyi"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "limits.in.pyx"),
+                str(HSE_PACKAGE / "limits.pyx"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "limits.in.pyi"),
+                str(HSE_PACKAGE / "limits.pyi"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "experimental.in.pyx"),
+                str(HSE_PACKAGE / "experimental.pyx"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "experimental.in.pyi"),
+                str(HSE_PACKAGE / "experimental.pyi"),
+                "docstrings.toml",
+            )
 
         return cythonize(
             modules,

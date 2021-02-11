@@ -90,8 +90,16 @@ def insert(input_file: str, output_file: str, docstrings_toml: str) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Insert docstrings into input files")
     parser.add_argument("-o", "--output", nargs=1, required=True, help="Output file")
-    parser.add_argument("-d", "--docstrings", nargs=1, required=True, help="Path to docstrings.toml file")
-    parser.add_argument("-f", "--file", nargs=1, required=True, help="Files to manipulate")
+    parser.add_argument(
+        "-d",
+        "--docstrings",
+        nargs=1,
+        required=True,
+        help="Path to docstrings.toml file",
+    )
+    parser.add_argument(
+        "-f", "--file", nargs=1, required=True, help="Files to manipulate"
+    )
     ns = parser.parse_args(sys.argv[1:])
 
     output = ns.output[0]
