@@ -5,6 +5,7 @@ project(
 		'buildtype=debugoptimized',
 		'warning_level=2',
 	],
+	meson_version: '>=0.57',
 )
 
 pymod = import('python')
@@ -61,12 +62,12 @@ if get_option('tests')
 	subdir('test')
 endif
 
-# TODO: remove when minimum Meson version moves to 0.57
-if meson.version().version_compare('>=0.57')
-	run_target(
-		'python-repl',
-		env: environment({
-			'PYTHONPATH': meson.project_build_root(),
-		}),
-	)
-endif
+run_target(
+	'python-repl',
+	command: [
+		python,
+	],
+	env: environment({
+		'PYTHONPATH': meson.project_build_root(),
+	}),
+)
