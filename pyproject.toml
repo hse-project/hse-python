@@ -1,38 +1,9 @@
-[tool.poetry]
-name = "hse"
-version = "1.0.0"
-description = """\
-	Python bindings to HSE's C API. \
-    HSE is an embeddable key-value store designed for SSDs based on NAND \
-    flash or persistent memory. HSE optimizes performance and endurance by \
-    orchestrating data placement across DRAM and multiple classes of SSDs \
-    or other solid-state storage. HSE is ideal for powering NoSQL, \
-    Software-Defined Storage (SDS), High-Performance Computing (HPC), \
-    Big Data, Internet of Things (IoT), and Artificial Intelligence (AI) \
-    solutions.\
-"""
-authors = ["Micron Technology, Inc."]
-
-[tool.poetry.dependencies]
-python = "^3.6"
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.2"
-pytest-tap = "^3.2"
-black = "^20.8b1"
-toml = "^0.10.2"
-Cython = "^0.29.21"
-mesonpep517 = "^0.1.9999996"
-meson = "^0.57.0"
-pep517 = "^0.9.1"
-
 [build-system]
-requires = ["mesonpep517"]
+requires = ["mesonpep517", "toml", "Cython", "pytest", "pytest-tap"]
 build-backend = "mesonpep517.buildapi"
 
 [tool.mesonpep517.metadata]
 author = "Micron Technology, Inc."
-author-email = "workaround@example.com"
 summary = "Fast key-value storage for SSDs and persistent memory"
 description-file = "README.md"
 classifiers = [
@@ -52,5 +23,5 @@ project-urls = [
 ]
 module = "hse"
 meson-options = [
-	"tests=false"
+	"-Dtests=false",
 ]

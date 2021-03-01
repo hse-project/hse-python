@@ -12,7 +12,13 @@ pymod = import('python')
 
 docstrings = find_program('docstrings.py', required: true)
 cython = find_program('cython', required: true)
-python = pymod.find_installation('python3', required: true)
+python = pymod.find_installation(
+	'python3',
+	required: true,
+	modules: [
+		'toml',
+	],
+)
 
 build_number_result = run_command(
 	'sh',
@@ -50,16 +56,18 @@ hse_dep = dependency(
 	required: true,
 	fallback: ['hse', 'hse_dep'],
 	default_options: [
+		'cli=false',
 		'tests=false',
 		'tools=false',
 		'samples=false',
+		'bindings-python=false',
 	],
 )
 
 subdir('hse')
 
 if get_option('tests')
-	subdir('test')
+	subdir('tests')
 endif
 
 run_target(

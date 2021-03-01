@@ -11,7 +11,7 @@ typings/
 !*.in.pyi
 .pytest_cache/
 hse/*.html
-test/kvdb-export/
+tests/kvdb-export/
 subprojects/*
 !subprojects/packagefiles
 *build*/
