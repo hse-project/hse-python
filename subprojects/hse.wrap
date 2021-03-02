@@ -4,3 +4,4 @@ revision = updates/NFSE-4592-meson-build-system-improvements
 
 [provide]
 dependency_names = hse-1
+program_names = hse1
