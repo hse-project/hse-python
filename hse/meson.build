@@ -50,6 +50,7 @@ foreach m : modules
 	pxds += pxd
 endforeach
 
+pyi_stubs = []
 extension_modules = []
 foreach m : modules
 	pyi = custom_target(
@@ -73,6 +74,8 @@ foreach m : modules
 		install: true,
 		install_dir: python.get_install_dir() / 'hse'
 	)
+
+	pyi_stubs += pyi
 
 	pyx = custom_target(
 		'@0@-pyx'.format(m),
