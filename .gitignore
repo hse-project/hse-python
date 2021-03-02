@@ -13,6 +13,6 @@ typings/
 hse/*.html
 tests/kvdb-export/
 subprojects/*
-!subprojects/packagefiles
+!subprojects/packagefiles/
 *build*/
 !subprojects/hse.wrap
