@@ -72,7 +72,7 @@ foreach m : modules
         ],
         output: '@0@.pyi'.format(m),
         install: true,
-        install_dir: python.get_install_dir() / 'hse'
+        install_dir: python.get_install_dir(pure: false) / 'hse'
     )
 
     pyi_stubs += pyi
