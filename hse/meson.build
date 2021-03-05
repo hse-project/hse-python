@@ -134,35 +134,21 @@ foreach m : modules
     extension_modules += extension_module
 endforeach
 
-# HACK: for easy interpreter integration cp the __init__.py over to the analogous build dir
-init_py = custom_target(
-    'init-py',
-    build_by_default: true,
+init_py = configure_file(
     input: '__init__.py',
-    command: [
-        'cp',
-        '@INPUT@',
-        '@OUTPUT@',
-    ],
     output: '__init__.py',
+    copy: true,
 )
 
-# HACK: for easy interpreter integration cp the __init__.py over to the analogous build dir
-py_typed = custom_target(
-    'py-typed',
-    build_by_default: true,
+py_typed = configure_file(
     input: 'py.typed',
-    command: [
-        'cp',
-        '@INPUT@',
-        '@OUTPUT@',
-    ],
     output: 'py.typed',
+    copy: true,
 )
 
 python.install_sources(
-    '__init__.py',
-    'py.typed',
+    init_py,
+    py_typed,
     subdir: 'hse',
     pure: false,
 )
