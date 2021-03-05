@@ -163,5 +163,6 @@ py_typed = custom_target(
 python.install_sources(
     '__init__.py',
     'py.typed',
-    subdir: 'hse'
+    subdir: 'hse',
+    pure: false,
 )
