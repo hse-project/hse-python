@@ -26,25 +26,6 @@ The version commit hash is a git commit hash
 (e.g., b55fe07774d7cbc1492d7b8a47dc2c194cd3e24a).
 """
 
-[hse.init]
-__doc__ = """
-Initialize the HSE subsystem
-
-This function initializes a range of different internal HSE structures. It must be
-called before any other HSE functions are used. It is not thread safe and is
-idempotent.
-"""
-
-[hse.fini]
-__doc__ = """
-Shutdown the HSE subsystem
-
-This function cleanly finalizes a range of different internal HSE structures. It
-should be called prior to application exit and is not thread safe. After it is
-invoked (and even before it returns), calling any other HSE functions will result in
-undefined behavior. This function is not thread safe.
-"""
-
 [hse.KvdbException]
 __doc__ = """
 Raised when HSE encounters an error. Wrapper around `hse_err_t`.
@@ -60,6 +41,25 @@ Close an open HSE KVDB
 
 No client thread may enter the HSE KVDB API with the referenced KVDB after this
 function starts. This function is not thread safe.
+"""
+
+[hse.Kvdb.init]
+__doc__ = """
+Initialize the HSE KVDB subsystem
+
+This function initializes a range of different internal HSE structures. It must be
+called before any other HSE functions are used. It is not thread safe and is
+idempotent.
+"""
+
+[hse.Kvdb.fini]
+__doc__ = """
+Shutdown the HSE KVDB subsystem
+
+This function cleanly finalizes a range of different internal HSE structures. It
+should be called prior to application exit and is not thread safe. After it is
+invoked (and even before it returns), calling any other HSE functions will result in
+undefined behavior. This function is not thread safe.
 """
 
 [hse.Kvdb.make]

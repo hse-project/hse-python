@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
 
 """
 KVDB_VERSION_STRING:
@@ -24,18 +24,6 @@ KVDB_VERSION_STRING: str
 KVDB_VERSION_TAG: str
 KVDB_VERSION_SHA: str
 
-def init() -> None:
-    """
-    @SUB@ hse.init.__doc__
-    """
-    ...
-
-def fini() -> None:
-    """
-    @SUB@ hse.fini.__doc__
-    """
-    ...
-
 class KvdbException(Exception):
     """
     @SUB@ hse.KvdbException.__doc__
@@ -48,6 +36,18 @@ class Kvdb:
     def close(self) -> None:
         """
         @SUB@ hse.Kvdb.close.__doc__
+        """
+        ...
+    @staticmethod
+    def init() -> None:
+        """
+        @SUB@ hse.Kvdb.init.__doc__
+        """
+        ...
+    @staticmethod
+    def fini() -> None:
+        """
+        @SUB@ hse.Kvdb.fini.__doc__
         """
         ...
     @staticmethod

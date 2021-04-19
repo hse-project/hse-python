@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
 
 """
 KVDB_VERSION_STRING:
@@ -36,22 +36,6 @@ from libc.stdlib cimport free
 KVDB_VERSION_STRING = hse_kvdb_version_string().decode()
 KVDB_VERSION_TAG = hse_kvdb_version_tag().decode()
 KVDB_VERSION_SHA = hse_kvdb_version_sha().decode()
-
-
-def init() -> None:
-    """
-    @SUB@ hse.init.__doc__
-    """
-    cdef hse_err_t err = hse_init()
-    if err != 0:
-        raise KvdbException(err)
-
-
-def fini() -> None:
-    """
-    @SUB@ hse.fini.__doc__
-    """
-    hse_fini()
 
 
 class KvdbException(Exception):
@@ -94,6 +78,22 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
         self._c_hse_kvdb = NULL
+
+    @staticmethod
+    def init() -> None:
+        """
+        @SUB@ hse.Kvdb.init.__doc__
+        """
+        cdef hse_err_t err = hse_kvdb_init()
+        if err != 0:
+            raise KvdbException(err)
+
+    @staticmethod
+    def fini() -> None:
+        """
+        @SUB@ hse.Kvdb.fini.__doc__
+        """
+        hse_kvdb_fini()
 
     @staticmethod
     def make(str mp_name, Params params=None) -> None:
