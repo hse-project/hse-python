@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 from libc.stdint cimport uint64_t
 # Avoid interfering with Python bool type since Cython seems to struggle
@@ -38,8 +38,8 @@ cdef extern from "hse/hse.h":
     const char *hse_kvdb_version_tag()
     const char *hse_kvdb_version_sha()
 
-    hse_err_t hse_kvdb_init()
-    void hse_kvdb_fini()
+    hse_err_t hse_init()
+    void hse_fini()
 
     hse_err_t hse_kvdb_make(const char *mp_name, const hse_params *params)
     hse_err_t hse_kvdb_open(const char *mp_name, const hse_params *params, hse_kvdb **kvdb)
