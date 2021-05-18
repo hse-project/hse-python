@@ -28,25 +28,6 @@ class KvsPfxProbeCnt(Enum):
     MUL = experimental.HSE_KVS_PFX_FOUND_MUL
 
 
-def kvdb_export(hse.Kvdb kvdb, str path, hse.Params params=None) -> None:
-    """
-    @SUB@ experimental.kvdb_export.__doc__
-    """
-    cdef hse.hse_params *p = params._c_hse_params if params else NULL
-    cdef hse.hse_err_t err = experimental.hse_kvdb_export_exp(kvdb._c_hse_kvdb, p, path.encode())
-    if err != 0:
-        raise hse.KvdbException(err)
-
-
-def kvdb_import(str mpool_name, str path) -> None:
-    """
-    @SUB@ experimental.kvdb_import.__doc__
-    """
-    cdef hse.hse_err_t err = experimental.hse_kvdb_import_exp(mpool_name.encode(), path.encode())
-    if err != 0:
-        raise hse.KvdbException(err)
-
-
 def kvs_prefix_probe(hse.Kvs kvs, const unsigned char [:]pfx, unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KLEN_MAX), unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VLEN_MAX), hse.Transaction txn=None) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
