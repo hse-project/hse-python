@@ -6,9 +6,6 @@ from hse cimport hse_err_t, hse_kvdb, hse_params, hse_kvs, hse_kvdb_opspec
 
 
 cdef extern from "hse/hse_experimental.h":
-    hse_err_t hse_kvdb_export_exp(hse_kvdb *handle, hse_params *params, const char *path)
-    hse_err_t hse_kvdb_import_exp(const char *mpool_name, const char *path)
-
     cdef enum hse_kvs_pfx_probe_cnt:
         HSE_KVS_PFX_FOUND_ZERO,
         HSE_KVS_PFX_FOUND_ONE,

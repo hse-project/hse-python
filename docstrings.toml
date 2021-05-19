@@ -649,27 +649,6 @@ __doc__ = """
 Enum representing how many results were found in the probe operation.
 """
 
-[experimental.kvdb_export]
-__doc__ = """
-Export a kvdb into files
-
-Args:
-
-`kvdb` - Kvdb instance\\n
-`params` - Configuration parameters\\n
-`path` - Export target path
-"""
-
-[experimental.kvdb_import]
-__doc__ = """
-Import a kvdb from files
-
-Args:
-
-`mpool_name` - Mpool name\\n
-`path` - Import target path
-"""
-
 [experimental.kvs_prefix_probe]
 __doc__ = """
 Probe for prefix

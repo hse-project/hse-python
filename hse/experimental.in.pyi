@@ -26,18 +26,6 @@ class KvsPfxProbeCnt(Enum):
     ONE = ...
     MUL = ...
 
-def kvdb_export(kvdb: Kvdb, path: str, params: Optional[Params] = ...) -> None:
-    """
-    @SUB@ experimental.kvdb_export.__doc__
-    """
-    ...
-
-def kvdb_import(mpool_name: str, path: str) -> None:
-    """
-    @SUB@ experimental.kvdb_import.__doc__
-    """
-    ...
-
 def kvs_prefix_probe(
     kvs: Kvs,
     pfx: bytes,
