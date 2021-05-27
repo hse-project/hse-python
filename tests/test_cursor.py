@@ -6,16 +6,14 @@ import errno
 
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
-    p = hse.Params().set("kvs.pfx_len", "3")
-
     try:
-        kvdb.kvs_make("cursor-test", params=p)
+        kvdb.kvs_make("cursor-test", "pfx_len=3")
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
             raise e
-    kvs = kvdb.kvs_open("cursor-test", params=p)
+    kvs = kvdb.kvs_open("cursor-test", "transactions_enable=0")
 
     yield kvs
 
@@ -85,53 +83,3 @@ def test_reverse(kvs: hse.Kvs):
                 cursor.read() == (f"key{i}".encode(), f"value{i}".encode())
                 and not cursor.eof
             )
-
-
-def test_type2(kvdb: hse.Kvdb, kvs: hse.Kvs):
-    with kvdb.transaction() as txn:
-        kvs.put(b"key5", b"value5")
-        kvs.put(b"key6", b"value6", txn=txn)
-        with kvs.cursor(txn=txn) as cursor:
-            for _ in range(5):
-                cursor.read()
-            cursor.read()
-            assert cursor.eof
-
-
-def test_update_to_type2(kvdb: hse.Kvdb, kvs: hse.Kvs):
-    with kvdb.transaction() as txn:
-        kvs.put(b"key5", b"value5")
-        kvs.put(b"key6", b"value6", txn=txn)
-        with kvs.cursor() as cursor:
-            cursor.update(txn=txn)
-            for _ in range(5):
-                cursor.read()
-            cursor.read()
-            assert cursor.eof
-
-
-def test_type3(kvdb: hse.Kvdb, kvs: hse.Kvs):
-    with kvdb.transaction() as txn:
-        kvs.put(b"key5", b"value5")
-        kvs.put(b"key6", b"value6", txn=txn)
-        with kvs.cursor(bind_txn=True, txn=txn) as cursor:
-            for _ in range(5):
-                cursor.read()
-            kv = cursor.read()
-            assert kv == (b"key6", b"value6")
-            cursor.read()
-            assert cursor.eof
-
-
-def test_update_to_type3(kvdb: hse.Kvdb, kvs: hse.Kvs):
-    with kvdb.transaction() as txn:
-        kvs.put(b"key5", b"value5")
-        kvs.put(b"key6", b"value6", txn=txn)
-        with kvs.cursor() as cursor:
-            cursor.update(bind_txn=True, txn=txn)
-            for _ in range(5):
-                cursor.read()
-            kv = cursor.read()
-            assert kv == (b"key6", b"value6")
-            cursor.read()
-            assert cursor.eof

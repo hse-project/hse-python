@@ -6,16 +6,14 @@ import errno
 
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
-    p = hse.Params().set("kvs.pfx_len", "3")
-
     try:
-        kvdb.kvs_make("kvdb-test", params=p)
+        kvdb.kvs_make("kvdb-test", "pfx_len=3")
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
             raise e
-    kvs = kvdb.kvs_open("kvdb-test", params=p)
+    kvs = kvdb.kvs_open("kvdb-test")
 
     yield kvs
 

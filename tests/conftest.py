@@ -2,23 +2,36 @@ import errno
 from typing import Generator
 import hse
 import pytest
+from _pytest.config.argparsing import Parser
+from _pytest.config import Config
+import pathlib
+
+
+def pytest_addoption(parser: Parser) -> None:
+    parser.addoption("-C", "--home", type=pathlib.Path, default=pathlib.Path.cwd())
 
 
 @pytest.fixture(scope="package")
-def kvdb() -> Generator[hse.Kvdb, None, None]:
-    hse.Kvdb.init()
+def home(pytestconfig: Config) -> Generator[pathlib.Path, None, None]:
+    return pytestconfig.getoption("home") # type: ignore
+
+
+@pytest.fixture(scope="package")
+def kvdb(home: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
+    hse.init()
 
     try:
-        hse.Kvdb.make("hse-python-test")
+        hse.Kvdb.make(home)
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
             raise e
 
-    kvdb = hse.Kvdb.open("hse-python-test")
+    kvdb = hse.Kvdb.open(home)
 
     yield kvdb
 
     kvdb.close()
-    hse.Kvdb.fini()
+    hse.Kvdb.drop(home)
+    hse.fini()

@@ -24,7 +24,7 @@ cimport limits
 from enum import Enum
 from types import TracebackType
 from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable
-from libc.stdlib cimport free
+from libc.stdlib cimport malloc, free
 
 
 # Throughout these bindings, you will see C pointers be set to NULL after their
@@ -54,6 +54,20 @@ def fini() -> None:
     hse_fini()
 
 
+cdef char **to_paramv(tuple params) except NULL:
+    cdef char **paramv = <char **>malloc(len(params) * sizeof(char *))
+    if not paramv:
+        raise MemoryError()
+    else:
+        for i, param in enumerate(params):
+            assert isinstance(param, str)
+            paramv[i] = <char *>PyUnicode_AsUTF8(param)
+            if not paramv[i]:
+                return NULL
+
+    return paramv
+
+
 class KvdbException(Exception):
     """
     @SUB@ hse.KvdbException.__doc__
@@ -71,12 +85,16 @@ class KvdbException(Exception):
 
 
 cdef class Kvdb:
-    def __cinit__(self, str mp_name, Params params=None):
+    def __cinit__(self, home: Optional[os.PathLike[str]], *params: str):
         self._c_hse_kvdb = NULL
 
-        cdef hse_params *p = params._c_hse_params if params else NULL
+        home_bytes = os.fspath(home).encode() if home else None
+        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        err = hse_kvdb_open(mp_name.encode(), p, &self._c_hse_kvdb)
+        err = hse_kvdb_open(home_addr, len(params), <const char * const*>paramv, &self._c_hse_kvdb)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise KvdbException(err)
 
@@ -96,23 +114,41 @@ cdef class Kvdb:
         self._c_hse_kvdb = NULL
 
     @staticmethod
-    def make(str mp_name, Params params=None) -> None:
+    def make(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
-        mp_name_bytes = mp_name.encode()
-        cdef hse_params *p = params._c_hse_params if params else NULL
+        home_bytes = os.fspath(home).encode() if home else None
+        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_make(<char *>mp_name_bytes, p)
+        cdef hse_err_t err = hse_kvdb_make(home_addr, len(params), <const char * const*>paramv)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise KvdbException(err)
 
     @staticmethod
-    def open(str mp_name, Params params=None) -> Kvdb:
+    def drop(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
+        """
+        @SUB@ hse.Kvdb.drop.__doc__
+        """
+        home_bytes = os.fspath(home).encode() if home else None
+        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
+
+        cdef hse_err_t err = hse_kvdb_drop(home_addr, len(params), <const char * const*>paramv)
+        if paramv:
+            free(paramv)
+        if err != 0:
+            raise KvdbException(err)
+
+    @staticmethod
+    def open(home: Optional[os.PathLike[str]]=None, *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
-        return Kvdb(mp_name, params=params)
+        return Kvdb(home, *params)
 
     @property
     def names(self) -> List[str]:
@@ -135,14 +171,17 @@ cdef class Kvdb:
 
         return result
 
-    def kvs_make(self, str kvs_name, Params params=None) -> None:
+    def kvs_make(self, str name, *params: str) -> None:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
-        kvs_name_bytes = kvs_name.encode()
-        cdef hse_params *p = params._c_hse_params if params else NULL
+        name_bytes = name.encode() if name else None
+        cdef const char *name_addr = <char *>name_bytes if name_bytes else NULL
+        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_kvs_make(self._c_hse_kvdb, <char *>kvs_name_bytes, p)
+        cdef hse_err_t err = hse_kvdb_kvs_make(
+            self._c_hse_kvdb, name_addr, len(params),
+            <const char * const*>paramv)
         if err != 0:
             raise KvdbException(err)
 
@@ -154,11 +193,11 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def kvs_open(self, str kvs_name, Params params=None) -> Kvs:
+    def kvs_open(self, str kvs_name, *params: str) -> Kvs:
         """
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
-        return Kvs(self, kvs_name, params=params)
+        return Kvs(self, kvs_name, *params)
 
     def sync(self) -> None:
         """
@@ -209,6 +248,19 @@ cdef class Kvdb:
             raise KvdbException(err)
         return status
 
+    @property
+    def storage_info(self) -> KvdbStorageInfo:
+        """
+        @SUB@ hse.Kvdb.storage_info.__doc__
+        """
+        info: KvdbStorageInfo = KvdbStorageInfo()
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_storage_info_get(self._c_hse_kvdb, &info._c_hse_kvdb_storage_info)
+        if err != 0:
+            raise KvdbException(err)
+        return info
+
     def transaction(self) -> Transaction:
         """
         @SUB@ hse.Kvdb.transaction.__doc__
@@ -219,12 +271,15 @@ cdef class Kvdb:
 
 
 cdef class Kvs:
-    def __cinit__(self, Kvdb kvdb, str kvs_name, Params params=None):
+    def __cinit__(self, Kvdb kvdb, str name, *params: str):
         self._c_hse_kvs = NULL
 
-        cdef hse_params *p = params._c_hse_params if params else NULL
+        name_bytes = name.encode() if name else None
+        cdef const char *name_addr = <char *>name_bytes if name_bytes else NULL
+        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, kvs_name.encode(), p, &self._c_hse_kvs)
+        cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, name_addr, len(params),
+            <const char * const*>paramv, &self._c_hse_kvs)
         if err != 0:
             raise KvdbException(err)
 
@@ -257,22 +312,20 @@ cdef class Kvs:
         cdef size_t key_len = 0
         cdef const void *value_addr = NULL
         cdef size_t value_len = 0
-        if key is not None and len(key) > 0:
+        if key is not None:
             key_addr = &key[0]
-            key_len = len(key)
-        if value is not None and len(value) > 0:
+            key_len = key.shape[0]
+        if value is not None:
             value_addr = &value[0]
-            value_len = len(value)
+            value_len = value.shape[0]
 
         cdef hse_err_t err = 0
-        try:
-            with nogil:
-                err = hse_kvs_put(self._c_hse_kvs, opspec, key_addr, key_len, value_addr, value_len)
-            if err != 0:
-                raise KvdbException(err)
-        finally:
-            if opspec:
-                free(opspec)
+        with nogil:
+            err = hse_kvs_put(self._c_hse_kvs, opspec, key_addr, key_len, value_addr, value_len)
+        if opspec:
+            free(opspec)
+        if err != 0:
+            raise KvdbException(err)
 
     def get(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
         """
@@ -294,26 +347,24 @@ cdef class Kvs:
         cdef size_t key_len = 0
         cdef void *buf_addr = NULL
         cdef size_t buf_len = 0
-        if key is not None and len(key) > 0:
+        if key is not None:
             key_addr = &key[0]
-            key_len = len(key)
-        if buf is not None and len(buf) > 0:
+            key_len = key.shape[0]
+        if buf is not None:
             buf_addr = &buf[0]
-            buf_len = len(buf)
+            buf_len = buf.shape[0]
 
         cdef cbool found = False
         cdef size_t value_len = 0
         cdef hse_err_t err = 0
-        try:
-            with nogil:
-                err = hse_kvs_get(self._c_hse_kvs, opspec, key_addr, key_len, &found, buf_addr, buf_len, &value_len)
-            if err != 0:
-                raise KvdbException(err)
-            if not found:
-                return None, 0
-        finally:
-            if opspec:
-                free(opspec)
+        with nogil:
+            err = hse_kvs_get(self._c_hse_kvs, opspec, key_addr, key_len, &found, buf_addr, buf_len, &value_len)
+        if opspec:
+            free(opspec)
+        if err != 0:
+            raise KvdbException(err)
+        if not found:
+            return None, 0
 
         if buf is None:
             return None, value_len
@@ -335,18 +386,17 @@ cdef class Kvs:
 
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
-        if key is not None and len(key) > 0:
+        if key is not None:
             key_addr = &key[0]
-            key_len = len(key)
+            key_len = key.shape[0]
 
         cdef hse_err_t err = 0
-        try:
-            with nogil:
-                err = hse_kvs_delete(self._c_hse_kvs, opspec, key_addr, key_len)
-            if err != 0:
-                raise KvdbException(err)
-        finally:
+        with nogil:
+            err = hse_kvs_delete(self._c_hse_kvs, opspec, key_addr, key_len)
+        if opspec:
             free(opspec)
+        if err != 0:
+            raise KvdbException(err)
 
     def prefix_delete(self, const unsigned char [:]filt, priority: bool=False, txn: Transaction=None) -> int:
         """
@@ -360,20 +410,18 @@ cdef class Kvs:
 
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
-        if filt is not None and len(filt) > 0:
+        if filt is not None:
             filt_addr = &filt[0]
-            filt_len = len(filt)
+            filt_len = filt.shape[0]
 
         cdef hse_err_t err = 0
         cdef size_t kvs_pfx_len = 0
-        try:
-            with nogil:
-                err = hse_kvs_prefix_delete(self._c_hse_kvs, opspec, filt_addr, filt_len, &kvs_pfx_len)
-            if err != 0:
-                raise KvdbException(err)
-        finally:
-            if opspec:
-                free(opspec)
+        with nogil:
+            err = hse_kvs_prefix_delete(self._c_hse_kvs, opspec, filt_addr, filt_len, &kvs_pfx_len)
+        if opspec:
+            free(opspec)
+        if err != 0:
+            raise KvdbException(err)
 
         return kvs_pfx_len
 
@@ -436,7 +484,7 @@ cdef class Transaction:
         self.begin()
         return self
 
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Exception], exc_tb: Optional[TracebackType]):
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]):
         # PEP-343: If exception occurred in with statement, abort transaction
         if exc_tb:
             self.abort()
@@ -492,8 +540,8 @@ cdef class Transaction:
 
 cdef class Cursor:
     """
-    See the concept and best practices sections on the HSE Wiki at
-    https://github.com/hse-project/hse/wiki
+    See the concepts and best practices sections on the HSE website at
+    https://hse-project.github.io/
     """
     def __cinit__(
         self,
@@ -518,25 +566,22 @@ cdef class Cursor:
 
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
-        if filt is not None and len(filt) > 0:
+        if filt is not None:
             filt_addr = &filt[0]
-            filt_len = len(filt)
+            filt_len = filt.shape[0]
 
-        cdef hse_err_t err = 0
-        try:
-            with nogil:
-                err = hse_kvs_cursor_create(
-                    kvs._c_hse_kvs,
-                    opspec,
-                    filt_addr,
-                    filt_len,
-                    &self._c_hse_kvs_cursor
-                )
-            if err != 0:
-                raise KvdbException(err)
-        finally:
-            if opspec:
-                free(opspec)
+        with nogil:
+            err = hse_kvs_cursor_create(
+                kvs._c_hse_kvs,
+                opspec,
+                filt_addr,
+                filt_len,
+                &self._c_hse_kvs_cursor
+            )
+        if opspec:
+            free(opspec)
+        if err != 0:
+            raise KvdbException(err)
 
     def __dealloc__(self):
         self.destroy()
@@ -544,7 +589,7 @@ cdef class Cursor:
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Optional[Type[Exception]], exc_val: Optional[Exception], exc_tb: Optional[TracebackType]):
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_val: Optional[BaseException], exc_tb: Optional[TracebackType]):
         self.destroy()
 
     def destroy(self):
@@ -586,14 +631,12 @@ cdef class Cursor:
             opspec.kop_txn = txn._c_hse_kvdb_txn
 
         cdef hse_err_t err = 0
-        try:
-            with nogil:
-                err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, opspec)
-            if err != 0:
-                raise KvdbException(err)
-        finally:
-            if opspec:
-                free(opspec)
+        with nogil:
+            err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, opspec)
+        if opspec:
+            free(opspec)
+        if err != 0:
+            raise KvdbException(err)
 
     def seek(self, const unsigned char [:]key) -> Optional[bytes]:
         """
@@ -601,9 +644,9 @@ cdef class Cursor:
         """
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
-        if key is not None and len(key) > 0:
+        if key is not None:
             key_addr = &key[0]
-            key_len = len(key)
+            key_len = key.shape[0]
 
         cdef const void *found = NULL
         cdef size_t found_len = 0
@@ -633,12 +676,12 @@ cdef class Cursor:
         cdef size_t filt_min_len = 0
         cdef const void *filt_max_addr = NULL
         cdef size_t filt_max_len = 0
-        if filt_min is not None and len(filt_min) > 0:
+        if filt_min is not None:
             filt_min_addr = &filt_min[0]
-            filt_min_len = len(filt_min)
-        if filt_max is not None and len(filt_max) > 0:
+            filt_min_len = filt_min.shape[0]
+        if filt_max is not None:
             filt_max_addr = &filt_max[0]
-            filt_max_len = len(filt_max)
+            filt_max_len = filt_max.shape[0]
 
         cdef const void *found = NULL
         cdef size_t found_len = 0
@@ -736,88 +779,34 @@ cdef class KvdbCompactStatus:
         return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
-Config = Dict[
-    str,
-    Optional[
-        Union[
-            str,
-            int,
-            float,
-            bool,
-            Iterable[Optional[Union[str, float, int, bool, "Config"]]],
-            "Config",
-        ]
-    ],
-]
-
-
-cdef class Params:
+cdef class KvdbStorageInfo:
     """
-    @SUB@ hse.Params.__doc__
+    @SUB@ hse.KvdbStorageInfo.__doc__
     """
-    def __cinit__(self):
-        cdef hse_err_t err = hse_params_create(&self._c_hse_params)
-        if err != 0:
-            raise KvdbException(err)
-
-    def __dealloc__(self):
-        if self._c_hse_params:
-            hse_params_destroy(self._c_hse_params)
-        self._c_hse_params = NULL
-
-    def set(self, str key, str value) -> Params:
+    @property
+    def total_bytes(self) -> int:
         """
-        @SUB@ hse.Params.set.__doc__
+        @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
         """
-        cdef char *value_addr = NULL
-        if value:
-            value_bytes = value.encode()
-            value_addr = value_bytes
+        return self._c_hse_kvdb_storage_info.total_bytes
 
-        cdef hse_err_t err = hse_params_set(self._c_hse_params, key.encode(), value_addr)
-        if err != 0:
-            raise KvdbException(err)
-
-        return self
-
-    # 256 comes from hse_params.c HP_DICT_LET_MAX
-    def get(self, str key, char [:]buf=bytearray(256)) -> Optional[str]:
+    @property
+    def available_bytes(self) -> int:
         """
-        @SUB@ hse.Params.get.__doc__
+        @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
         """
-        cdef char *buf_addr = NULL
-        cdef size_t buf_len = 0
-        if buf is not None and len(buf) > 0:
-            buf_addr = &buf[0]
-            buf_len = len(buf)
+        return self._c_hse_kvdb_storage_info.available_bytes
 
-        cdef size_t param_len = 0
-        cdef char *param = hse_params_get(self._c_hse_params, key.encode(), buf_addr, buf_len, &param_len)
-
-        if buf is None:
-            return None
-
-        if len(buf) < param_len:
-            return param[:param_len].decode() if param else None
-
-        return param[:param_len].decode() if param else None
-
-    def from_file(self, str path) -> Params:
+    @property
+    def allocated_bytes(self) -> int:
         """
-        @SUB@ hse.Params.from_file.__doc__
+        @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
         """
-        cdef hse_err_t err = hse_params_from_file(self._c_hse_params, path.encode())
-        if err != 0:
-            raise KvdbException(err)
+        return self._c_hse_kvdb_storage_info.allocated_bytes
 
-        return self
-
-    def from_string(self, str input) -> Params:
+    @property
+    def used_bytes(self) -> int:
         """
-        @SUB@ hse.Params.from_string.__doc__
+        @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
         """
-        cdef hse_err_t err = hse_params_from_string(self._c_hse_params, input.encode())
-        if err != 0:
-            raise KvdbException(err)
-
-        return self
+        return self._c_hse_kvdb_storage_info.used_bytes

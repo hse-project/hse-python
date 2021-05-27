@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2020 Micron Technology, Inc. All rights reserved.
 
-from hse cimport hse_err_t, hse_kvdb, hse_params, hse_kvs, hse_kvdb_opspec
+from hse cimport hse_err_t, hse_kvdb, hse_kvs, hse_kvdb_opspec
 
 
 cdef extern from "hse/hse_experimental.h":
@@ -23,5 +23,3 @@ cdef extern from "hse/hse_experimental.h":
         void *                 valbuf,
         size_t                 valbuf_sz,
         size_t *               val_len) nogil
-
-    char *hse_params_err_exp(const hse_params *params, char *buf, size_t buf_sz)

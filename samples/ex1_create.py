@@ -6,14 +6,14 @@ import sys
 
 def main() -> int:
     if len(sys.argv) < 3:
-        print(f"Usage: {sys.argv[0]} <mpool> <kvs1> [<kvs2> ... <kvsN>")
+        print(f"Usage: {sys.argv[0]} <home> <kvs1> [<kvs2> ... <kvsN>")
         return 1
 
-    MPOOL_NAME = sys.argv[1]
+    KVDB_HOME = sys.argv[1]
     KVS_LIST = sys.argv[2:]
 
-    hse.Kvdb.make(MPOOL_NAME)
-    kvdb = hse.Kvdb.open(MPOOL_NAME)
+    hse.Kvdb.make(KVDB_HOME)
+    kvdb = hse.Kvdb.open(KVDB_HOME)
     for kvs in KVS_LIST:
         kvdb.kvs_make(kvs)
 
@@ -25,8 +25,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    hse.Kvdb.init()
+    hse.init()
     try:
         main()
     finally:
-        hse.Kvdb.fini()
+        hse.fini()

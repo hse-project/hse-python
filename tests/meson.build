@@ -4,31 +4,52 @@ env = environment({
     'PYTHONPATH': meson.project_build_root(),
 })
 
-# Name of suite with whether or not it can be parallel. KVDBs can only be
-# opened one at a time.
-suites = {
-    'cursor': false,
-    'experimental': false,
-    'hse': false,
-    'kvdb': false,
-    'kvs': false,
-    'limits': true,
-    'params': false,
-    'transaction': false,
-}
+if get_option('tests-dir') == ''
+    tests_dir = meson.project_build_root() / 'hse-python-tests'
+else
+    tests_dir = get_option('tests-dir')
+endif
 
-foreach s, is_parallel : suites
+if not fs.exists(tests_dir)
+    run_command(
+        'mkdir',
+        tests_dir,
+        check: true,
+    )
+endif
+
+suites = [
+    'cursor',
+    'experimental',
+    'hse',
+    'kvdb',
+    'kvs',
+    'limits',
+    'transaction',
+]
+
+foreach s : suites
+    home_dir = tests_dir / s
+    if not fs.exists(home_dir)
+        run_command(
+            'mkdir',
+            home_dir,
+            check: true,
+        )
+    endif
+
     test(
         '@0@'.format(s),
         pytest,
         args: [
             '--tap-stream',
             meson.current_source_dir() / 'test_@0@.py'.format(s),
+            '--home',
+            home_dir,
         ],
         env: env,
         suite: ['unit'],
         protocol: 'tap',
-        is_parallel: is_parallel,
         depends: [
             extension_modules,
         ],

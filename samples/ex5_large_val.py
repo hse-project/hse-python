@@ -62,20 +62,18 @@ def put_files_as_kv(kvs: hse.Kvs, keys: List[str]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        usage=f"{sys.argv[0]} <kvdb> <kvs> <file1> [<fileN> ...]", add_help=True
-    )
-    parser.add_argument("kvdb", help="kvdb to operate in")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("home", help="kvdb home to operate on")
     parser.add_argument("kvs", help="kvs to operate in")
     parser.add_argument("files", nargs="+", help="files to operate on")
     parser.add_argument("-x", action="store_true")
     args = parser.parse_args(sys.argv[1:])
 
-    MPOOL_NAME: str = args.kvdb
+    KVDB_HOME: str = args.home
     KVS_NAME: str = args.kvs
     FILES: List[str] = args.files
 
-    kvdb = hse.Kvdb.open(MPOOL_NAME)
+    kvdb = hse.Kvdb.open(KVDB_HOME)
     kvs = kvdb.kvs_open(KVS_NAME)
 
     if args.x:
@@ -90,8 +88,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    hse.Kvdb.init()
+    hse.init()
     try:
         main()
     finally:
-        hse.Kvdb.fini()
+        hse.fini()
