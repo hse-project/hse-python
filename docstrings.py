@@ -12,7 +12,7 @@ import re
 import toml
 import sys
 import argparse
-from typing import Any, Dict, MutableMapping, cast
+from typing import Any, Dict, List, MutableMapping, Tuple, cast
 from io import StringIO
 
 
@@ -23,7 +23,7 @@ __INDENT = " " * 4  # 4 space indents in source files
 def __flatten(
     d: MutableMapping[str, Any], parent_key: str = "", sep: str = "."
 ) -> Dict[str, str]:
-    items = []
+    items: List[Tuple[str, str]] = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k
         if v and isinstance(v, MutableMapping):
@@ -65,7 +65,7 @@ def insert(input_file: str, output_file: str, docstrings_toml: str) -> None:
     HSE_DOCSTRINGS = __flatten(toml.load(docstrings_toml))
 
     with open(input_file, "r") as input:
-        output_lines = []
+        output_lines: List[str] = []
         for line in input.readlines():
             match = __DOCSTRING_PATTERN.search(line)
             if match is None:

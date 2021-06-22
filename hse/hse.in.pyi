@@ -2,28 +2,9 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-"""
-KVDB_VERSION_STRING:
-
-@SUB@ hse.KVDB_VERSION_STRING.__doc__
-
-KVDB_VERSION_TAG:
-
-@SUB@ hse.KVDB_VERSION_TAG.__doc__
-
-KVDB_VERSION_SHA:
-
-@SUB@ hse.KVDB_VERSION_SHA.__doc__
-"""
-
-import os
 from enum import Enum
 from types import TracebackType
 from typing import Iterator, List, Optional, Tuple, Type, Any, Union
-
-KVDB_VERSION_STRING: str
-KVDB_VERSION_TAG: str
-KVDB_VERSION_SHA: str
 
 def init() -> None:
     """
