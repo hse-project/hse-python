@@ -36,6 +36,5 @@ from hse.hse import *
 
 from hse import limits
 from hse import experimental
-from hse import version
 
-__all__ = ["limits", "experimental", "version"]
+__all__ = ["limits", "experimental"]
