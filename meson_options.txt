@@ -1,2 +1,4 @@
 option('tests', type: 'boolean', value: true,
     description: 'Build tests')
+option('tests-dir', type: 'string', value: '',
+    description: 'Directory for pre-creating home directories')

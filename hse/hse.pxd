@@ -4,15 +4,17 @@
 
 from libc.stdint cimport uint64_t
 # Avoid interfering with Python bool type since Cython seems to struggle
-# differentiating the 2
+# differentiating the two
 from libcpp cimport bool as cbool
 from libc.stdlib cimport calloc
 
 
+cdef extern from "Python.h":
+    char* PyUnicode_AsUTF8(object unicode)
+
+
 cdef extern from "hse/hse.h":
     ctypedef uint64_t hse_err_t
-    cdef struct hse_params:
-        pass
     cdef struct hse_kvdb:
         pass
     cdef struct hse_kvs:
@@ -41,18 +43,20 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_init()
     void hse_fini()
 
-    hse_err_t hse_kvdb_make(const char *mp_name, const hse_params *params)
-    hse_err_t hse_kvdb_open(const char *mp_name, const hse_params *params, hse_kvdb **kvdb)
+    hse_err_t hse_kvdb_make(const char *kvdb_home, size_t paramc, char **paramv)
+    hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, char **paramv)
+    hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, char **paramv, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
     hse_err_t hse_kvdb_get_names(hse_kvdb *kvdb, unsigned int *count, char ***kvs_list) nogil
     void hse_kvdb_free_names(hse_kvdb *kvdb, char **kvs_list) nogil
-    hse_err_t hse_kvdb_kvs_make(hse_kvdb *kvdb, const char *kvs_name, const hse_params *params)
+    hse_err_t hse_kvdb_kvs_make(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
-        hse_kvdb            *kvdb,
-        const char          *kvs_name,
-        const hse_params    *params,
-        hse_kvs            **kvs_out)
+        hse_kvdb *  kvdb,
+        const char *kvs_name,
+        size_t      paramc,
+        char **     paramv,
+        hse_kvs **  kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
     hse_err_t hse_kvs_put(
@@ -106,6 +110,16 @@ cdef extern from "hse/hse.h":
 
     hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
 
+    cdef struct hse_kvdb_storage_info:
+        uint64_t total_bytes
+        uint64_t available_bytes
+        uint64_t allocated_bytes
+        uint64_t used_bytes
+        char capacity_path[4096]
+        char staging_path[4096]
+
+    hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
+
     hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
     void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
@@ -146,18 +160,6 @@ cdef extern from "hse/hse.h":
         cbool           *eof) nogil
     hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor) nogil
 
-    hse_err_t hse_params_create(hse_params **params)
-    void hse_params_destroy(hse_params *params)
-    hse_err_t hse_params_from_file(hse_params *params, const char *path)
-    hse_err_t hse_params_from_string(hse_params *params, const char *input)
-    hse_err_t hse_params_set(hse_params *params, const char *key, const char *val)
-    char *hse_params_get(
-        const hse_params 	*params,
-        const char          *key,
-        char                *buf,
-        size_t               buf_len,
-        size_t              *param_len)
-
 
 cdef inline hse_kvdb_opspec *HSE_KVDB_OPSPEC_INIT() except NULL:
     cdef hse_kvdb_opspec *opspec = <hse_kvdb_opspec *>calloc(1, sizeof(hse_kvdb_opspec))
@@ -190,6 +192,5 @@ cdef class Cursor:
 cdef class KvdbCompactStatus:
     cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
 
-
-cdef class Params:
-    cdef hse_params *_c_hse_params
+cdef class KvdbStorageInfo:
+    cdef hse_kvdb_storage_info _c_hse_kvdb_storage_info

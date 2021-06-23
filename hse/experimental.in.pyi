@@ -7,15 +7,8 @@
 """
 
 from typing import Optional, Tuple
-from hse import Kvdb, Params, Kvs, Transaction
+from hse import Kvs, Transaction
 from enum import Enum
-
-class ParamsException(Exception):
-    """
-    @SUB@ experimental.ParamsException.__doc__
-    """
-
-    def __init__(self, error: str) -> None: ...
 
 class KvsPfxProbeCnt(Enum):
     """
@@ -47,11 +40,5 @@ def kvs_prefix_probe_with_lengths(
 ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """
     @SUB@ experimental.kvs_prefix_probe_with_lengths.__doc__
-    """
-    ...
-
-def params_err(params: Params, buf: bytearray = ...) -> None:
-    """
-    @SUB@ experimental.params_err.__doc__
     """
     ...

@@ -64,15 +64,27 @@ function starts. This function is not thread safe.
 
 [hse.Kvdb.make]
 __doc__ = """
-Create a new KVDB instance within the named mpool
+Create a new KVDB instance
 
-The mpool must already exist and the client must have permission to use the
-mpool. This function is not thread safe.
+This function is not thread safe.
 
 Args:
 
-`mp_name` - Mpool name in which the KVDB exists\\n
-`params` - Configuration parameters
+`home` - KVDB home directory\\n
+`params` - key=value parameters
+"""
+
+[hse.Kvdb.drop]
+__doc__ = """
+Remove a KVDB
+
+It is an error to call this function on a KVDB that is open. This function is
+not thread safe.
+
+Args:
+
+`home` - KVDB home directory\\n
+`params` - key=value parameters
 """
 
 [hse.Kvdb.open]
@@ -84,8 +96,8 @@ function is not thread safe.
 
 Args:
 
-`mp_name` - Mpool name in which the KVDB exists\\n
-`params` - Configuration parameters
+`home` - KVDB home directory\\n
+`params` - key=value parameters
 """
 
 [hse.Kvdb.names]
@@ -107,7 +119,8 @@ if there is already a KVS with the given name.  This function is not thread safe
 
 Args:
 
-`kvs_name` - KVS name
+`name` - KVS name
+`params` - key=value parameters
 """
 
 [hse.Kvdb.kvs_drop]
@@ -119,7 +132,7 @@ thread safe.
 
 Args:
 
-`kvs_name` - KVS name
+`name` - KVS name
 """
 
 [hse.Kvdb.kvs_open]
@@ -130,8 +143,8 @@ This function is not thread safe.
 
 Args:
 
-`kvs_name` - KVS name\\n
-`params` - Parameters that affect how the KVS will function
+`name` - KVS name\\n
+`params` - key=value parameters
 """
 
 [hse.Kvdb.sync]
@@ -174,6 +187,14 @@ Get status of an ongoing compaction activity
 
 The caller can examine the properties of the `KvdbCompactStatus` class to determine
 the current state of maintenance compaction. This function is thread safe.
+"""
+
+[hse.Kvdb.storage_info]
+__doc__ = """
+Get storage statistics
+
+Obtain allocated and used space for a specified KVDB. This function is thread
+safe.
 """
 
 [hse.Kvdb.transaction]
@@ -536,63 +557,48 @@ __doc__ = """
 was an externally requested compaction canceled
 """
 
-[hse.Params.get]
+[hse.KvdbStorageInfo]
 __doc__ = """
-Get configuration parameter
-
-Obtain the value the parameter denoted by `key` is set to in the params object.
-This function is not thread safe.
-
-Args:
-
-`key` - Target key
+Storage information for a KVDB
 """
 
-[hse.Params.set]
+[hse.KvdbStorageInfo.total_bytes]
 __doc__ = """
-Set configuration parameter
-
-Set the parameter setting given by `key` to `value`. If the `key` or `value` is
-invalid then the call will fail.
-
-The following syntax is supported for keys:
-
-kvdb.<param>           # param is set for the KVDB\\n
-kvs.<param>            # param is set for all KVSs in the KVDB\\n
-kvs.<kvs_name>.<param> # param is set for the named KVS
-
-This function is not thread safe.
-
-Args:
-
-`key` - Target key\\n
-`value` - Target value
+total space in the file-system containing this kvdb
 """
 
-[hse.Params.from_file]
+[hse.KvdbStorageInfo.available_bytes]
 __doc__ = """
-Parse params from a file
-
-This function takes a filename and parses it, populating the supplied params
-object. If the file is not a valid params specification, the parsing will
-fail. This function is not thread safe.
-
-Args:
-
-`path` - Path to configuration file
+available space in the file-system containing this kvdb
 """
 
-[hse.Params.from_string]
+[hse.KvdbStorageInfo.allocated_bytes]
 __doc__ = """
-Parse params from a string
+allocated storage space for a kvdb
+"""
 
-This function takes a YAML string and parses it, populating the supplied params object. If
-the string is not a valid params specification, the parsing will fail. This function is
-not thread safe.
+[hse.KvdbStorageInfo.used_bytes]
+__doc__ = """
+used storage space for a kvdb
+"""
+
+[hse.config_merge]
+__doc__ = """
+Merge multiple config strings into one
+
+Assumes both inputs are valid config strings. Caller must free merged when
+done. This function is thread safe.
 
 Args:
 
-`input` - Input paramters in YAML format
+`configs`: Configuration strings
+"""
+
+[hse.config_valid]
+__doc__ = """
+Determine if a configuration is valid
+
+This function is thread safe.
 """
 
 [limits]
@@ -635,15 +641,6 @@ Experimental APIs which may or may not changed, added, or deleted
 between releases
 """
 
-[experimental.ParamsException]
-__doc__ = """
-Raised when `hse.experimental.params_err()` is called.
-
-Members:
-
-`error` - Error string
-"""
-
 [experimental.KvsPfxProbeCnt]
 __doc__ = """
 Enum representing how many results were found in the probe operation.
@@ -678,11 +675,4 @@ Args:
 `key_buf` - Buffer which will be populated with contents of first seen key\\n
 `val_buf` - Buffer which will be populated with value for `key_buf`\\n
 `txn` - Transaction context
-"""
-
-[experimental.params_err]
-__doc__ = """
-Check an `hse.Params` object for an error
-
-Raises an `hse.experimental.ParamsException` if error occured.
 """

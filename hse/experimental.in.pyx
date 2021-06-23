@@ -11,14 +11,6 @@ cimport hse
 from libc.stdlib cimport free
 
 
-class ParamsException(Exception):
-    """
-    @SUB@ experimental.ParamsException.__doc__
-    """
-    def __init__(self, message: str):
-        super().__init__(message)
-
-
 class KvsPfxProbeCnt(Enum):
     """
     @SUB@ experimental.KvsPfxProbeCnt.__doc__
@@ -85,21 +77,3 @@ def kvs_prefix_probe_with_lengths(hse.Kvs kvs, const unsigned char [:]pfx, unsig
         bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
         value_len
     )
-
-
-# 256 is arbitrary
-def params_err(hse.Params params, char [:]buf=bytearray(256)) -> None:
-    """
-    @SUB@ experimental.params_err.__doc__
-    """
-    cdef hse.hse_params *p = params._c_hse_params if params else NULL
-
-    cdef char *buf_addr = NULL
-    cdef size_t buf_len = 0
-    if buf is not None:
-        buf_addr = &buf[0]
-        buf_len = len(buf)
-
-    cdef char *err = experimental.hse_params_err_exp(p, buf_addr, buf_len)
-    if err:
-        raise ParamsException(err)

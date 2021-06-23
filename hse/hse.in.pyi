@@ -16,9 +16,10 @@ KVDB_VERSION_SHA:
 @SUB@ hse.KVDB_VERSION_SHA.__doc__
 """
 
+import os
 from enum import Enum
 from types import TracebackType
-from typing import Dict, Iterable, Iterator, List, Optional, Tuple, Type, Any, Union
+from typing import Iterator, List, Optional, Tuple, Type, Any, Union
 
 KVDB_VERSION_STRING: str
 KVDB_VERSION_TAG: str
@@ -42,7 +43,7 @@ class KvdbException(Exception):
     """
 
     returncode: int
-    def __init__(self, returncode: int) -> KvdbException: ...
+    def __init__(self, returncode: int) -> None: ...
 
 class Kvdb:
     def close(self) -> None:
@@ -51,13 +52,19 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def make(mp_name: str, params: Optional[Params] = ...) -> None:
+    def make(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
         """
         @SUB@ hse.Kvdb.make.__doc__
         """
         ...
     @staticmethod
-    def open(mp_name: str, params: Optional[Params] = ...) -> Kvdb:
+    def drop(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
+        """
+        @SUB@ hse.Kvdb.drop.__doc__
+        """
+        ...
+    @staticmethod
+    def open(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
@@ -68,17 +75,17 @@ class Kvdb:
         @SUB@ hse.Kvdb.names.__doc__
         """
         ...
-    def kvs_make(self, kvs_name: str, params: Optional[Params] = ...) -> None:
+    def kvs_make(self, name: str, *params: str) -> None:
         """
         @SUB@ hse.Kvdb.kvs_make.__doc__
         """
         ...
-    def kvs_drop(self, kvs_name: str) -> None:
+    def kvs_drop(self, name: str) -> None:
         """
         @SUB@ hse.Kvdb.kvs_drop.__doc__
         """
         ...
-    def kvs_open(self, kvs_name: str, params: Optional[Params] = ...) -> Kvs:
+    def kvs_open(self, name: str, *params: str) -> Kvs:
         """
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
@@ -102,6 +109,12 @@ class Kvdb:
     def compact_status(self) -> KvdbCompactStatus:
         """
         @SUB@ hse.Kvdb.compact_status.__doc__
+        """
+        ...
+    @property
+    def storage_info(self) -> KvdbStorageInfo:
+        """
+        @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
     def transaction(self) -> Transaction:
@@ -312,38 +325,31 @@ class KvdbCompactStatus:
         """
         ...
 
-Config = Dict[
-    str,
-    Optional[
-        Union[
-            str,
-            int,
-            float,
-            bool,
-            Iterable[Optional[Union[str, float, int, bool, "Config"]]],
-            "Config",
-        ]
-    ],
-]
-
-class Params:
-    def get(self, key: str) -> Optional[str]:
+class KvdbStorageInfo:
+    """
+    @SUB@ hse.KvdbStorageInfo.__doc__
+    """
+    @property
+    def total_bytes(self) -> int:
         """
-        @SUB@ hse.Params.get.__doc__
+        @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
         """
         ...
-    def set(self, key: str, value: Optional[str]) -> Params:
+    @property
+    def available_bytes(self) -> int:
         """
-        @SUB@ hse.Params.set.__doc__
-        """
-        ...
-    def from_file(self, path: str) -> Params:
-        """
-        @SUB@ hse.Params.from_file.__doc__
+        @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
         """
         ...
-    def from_string(self, input: str) -> Params:
+    @property
+    def allocated_bytes(self) -> int:
         """
-        @SUB@ hse.Params.from_string.__doc__
+        @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
+        """
+        ...
+    @property
+    def used_bytes(self) -> int:
+        """
+        @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
         """
         ...

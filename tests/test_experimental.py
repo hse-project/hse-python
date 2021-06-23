@@ -2,32 +2,23 @@ from typing import Generator, Optional
 import hse
 import pytest
 import errno
-from pathlib import Path
 
 
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
-    p = hse.Params().set("kvs.pfx_len", "3").set("kvs.sfx_len", "1")
-
     try:
-        kvdb.kvs_make("experimental-test", params=p)
+        kvdb.kvs_make("experimental-test", "pfx_len=3", "sfx_len=1")
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
             raise e
-    kvs = kvdb.kvs_open("experimental-test", params=p)
+    kvs = kvdb.kvs_open("experimental-test")
 
     yield kvs
 
     kvs.close()
     kvdb.kvs_drop("experimental-test")
-
-
-@pytest.mark.xfail(strict=True)
-def test_params_err():
-    p = hse.Params().set("", "")
-    hse.experimental.params_err(p)
 
 
 def test_prefix_probe(kvs: hse.Kvs):

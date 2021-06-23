@@ -8,6 +8,7 @@ project(
     meson_version: '>=0.57',
 )
 
+fs = import('fs')
 pymod = import('python')
 
 docstrings = find_program('docstrings.py', required: true)
