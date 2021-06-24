@@ -1,7 +1,7 @@
 pytest = find_program('pytest', required: true)
 
 env = environment({
-    'PYTHONPATH': meson.project_build_root(),
+    'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
 })
 
 if get_option('tests-dir') == ''
@@ -21,11 +21,11 @@ endif
 suites = [
     'cursor',
     'experimental',
-    'hse',
     'kvdb',
     'kvs',
     'limits',
     'transaction',
+    'version',
 ]
 
 foreach s : suites

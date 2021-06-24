@@ -135,21 +135,9 @@ foreach m : modules
     extension_modules += extension_module
 endforeach
 
-init_py = configure_file(
-    input: '__init__.py',
-    output: '__init__.py',
-    copy: true,
-)
-
-py_typed = configure_file(
-    input: 'py.typed',
-    output: 'py.typed',
-    copy: true,
-)
-
 python.install_sources(
-    init_py,
-    py_typed,
+    '__init__.py',
+    'py.typed',
     subdir: 'hse',
     pure: false,
 )

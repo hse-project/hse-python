@@ -77,6 +77,6 @@ run_target(
         python,
     ],
     env: environment({
-        'PYTHONPATH': meson.project_build_root(),
+        'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
     }),
 )
