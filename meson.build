@@ -50,7 +50,6 @@ endif
 
 # Exported for usage in hse.
 project_build_root = meson.project_build_root()
-project_source_root = meson.project_source_root()
 
 hse_dep = dependency(
     'hse-1',

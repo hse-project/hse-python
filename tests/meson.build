@@ -1,7 +1,7 @@
 pytest = find_program('pytest', required: true)
 
 env = environment({
-    'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
+    'PYTHONPATH': meson.project_build_root(),
 })
 
 if get_option('tests-dir') == ''

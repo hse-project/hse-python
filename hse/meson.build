@@ -26,6 +26,32 @@ if get_option('werror')
     extra_cython_args += '-Werror'
 endif
 
+init_py = custom_target(
+    '__init__.py',
+    input: '__init__.py',
+    output: '__init__.py',
+    command: [
+        'cp',
+        '@INPUT@',
+        '@OUTPUT@',
+    ],
+    install: true,
+    install_dir: python.get_install_dir(pure: false) / 'hse',
+)
+
+py_typed = custom_target(
+    'py.typed',
+    input: 'py.typed',
+    output: 'py.typed',
+    command: [
+        'cp',
+        '@INPUT@',
+        '@OUTPUT@',
+    ],
+    install: true,
+    install_dir: python.get_install_dir(pure: false) / 'hse',
+)
+
 modules = [
     'hse',
     'limits',
@@ -123,7 +149,7 @@ foreach m : modules
 
     extension_module = python.extension_module(
         '@0@'.format(m),
-        c,
+        [c, init_py, py_typed],
         dependencies: [
             hse_dep,
             python.dependency(),
@@ -134,10 +160,3 @@ foreach m : modules
 
     extension_modules += extension_module
 endforeach
-
-python.install_sources(
-    '__init__.py',
-    'py.typed',
-    subdir: 'hse',
-    pure: false,
-)
