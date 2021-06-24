@@ -2,6 +2,7 @@ import os
 import pathlib
 from typing import Any, Dict, List, Type
 from setuptools import Command, find_packages, setup, Extension
+from setuptools.extension import Library
 
 
 HERE = pathlib.Path(__file__).parent
@@ -33,6 +34,11 @@ extensions: List[Extension] = [
     Extension(
         "hse.experimental",
         [str(HSE_PACKAGE / f"experimental.{SOURCE_EXTENSION}")],
+        libraries=["hse-1"],
+    ),
+    Extension(
+        "hse.version",
+        [str(HSE_PACKAGE / f"version.{SOURCE_EXTENSION}")],
         libraries=["hse-1"],
     ),
 ]
@@ -81,6 +87,16 @@ if USE_CYTHON:
             docstrings.insert(
                 str(HSE_PACKAGE / "experimental.in.pyi"),
                 str(HSE_PACKAGE / "experimental.pyi"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "version.in.pyx"),
+                str(HSE_PACKAGE / "version.pyx"),
+                "docstrings.toml",
+            )
+            docstrings.insert(
+                str(HSE_PACKAGE / "version.in.pyi"),
+                str(HSE_PACKAGE / "version.pyi"),
                 "docstrings.toml",
             )
 

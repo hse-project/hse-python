@@ -2,7 +2,7 @@
 
 # Be sure to double escape \n. May have unintended effects otherwise.
 
-[hse.KVDB_VERSION_STRING]
+[hse.version.STRING]
 __doc__ = """
 A string representing the HSE KVDB libary version
 
@@ -10,7 +10,7 @@ The version string starts with a numeric sequence (e.g., 1.7.0) and then, depend
 on the type of build may have additional information appended.
 """
 
-[hse.KVDB_VERSION_TAG]
+[hse.version.TAG]
 __doc__ = """
 A string representing the HSE KVDB libary version tag
 
@@ -18,7 +18,7 @@ The version tag starts with a sequence (e.g., r1.9.0) and then, depending
 on the type of build may have additional information appended.
 """
 
-[hse.KVDB_VERSION_SHA]
+[hse.version.SHA]
 __doc__ = """
 A string representing the HSE KVDB library version commit hash
 

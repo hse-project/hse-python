@@ -30,6 +30,7 @@ modules = [
     'hse',
     'limits',
     'experimental',
+    'version',
 ]
 
 pxds = []

@@ -2,21 +2,6 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-"""
-KVDB_VERSION_STRING:
-
-@SUB@ hse.KVDB_VERSION_STRING.__doc__
-
-KVDB_VERSION_TAG:
-
-@SUB@ hse.KVDB_VERSION_TAG.__doc__
-
-KVDB_VERSION_SHA:
-
-@SUB@ hse.KVDB_VERSION_SHA.__doc__
-"""
-
-
 import errno
 import os
 cimport cython
@@ -30,12 +15,7 @@ from libc.stdlib cimport malloc, free
 # Throughout these bindings, you will see C pointers be set to NULL after their
 # destruction. Please continue to follow this pattern as the HSE C code does
 # not do this. We use NULL checks to protect against double free
-# issues within the python bindings.
-
-
-KVDB_VERSION_STRING = hse_kvdb_version_string().decode()
-KVDB_VERSION_TAG = hse_kvdb_version_tag().decode()
-KVDB_VERSION_SHA = hse_kvdb_version_sha().decode()
+# issues within the Python bindings.
 
 
 def init() -> None:
