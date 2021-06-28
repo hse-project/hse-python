@@ -239,8 +239,8 @@ Args:
 
 `key` - Key to put into KVS\\n
 `value` - Value associated with key\\n
-`priority` - Operation won't be throttled\\n
-`txn` - Transaction context
+`txn` - Transaction context\\n
+`flags` - Flags for operation specialization
 """
 
 [hse.Kvs.get]
@@ -362,10 +362,8 @@ mutations that occurred during the lifespan of the transaction visible as well.
 Args:
 
 `filt` - Iteration limited to keys matching this prefix filter\\n
-`reverse` - Reverse cursor\\n
-`static_view` - Bound cursor's view is static\\n
-`bind_txn` - Cursor bound to transaction\\n
-`txn` - Transaction context
+`txn` - Transaction context\\n
+`flags` - Flags for operation specialization
 """
 
 [hse.TransactionState]
@@ -480,10 +478,8 @@ across disparate cursors.
 
 Args:
 
-`reverse` - Reverse cursor\\n
-`static_view` - Bound cursor's view is static\\n
-`bind_txn` - Cursor bound to transaction\\n
 `txn` - Transaction context
+`flags` - Flags for operation specialization
 """
 
 [hse.Cursor.seek]
@@ -584,25 +580,6 @@ allocated storage space for a kvdb
 [hse.KvdbStorageInfo.used_bytes]
 __doc__ = """
 used storage space for a kvdb
-"""
-
-[hse.config_merge]
-__doc__ = """
-Merge multiple config strings into one
-
-Assumes both inputs are valid config strings. Caller must free merged when
-done. This function is thread safe.
-
-Args:
-
-`configs`: Configuration strings
-"""
-
-[hse.config_valid]
-__doc__ = """
-Determine if a configuration is valid
-
-This function is thread safe.
 """
 
 [limits]
