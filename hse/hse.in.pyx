@@ -18,11 +18,14 @@ from libc.stdlib cimport malloc, free
 # issues within the Python bindings.
 
 
-def init() -> None:
+def init(*params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
-    cdef hse_err_t err = hse_init()
+    cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
+    cdef hse_err_t err = hse_init(len(params), <const char * const*>paramv)
+    if paramv:
+        free(paramv)
     if err != 0:
         raise KvdbException(err)
 

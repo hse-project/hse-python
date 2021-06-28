@@ -40,7 +40,7 @@ cdef extern from "hse/hse.h":
     const char *hse_kvdb_version_tag()
     const char *hse_kvdb_version_sha()
 
-    hse_err_t hse_init()
+    hse_err_t hse_init(size_t paramc, const char *const *paramv)
     void hse_fini()
 
     hse_err_t hse_kvdb_make(const char *kvdb_home, size_t paramc, char **paramv)

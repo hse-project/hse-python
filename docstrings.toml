@@ -33,6 +33,10 @@ Initialize the HSE subsystem
 This function initializes a range of different internal HSE structures. It must be
 called before any other HSE functions are used. It is not thread safe and is
 idempotent.
+
+Args:
+
+`params` - key=value parameters
 """
 
 [hse.fini]

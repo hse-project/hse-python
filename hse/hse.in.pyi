@@ -6,7 +6,7 @@ from enum import Enum
 from types import TracebackType
 from typing import Iterator, List, Optional, Tuple, Type, Any, Union
 
-def init() -> None:
+def init(*params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
