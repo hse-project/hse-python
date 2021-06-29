@@ -153,12 +153,11 @@ Args:
 
 [hse.Kvdb.sync]
 __doc__ = """
-Flush data in all of the referenced KVDB's KVSs to stable media and return
-"""
+Sync data in all of the referenced KVDB's KVSs to stable media and return
 
-[hse.Kvdb.flush]
-__doc__ = """
-Initiate data flush in all of the referenced KVDB's KVSs
+Args:
+
+`flags` - Flags for operation specialization
 """
 
 [hse.Kvdb.compact]

@@ -67,6 +67,11 @@ class KvdbException(Exception):
         return self.message
 
 
+@unique
+class SyncFlag(IntFlag):
+    ASYNC = HSE_FLAG_SYNC_ASYNC
+
+
 cdef class Kvdb:
     def __cinit__(self, home: Optional[os.PathLike[str]], *params: str):
         self._c_hse_kvdb = NULL
@@ -182,23 +187,14 @@ cdef class Kvdb:
         """
         return Kvs(self, kvs_name, *params)
 
-    def sync(self) -> None:
+    def sync(self, flags: SyncFlag=0) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
+        cdef unsigned int cflags = int(flags)
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_sync(self._c_hse_kvdb)
-        if err != 0:
-            raise KvdbException(err)
-
-    def flush(self) -> None:
-        """
-        @SUB@ hse.Kvdb.flush.__doc__
-        """
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvdb_flush(self._c_hse_kvdb)
+            err = hse_kvdb_sync(self._c_hse_kvdb, cflags)
         if err != 0:
             raise KvdbException(err)
 

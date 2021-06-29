@@ -27,6 +27,9 @@ class KvdbException(Exception):
     returncode: int
     def __init__(self, returncode: int) -> None: ...
 
+class SyncFlag(IntFlag):
+    ASYNC = ...
+
 class Kvdb:
     def close(self) -> None:
         """
@@ -72,14 +75,9 @@ class Kvdb:
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
         ...
-    def sync(self) -> None:
+    def sync(self, flags: SyncFlag = ...) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
-        """
-        ...
-    def flush(self) -> None:
-        """
-        @SUB@ hse.Kvdb.flush.__doc__
         """
         ...
     def compact(self, cancel: bool = ..., samp_lwm: bool = ...) -> None:

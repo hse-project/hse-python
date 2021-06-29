@@ -25,10 +25,6 @@ def test_sync(kvdb: hse.Kvdb):
     kvdb.sync()
 
 
-def test_flush(kvdb: hse.Kvdb):
-    kvdb.flush()
-
-
 @pytest.mark.skip(reason="Hard to control when compaction occurs")
 def test_compact(kvdb: hse.Kvdb, kvs: hse.Kvs):
     for i in range(1000):

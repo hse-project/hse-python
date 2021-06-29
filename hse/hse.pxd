@@ -85,8 +85,9 @@ cdef extern from "hse/hse.h":
         HSE_KVDB_TXN_COMMITTED,
         HSE_KVDB_TXN_ABORTED
 
-    hse_err_t hse_kvdb_sync(hse_kvdb *kvdb) nogil
-    hse_err_t hse_kvdb_flush(hse_kvdb *kvdb) nogil
+    cdef int HSE_FLAG_SYNC_ASYNC
+
+    hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
     cdef int HSE_KVDB_COMP_FLAG_CANCEL
     cdef int HSE_KVDB_COMP_FLAG_SAMP_LWM
