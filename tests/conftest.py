@@ -21,7 +21,7 @@ def kvdb(home: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
     hse.init()
 
     try:
-        hse.Kvdb.make(home)
+        hse.Kvdb.create(home)
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass

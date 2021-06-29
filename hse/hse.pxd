@@ -26,20 +26,16 @@ cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
     cdef char *hse_err_to_string(hse_err_t err, char *buf, size_t buf_len, size_t *need_len)
 
-    const char *hse_kvdb_version_string()
-    const char *hse_kvdb_version_tag()
-    const char *hse_kvdb_version_sha()
-
     hse_err_t hse_init(size_t paramc, const char *const *paramv)
     void hse_fini()
 
-    hse_err_t hse_kvdb_make(const char *kvdb_home, size_t paramc, char **paramv)
+    hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, char **paramv, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
     hse_err_t hse_kvdb_get_names(hse_kvdb *kvdb, unsigned int *count, char ***kvs_list) nogil
     void hse_kvdb_free_names(hse_kvdb *kvdb, char **kvs_list) nogil
-    hse_err_t hse_kvdb_kvs_make(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
+    hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
         hse_kvdb * kvdb,

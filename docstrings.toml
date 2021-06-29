@@ -66,7 +66,7 @@ No client thread may enter the HSE KVDB API with the referenced KVDB after this
 function starts. This function is not thread safe.
 """
 
-[hse.Kvdb.make]
+[hse.Kvdb.create]
 __doc__ = """
 Create a new KVDB instance
 
@@ -112,7 +112,7 @@ Key-value stores (KVSs) are opened by name. This function allocates a list of
 strings, each containing the name of a KVS. This function is thread safe.
 """
 
-[hse.Kvdb.kvs_make]
+[hse.Kvdb.kvs_create]
 __doc__ = """
 Create a new KVS within the referenced KVDB
 

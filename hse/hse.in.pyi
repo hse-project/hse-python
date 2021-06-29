@@ -34,9 +34,9 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def make(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
+    def create(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.make.__doc__
+        @SUB@ hse.Kvdb.create.__doc__
         """
         ...
     @staticmethod
@@ -57,9 +57,9 @@ class Kvdb:
         @SUB@ hse.Kvdb.names.__doc__
         """
         ...
-    def kvs_make(self, name: str, *params: str) -> None:
+    def kvs_create(self, name: str, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_make.__doc__
+        @SUB@ hse.Kvdb.kvs_create.__doc__
         """
         ...
     def kvs_drop(self, name: str) -> None:

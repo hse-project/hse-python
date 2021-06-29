@@ -97,15 +97,15 @@ cdef class Kvdb:
         self._c_hse_kvdb = NULL
 
     @staticmethod
-    def make(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
+    def create(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.make.__doc__
+        @SUB@ hse.Kvdb.create.__doc__
         """
         home_bytes = os.fspath(home).encode() if home else None
         cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_make(home_addr, len(params), <const char * const*>paramv)
+        cdef hse_err_t err = hse_kvdb_create(home_addr, len(params), <const char * const*>paramv)
         if paramv:
             free(paramv)
         if err != 0:
@@ -154,15 +154,15 @@ cdef class Kvdb:
 
         return result
 
-    def kvs_make(self, str name, *params: str) -> None:
+    def kvs_create(self, str name, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_make.__doc__
+        @SUB@ hse.Kvdb.kvs_create.__doc__
         """
         name_bytes = name.encode() if name else None
         cdef const char *name_addr = <char *>name_bytes if name_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_kvs_make(
+        cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv)
         if err != 0:

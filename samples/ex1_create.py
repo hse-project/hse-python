@@ -12,10 +12,10 @@ def main() -> int:
     KVDB_HOME = sys.argv[1]
     KVS_LIST = sys.argv[2:]
 
-    hse.Kvdb.make(KVDB_HOME)
+    hse.Kvdb.create(KVDB_HOME)
     kvdb = hse.Kvdb.open(KVDB_HOME)
     for kvs in KVS_LIST:
-        kvdb.kvs_make(kvs)
+        kvdb.kvs_create(kvs)
 
     print("KVDB and KVSes created")
 

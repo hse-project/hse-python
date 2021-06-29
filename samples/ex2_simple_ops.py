@@ -12,7 +12,6 @@ def main() -> int:
     KVDB_HOME = sys.argv[1]
     KVS_NAME = sys.argv[2]
 
-    hse.Kvdb.make(KVDB_HOME)
     kvdb = hse.Kvdb.open(KVDB_HOME)
     kvs = kvdb.kvs_open(KVS_NAME)
 

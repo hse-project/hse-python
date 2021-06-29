@@ -7,7 +7,7 @@ import pytest
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_make("kvs-test", "pfx_len=3")
+        kvdb.kvs_create("kvs-test", "pfx_len=3")
     except hse.KvdbException as e:
         if e.returncode == errno.EEXIST:
             pass
