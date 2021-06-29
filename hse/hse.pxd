@@ -6,7 +6,6 @@ from libc.stdint cimport uint64_t
 # Avoid interfering with Python bool type since Cython seems to struggle
 # differentiating the two
 from libcpp cimport bool as cbool
-from libc.stdlib cimport calloc
 
 
 cdef extern from "Python.h":
@@ -23,15 +22,6 @@ cdef extern from "hse/hse.h":
         pass
     cdef struct hse_kvdb_txn:
         pass
-    cdef struct hse_kvdb_opspec:
-        unsigned int  kop_opaque
-        unsigned int  kop_flags
-        hse_kvdb_txn *kop_txn
-
-    cdef int HSE_KVDB_KOP_FLAG_REVERSE
-    cdef int HSE_KVDB_KOP_FLAG_BIND_TXN
-    cdef int HSE_KVDB_KOP_FLAG_STATIC_VIEW
-    cdef int HSE_KVDB_KOP_FLAG_PRIORITY
 
     cdef int hse_err_to_errno(hse_err_t err)
     cdef char *hse_err_to_string(hse_err_t err, char *buf, size_t buf_len, size_t *need_len)
@@ -52,40 +42,46 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_kvs_make(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
-        hse_kvdb *  kvdb,
+        hse_kvdb * kvdb,
         const char *kvs_name,
-        size_t      paramc,
-        char **     paramv,
-        hse_kvs **  kvs_out)
+        size_t paramc,
+        char **paramv,
+        hse_kvs **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
+    cdef int HSE_FLAG_PUT_PRIORITY
+
     hse_err_t hse_kvs_put(
-        hse_kvs         *kvs,
-        hse_kvdb_opspec *opspec,
-        const void      *key,
-        size_t           key_len,
-        const void      *val,
-        size_t           val_len) nogil
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *key,
+        size_t key_len,
+        const void *val,
+        size_t val_len) nogil
     hse_err_t hse_kvs_get(
-        hse_kvs         *kvs,
-        hse_kvdb_opspec *opspec,
-        const void      *key,
-        size_t           key_len,
-        cbool           *found,
-        void            *buf,
-        size_t           buf_len,
-        size_t          *val_len) nogil
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *key,
+        size_t key_len,
+        cbool *found,
+        void *buf,
+        size_t buf_len,
+        size_t *val_len) nogil
     hse_err_t hse_kvs_delete(
-        hse_kvs         *kvs,
-        hse_kvdb_opspec *opspec,
-        const void      *key,
-        size_t           key_len) nogil
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *key,
+        size_t key_len) nogil
     hse_err_t hse_kvs_prefix_delete(
-        hse_kvs         *kvs,
-        hse_kvdb_opspec *opspec,
-        const void      *filt,
-        size_t           filt_len,
-        size_t          *kvs_pfx_len) nogil
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *filt,
+        size_t filt_len,
+        size_t *kvs_pfx_len) nogil
 
     cdef enum hse_kvdb_txn_state:
         HSE_KVDB_TXN_INVALID,
@@ -127,48 +123,46 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
 
+    cdef int HSE_FLAG_CURSOR_REVERSE
+    cdef int HSE_FLAG_CURSOR_BIND_TXN
+    cdef int HSE_FLAG_CURSOR_STATIC_VIEW
+
     hse_err_t hse_kvs_cursor_create(
-        hse_kvs         *kvs,
-        hse_kvdb_opspec *opspec,
-        const void      *filt,
-        size_t           filt_len,
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *filt,
+        size_t filt_len,
         hse_kvs_cursor **cursor) nogil
-    hse_err_t hse_kvs_cursor_update(hse_kvs_cursor *cursor, hse_kvdb_opspec *opspec) nogil
+    hse_err_t hse_kvs_cursor_update(
+        hse_kvs_cursor *cursor,
+        unsigned int flags,
+        hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvs_cursor_seek(
-        hse_kvs_cursor  *cursor,
-        hse_kvdb_opspec *opspec,
-        const void      *key,
-        size_t           key_len,
-        const void     **found,
-        size_t          *found_len) nogil
+        hse_kvs_cursor *cursor,
+        unsigned int flags,
+        const void *key,
+        size_t key_len,
+        const void **found,
+        size_t *found_len) nogil
     hse_err_t hse_kvs_cursor_seek_range(
-        hse_kvs_cursor  *cursor,
-        hse_kvdb_opspec *opspec,
-        const void      *filt_min,
-        size_t           filt_min_len,
-        const void      *filt_max,
-        size_t           filt_max_len,
-        const void     **found,
-        size_t          *found_len) nogil
+        hse_kvs_cursor *cursor,
+        unsigned int flags,
+        const void *filt_min,
+        size_t filt_min_len,
+        const void *filt_max,
+        size_t filt_max_len,
+        const void **found,
+        size_t *found_len) nogil
     hse_err_t hse_kvs_cursor_read(
         hse_kvs_cursor  *cursor,
-        hse_kvdb_opspec *opspec,
-        const void     **key,
-        size_t          *key_len,
-        const void     **val,
-        size_t          *val_len,
-        cbool           *eof) nogil
+        unsigned int flags,
+        const void **key,
+        size_t *key_len,
+        const void **val,
+        size_t *val_len,
+        cbool *eof) nogil
     hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor) nogil
-
-
-cdef inline hse_kvdb_opspec *HSE_KVDB_OPSPEC_INIT() except NULL:
-    cdef hse_kvdb_opspec *opspec = <hse_kvdb_opspec *>calloc(1, sizeof(hse_kvdb_opspec))
-    if not opspec:
-        raise MemoryError()
-
-    opspec.kop_opaque = 0xb0de0001
-
-    return opspec
 
 
 cdef class Kvdb:

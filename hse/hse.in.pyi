@@ -2,7 +2,8 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-from enum import Enum
+import os
+from enum import Enum, IntFlag
 from types import TracebackType
 from typing import Iterator, List, Optional, Tuple, Type, Any, Union
 
@@ -104,6 +105,14 @@ class Kvdb:
         """
         ...
 
+class PutFlag(IntFlag):
+    PRIORITY = ...
+
+class CursorFlag(IntFlag):
+    REVERSE = ...
+    STATIC_VIEW = ...
+    BIND_TXN = ...
+
 class Kvs:
     def close(self) -> None:
         """
@@ -114,8 +123,8 @@ class Kvs:
         self,
         key: bytes,
         value: Optional[bytes],
-        priority: bool = ...,
         txn: Optional[Transaction] = ...,
+        flags: PutFlag = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
@@ -141,16 +150,12 @@ class Kvs:
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
         ...
-    def delete(
-        self, key: bytes, priority: bool = ..., txn: Optional[Transaction] = ...
-    ) -> None:
+    def delete(self, key: bytes, txn: Optional[Transaction] = ...) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
         ...
-    def prefix_delete(
-        self, filt: bytes, priority: bool = ..., txn: Optional[Transaction] = ...
-    ) -> int:
+    def prefix_delete(self, filt: bytes, txn: Optional[Transaction] = ...) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -158,10 +163,8 @@ class Kvs:
     def cursor(
         self,
         filt: Optional[bytes] = ...,
-        reverse: bool = ...,
-        static_view: bool = ...,
-        bind_txn: bool = ...,
         txn: Optional[Transaction] = ...,
+        flags: CursorFlag = ...,
     ) -> Cursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
@@ -186,7 +189,7 @@ class Transaction:
     def __enter__(self) -> Transaction: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[Exception]],
+        exc_type: Optional[Type[BaseException]],
         exc_val: Optional[Any],
         exc_tb: Optional[TracebackType],
     ) -> None: ...
@@ -213,15 +216,10 @@ class Transaction:
         ...
 
 class Cursor:
-    """
-    See the concept and best practices sections on the HSE Wiki at
-    https://github.com/hse-project/hse/wiki
-    """
-
     def __enter__(self) -> Cursor: ...
     def __exit__(
         self,
-        exc_type: Optional[Type[Exception]],
+        exc_type: Optional[Type[BaseException]],
         exc_val: Optional[Any],
         exc_tb: Optional[TracebackType],
     ) -> None: ...
@@ -237,10 +235,8 @@ class Cursor:
         ...
     def update(
         self,
-        reverse: bool = ...,
-        static_view: bool = ...,
-        bind_txn: bool = ...,
         txn: Optional[Transaction] = ...,
+        flags: CursorFlag = ...,
     ) -> None:
         """
         @SUB@ hse.Cursor.update.__doc__
@@ -310,6 +306,7 @@ class KvdbStorageInfo:
     """
     @SUB@ hse.KvdbStorageInfo.__doc__
     """
+
     @property
     def total_bytes(self) -> int:
         """

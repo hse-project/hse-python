@@ -28,6 +28,7 @@ endif
 
 init_py = custom_target(
     '__init__.py',
+    build_by_default: true,
     input: '__init__.py',
     output: '__init__.py',
     command: [
@@ -41,6 +42,7 @@ init_py = custom_target(
 
 py_typed = custom_target(
     'py.typed',
+    build_by_default: true,
     input: 'py.typed',
     output: 'py.typed',
     command: [
@@ -64,7 +66,6 @@ foreach m : modules
     # HACK: cython needs pxds next to pyxs for whatever reasons and generators are dumb
     pxd = custom_target(
         '@0@-pxd'.format(m),
-        build_by_default: true,
         input: '@0@.pxd'.format(m),
         command: [
             'cp',
@@ -77,10 +78,9 @@ foreach m : modules
     pxds += pxd
 endforeach
 
-pyi_stubs = []
 extension_modules = []
 foreach m : modules
-    pyi = custom_target(
+    custom_target(
         '@0@-pyi'.format(m),
         build_by_default: true,
         input: meson.current_source_dir() / '@0@.in.pyi'.format(m),
@@ -102,11 +102,8 @@ foreach m : modules
         install_dir: python.get_install_dir(pure: false) / 'hse'
     )
 
-    pyi_stubs += pyi
-
     pyx = custom_target(
         '@0@-pyx'.format(m),
-        build_by_default: true,
         input: meson.current_source_dir() / '@0@.in.pyx'.format(m),
         command: [
             docstrings,
@@ -126,7 +123,6 @@ foreach m : modules
 
     c = custom_target(
         '@0@-c'.format(m),
-        build_by_default: true,
         input: pyx,
         command: [
             cython,
@@ -149,7 +145,7 @@ foreach m : modules
 
     extension_module = python.extension_module(
         '@0@'.format(m),
-        [c, init_py, py_typed],
+        c,
         dependencies: [
             hse_dep,
             python.dependency(),
