@@ -24,9 +24,8 @@ def kvs_prefix_probe(
         hse.Kvs kvs,
         const unsigned char [:]pfx,
         hse.Transaction txn=None,
-        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KLEN_MAX),
-        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VLEN_MAX),
-        **kwargs
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
     """
     @SUB@ experimental.kvs_prefix_probe.__doc__
@@ -43,8 +42,8 @@ def kvs_prefix_probe_with_lengths(
         hse.Kvs kvs,
         const unsigned char [:]pfx,
         hse.Transaction txn=None,
-        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KLEN_MAX),
-        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VLEN_MAX),
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         **kwargs
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
     """

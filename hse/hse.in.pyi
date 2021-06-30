@@ -55,9 +55,9 @@ class Kvdb:
         """
         ...
     @property
-    def names(self) -> List[str]:
+    def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.names.__doc__
+        @SUB@ hse.Kvdb.kvs_names.__doc__
         """
         ...
     def kvs_create(self, name: str, *params: str) -> None:

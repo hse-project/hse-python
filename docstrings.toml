@@ -104,7 +104,7 @@ Args:
 `params` - key=value parameters
 """
 
-[hse.Kvdb.names]
+[hse.Kvdb.kvs_names]
 __doc__ = """
 Get the names of the KVSs within the given KVDB
 
@@ -221,8 +221,8 @@ __doc__ = """
 Put a KV pair into KVS
 
 If the key already exists in the KVS then the value is effectively overwritten. The
-key length must be in the range [1, `hse.KVS_KLEN_MAX`] while the value length must be
-in the range [0, `hse.KVS_VLEN_MAX`]. See the section on transactions for information
+key length must be in the range [1, `limits.KVS_KEY_LEN_MAX`] while the value length must be
+in the range [0, `limits.KVS_VALUE_LEN_MAX`]. See the section on transactions for information
 on how puts within transactions are handled. This function is thread safe.
 
 The HSE KVDB attempts to maintain reasonable QoS and for high-throughput clients this
@@ -254,7 +254,7 @@ Args:
 
 `key` - Key to get from KVS\\n
 `txn` - Transaction context\\n
-`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VALUE_LEN_MAX`
 """
 
 [hse.Kvs.get_with_length]
@@ -269,7 +269,7 @@ Args:
 
 `key` - Key to get from KVS\\n
 `txn` - Transaction context\\n
-`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VALUE_LEN_MAX`
 """
 
 [hse.Kvs.delete]
@@ -591,7 +591,7 @@ __doc__ = """
 Maximum number of KVS's contained within one KVDB
 """
 
-[limits.KVS_KLEN_MAX]
+[limits.KVS_KEY_LEN_MAX]
 __doc__ = """
 A common requirement for key length for the software above HSE KVDB is 1024.
 Combined with a discriminant and (potentially) a chunk key, this pushes us to
@@ -600,12 +600,12 @@ can have at most 3 keys of such large size in a 4k page. Lopping off 64-bytes
 for other data, and we can have 3 keys of 1344 bytes.
 """
 
-[limits.KVS_VLEN_MAX]
+[limits.KVS_VALUE_LEN_MAX]
 __doc__ = """
 Max value length is 1MiB
 """
 
-[limits.KVS_MAX_PFXLEN]
+[limits.KVS_PFX_LEN_MAX]
 __doc__ = """
 Max key prefix length
 """

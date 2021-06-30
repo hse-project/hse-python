@@ -33,8 +33,8 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, char **paramv, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
-    hse_err_t hse_kvdb_get_names(hse_kvdb *kvdb, unsigned int *count, char ***kvs_list) nogil
-    void hse_kvdb_free_names(hse_kvdb *kvdb, char **kvs_list) nogil
+    hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
+    void hse_kvdb_kvs_names_free(hse_kvdb *kvdb, char **namev) nogil
     hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
@@ -45,7 +45,7 @@ cdef extern from "hse/hse.h":
         hse_kvs **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
-    cdef int HSE_FLAG_PUT_PRIORITY
+    cdef unsigned int HSE_FLAG_PUT_PRIORITY
 
     hse_err_t hse_kvs_put(
         hse_kvs *kvs,
@@ -85,7 +85,7 @@ cdef extern from "hse/hse.h":
         HSE_KVDB_TXN_COMMITTED,
         HSE_KVDB_TXN_ABORTED
 
-    cdef int HSE_FLAG_SYNC_ASYNC
+    cdef unsigned int HSE_FLAG_SYNC_ASYNC
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
@@ -120,9 +120,9 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
 
-    cdef int HSE_FLAG_CURSOR_REVERSE
-    cdef int HSE_FLAG_CURSOR_BIND_TXN
-    cdef int HSE_FLAG_CURSOR_STATIC_VIEW
+    cdef unsigned int HSE_FLAG_CURSOR_REVERSE
+    cdef unsigned int HSE_FLAG_CURSOR_BIND_TXN
+    cdef unsigned int HSE_FLAG_CURSOR_STATIC_VIEW
 
     hse_err_t hse_kvs_cursor_create(
         hse_kvs *kvs,

@@ -7,11 +7,11 @@
 
 @SUB@ limits.KVS_COUNT_MAX.__doc__
 
-@SUB@ limits.KVS_KLEN_MAX.__doc__
+@SUB@ limits.KVS_KEY_LEN_MAX.__doc__
 
-@SUB@ limits.KVS_VLEN_MAX.__doc__
+@SUB@ limits.KVS_VALUE_LEN_MAX.__doc__
 
-@SUB@ limits.KVS_MAX_PFXLEN.__doc__
+@SUB@ limits.KVS_PFX_LEN_MAX.__doc__
 
 @SUB@ limits.KVS_NAME_LEN_MAX.__doc__
 """
@@ -19,7 +19,7 @@
 cimport limits
 
 KVS_COUNT_MAX = limits.HSE_KVS_COUNT_MAX
-KVS_KLEN_MAX = limits.HSE_KVS_KLEN_MAX
-KVS_VLEN_MAX = limits.HSE_KVS_VLEN_MAX
-KVS_MAX_PFXLEN = limits.HSE_KVS_MAX_PFXLEN
+KVS_KEY_LEN_MAX = limits.HSE_KVS_KEY_LEN_MAX
+KVS_VALUE_LEN_MAX = limits.HSE_KVS_VALUE_LEN_MAX
+KVS_PFX_LEN_MAX = limits.HSE_KVS_PFX_LEN_MAX
 KVS_NAME_LEN_MAX = limits.HSE_KVS_NAME_LEN_MAX

@@ -43,8 +43,8 @@ def test_prefix_probe(kvs: hse.Kvs):
 @pytest.mark.parametrize(
     "key_buf,value_buf",
     [
-        (bytearray(hse.limits.KVS_KLEN_MAX), bytearray(256)),
-        (bytearray(hse.limits.KVS_KLEN_MAX), None),
+        (bytearray(hse.limits.KVS_KEY_LEN_MAX), bytearray(256)),
+        (bytearray(hse.limits.KVS_KEY_LEN_MAX), None),
     ],
 )
 def test_prefix_probe_with_lengths(

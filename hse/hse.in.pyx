@@ -143,19 +143,17 @@ cdef class Kvdb:
         """
         @SUB@ hse.Kvdb.names.__doc__
         """
-        cdef unsigned int count = 0
-        cdef char **kvs_list = NULL
-        cdef hse_err_t err = hse_kvdb_get_names(self._c_hse_kvdb, &count, &kvs_list)
+        cdef size_t namec = 0
+        cdef char **namev = NULL
+        cdef hse_err_t err = hse_kvdb_kvs_names_get(self._c_hse_kvdb, &namec, &namev)
         if err != 0:
             raise KvdbException(err)
-        if count > 0 and not kvs_list:
-            raise MemoryError()
 
         result = []
-        for i in range(count):
-            result.append(kvs_list[i].decode())
+        for i in range(namec):
+            result.append(namev[i].decode())
 
-        hse_kvdb_free_names(self._c_hse_kvdb, kvs_list)
+        hse_kvdb_kvs_names_free(self._c_hse_kvdb, namev)
 
         return result
 
@@ -325,7 +323,7 @@ cdef class Kvs:
             self,
             const unsigned char [:]key,
             Transaction txn=None,
-            unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX),
+            unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
@@ -337,7 +335,7 @@ cdef class Kvs:
             self,
             const unsigned char [:]key,
             Transaction txn=None,
-            unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX),
+            unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
