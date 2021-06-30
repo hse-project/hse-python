@@ -12,7 +12,17 @@ cdef extern from "Python.h":
     char* PyUnicode_AsUTF8(object unicode)
 
 
-cdef extern from "hse/hse.h":
+cdef extern from "hse/flags.h":
+    cdef unsigned int HSE_FLAG_PUT_PRIORITY
+    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_ON
+    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
+
+    cdef unsigned int HSE_FLAG_CURSOR_REVERSE
+    cdef unsigned int HSE_FLAG_CURSOR_BIND_TXN
+    cdef unsigned int HSE_FLAG_CURSOR_STATIC_VIEW
+
+
+cdef extern from "hse/types.h":
     ctypedef uint64_t hse_err_t
     cdef struct hse_kvdb:
         pass
@@ -23,6 +33,29 @@ cdef extern from "hse/hse.h":
     cdef struct hse_kvdb_txn:
         pass
 
+    cdef enum hse_kvdb_txn_state:
+        HSE_KVDB_TXN_INVALID,
+        HSE_KVDB_TXN_ACTIVE,
+        HSE_KVDB_TXN_COMMITTED,
+        HSE_KVDB_TXN_ABORTED
+
+    cdef struct hse_kvdb_compact_status:
+        unsigned int kvcs_samp_lwm
+        unsigned int kvcs_samp_hwm
+        unsigned int kvcs_samp_curr
+        unsigned int kvcs_active
+        unsigned int kvcs_canceled
+
+    cdef struct hse_kvdb_storage_info:
+        uint64_t total_bytes
+        uint64_t available_bytes
+        uint64_t allocated_bytes
+        uint64_t used_bytes
+        char capacity_path[4096]
+        char staging_path[4096]
+
+
+cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
     cdef char *hse_err_to_string(hse_err_t err, char *buf, size_t buf_len, size_t *need_len)
 
@@ -44,10 +77,6 @@ cdef extern from "hse/hse.h":
         char **paramv,
         hse_kvs **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
-
-    cdef unsigned int HSE_FLAG_PUT_PRIORITY
-    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_ON
-    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
 
     hse_err_t hse_kvs_put(
         hse_kvs *kvs,
@@ -81,12 +110,6 @@ cdef extern from "hse/hse.h":
         size_t filt_len,
         size_t *kvs_pfx_len) nogil
 
-    cdef enum hse_kvdb_txn_state:
-        HSE_KVDB_TXN_INVALID,
-        HSE_KVDB_TXN_ACTIVE,
-        HSE_KVDB_TXN_COMMITTED,
-        HSE_KVDB_TXN_ABORTED
-
     cdef unsigned int HSE_FLAG_SYNC_ASYNC
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
@@ -96,22 +119,7 @@ cdef extern from "hse/hse.h":
 
     hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
 
-    cdef struct hse_kvdb_compact_status:
-        unsigned int kvcs_samp_lwm
-        unsigned int kvcs_samp_hwm
-        unsigned int kvcs_samp_curr
-        unsigned int kvcs_active
-        unsigned int kvcs_canceled
-
     hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
-
-    cdef struct hse_kvdb_storage_info:
-        uint64_t total_bytes
-        uint64_t available_bytes
-        uint64_t allocated_bytes
-        uint64_t used_bytes
-        char capacity_path[4096]
-        char staging_path[4096]
 
     hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
 
@@ -121,10 +129,6 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_txn_commit(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-
-    cdef unsigned int HSE_FLAG_CURSOR_REVERSE
-    cdef unsigned int HSE_FLAG_CURSOR_BIND_TXN
-    cdef unsigned int HSE_FLAG_CURSOR_STATIC_VIEW
 
     hse_err_t hse_kvs_cursor_create(
         hse_kvs *kvs,

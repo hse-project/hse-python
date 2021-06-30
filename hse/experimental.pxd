@@ -4,13 +4,13 @@
 
 from hse cimport hse_err_t, hse_kvdb, hse_kvs, hse_kvdb_txn
 
-
-cdef extern from "hse/hse_experimental.h":
+cdef extern from "hse/types.h":
     cdef enum hse_kvs_pfx_probe_cnt:
         HSE_KVS_PFX_FOUND_ZERO,
         HSE_KVS_PFX_FOUND_ONE,
         HSE_KVS_PFX_FOUND_MUL
 
+cdef extern from "hse/hse_experimental.h":
     hse_err_t hse_kvs_prefix_probe_exp(
         hse_kvs *kvs,
         unsigned int flags,
