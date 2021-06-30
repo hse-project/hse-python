@@ -46,6 +46,8 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
     cdef unsigned int HSE_FLAG_PUT_PRIORITY
+    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_ON
+    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
 
     hse_err_t hse_kvs_put(
         hse_kvs *kvs,
