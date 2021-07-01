@@ -37,7 +37,9 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def create(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
+    def create(
+        home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str
+    ) -> None:
         """
         @SUB@ hse.Kvdb.create.__doc__
         """
@@ -113,6 +115,15 @@ class CursorFlag(IntFlag):
     STATIC_VIEW = ...
     BIND_TXN = ...
 
+class KvsPfxProbeCnt(Enum):
+    """
+    @SUB@ hse.KvsPfxProbeCnt.__doc__
+    """
+
+    ZERO = ...
+    ONE = ...
+    MUL = ...
+
 class Kvs:
     def close(self) -> None:
         """
@@ -158,6 +169,28 @@ class Kvs:
     def prefix_delete(self, filt: bytes, txn: Optional[Transaction] = ...) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
+        """
+        ...
+    def prefix_probe(
+        self,
+        pfx: bytes,
+        key_buf: bytearray = ...,
+        value_buf: bytearray = ...,
+        txn: Optional[Transaction] = ...,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+        """
+        @SUB@ hse.prefix_probe.__doc__
+        """
+        ...
+    def prefix_probe_with_lengths(
+        self,
+        pfx: bytes,
+        key_buf: bytearray = ...,
+        value_buf: Optional[bytearray] = ...,
+        txn: Optional[Transaction] = ...,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+        """
+        @SUB@ hse.prefix_probe_with_lengths.__doc__
         """
         ...
     def cursor(

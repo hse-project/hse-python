@@ -54,6 +54,11 @@ cdef extern from "hse/types.h":
         char capacity_path[4096]
         char staging_path[4096]
 
+    cdef enum hse_kvs_pfx_probe_cnt:
+        HSE_KVS_PFX_FOUND_ZERO,
+        HSE_KVS_PFX_FOUND_ONE,
+        HSE_KVS_PFX_FOUND_MUL
+
 
 cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
@@ -109,6 +114,19 @@ cdef extern from "hse/hse.h":
         const void *filt,
         size_t filt_len,
         size_t *kvs_pfx_len) nogil
+    hse_err_t hse_kvs_prefix_probe(
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *pfx,
+        size_t pfx_len,
+        hse_kvs_pfx_probe_cnt *found,
+        void *keybuf,
+        size_t keybuf_sz,
+        size_t *key_len,
+        void *valbuf,
+        size_t valbuf_sz,
+        size_t *val_len) nogil
 
     cdef unsigned int HSE_FLAG_SYNC_ASYNC
 

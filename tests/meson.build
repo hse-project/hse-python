@@ -20,7 +20,6 @@ endif
 
 suites = [
     'cursor',
-    'experimental',
     'kvdb',
     'kvs',
     'limits',
@@ -52,6 +51,7 @@ foreach s : suites
         protocol: 'tap',
         depends: [
             extension_modules,
+            init_py,
         ],
     )
 endforeach

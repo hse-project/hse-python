@@ -28,7 +28,6 @@ endif
 
 init_py = custom_target(
     '__init__.py',
-    build_by_default: true,
     input: '__init__.py',
     output: '__init__.py',
     command: [
@@ -42,7 +41,6 @@ init_py = custom_target(
 
 py_typed = custom_target(
     'py.typed',
-    build_by_default: true,
     input: 'py.typed',
     output: 'py.typed',
     command: [
@@ -57,7 +55,6 @@ py_typed = custom_target(
 modules = [
     'hse',
     'limits',
-    'experimental',
     'version',
 ]
 
@@ -80,9 +77,8 @@ endforeach
 
 extension_modules = []
 foreach m : modules
-    custom_target(
+    pyi = custom_target(
         '@0@-pyi'.format(m),
-        build_by_default: true,
         input: meson.current_source_dir() / '@0@.in.pyi'.format(m),
         command: [
             docstrings,
@@ -145,7 +141,10 @@ foreach m : modules
 
     extension_module = python.extension_module(
         '@0@'.format(m),
-        c,
+        [c, init_py, py_typed, pyi],
+        c_args: [
+            '-DHSE_EXPERIMENTAL',
+        ],
         dependencies: [
             hse_dep,
             python.dependency(),

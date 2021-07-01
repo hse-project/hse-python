@@ -32,11 +32,6 @@ extensions: List[Extension] = [
         libraries=["hse-1"],
     ),
     Extension(
-        "hse.experimental",
-        [str(HSE_PACKAGE / f"experimental.{SOURCE_EXTENSION}")],
-        libraries=["hse-1"],
-    ),
-    Extension(
         "hse.version",
         [str(HSE_PACKAGE / f"version.{SOURCE_EXTENSION}")],
         libraries=["hse-1"],
@@ -77,16 +72,6 @@ if USE_CYTHON:
             docstrings.insert(
                 str(HSE_PACKAGE / "limits.in.pyi"),
                 str(HSE_PACKAGE / "limits.pyi"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "experimental.in.pyx"),
-                str(HSE_PACKAGE / "experimental.pyx"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "experimental.in.pyi"),
-                str(HSE_PACKAGE / "experimental.pyi"),
                 "docstrings.toml",
             )
             docstrings.insert(

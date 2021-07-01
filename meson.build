@@ -79,4 +79,9 @@ run_target(
     env: environment({
         'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
     }),
+    depends: [
+        extension_modules,
+        init_py,
+        py_typed,
+    ]
 )

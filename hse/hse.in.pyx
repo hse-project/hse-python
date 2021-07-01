@@ -139,9 +139,9 @@ cdef class Kvdb:
         return Kvdb(home, *params)
 
     @property
-    def names(self) -> List[str]:
+    def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.names.__doc__
+        @SUB@ hse.Kvdb._kvs_names.__doc__
         """
         cdef size_t namec = 0
         cdef char **namev = NULL
@@ -259,6 +259,16 @@ class CursorFlag(IntFlag):
     REVERSE = HSE_FLAG_CURSOR_REVERSE
     STATIC_VIEW = HSE_FLAG_CURSOR_STATIC_VIEW
     BIND_TXN = HSE_FLAG_CURSOR_BIND_TXN
+
+
+@unique
+class KvsPfxProbeCnt(Enum):
+    """
+    @SUB@ hse.KvsPfxProbeCnt.__doc__
+    """
+    ZERO = HSE_KVS_PFX_FOUND_ZERO
+    ONE = HSE_KVS_PFX_FOUND_ONE
+    MUL = HSE_KVS_PFX_FOUND_MUL
 
 
 cdef class Kvs:
@@ -423,6 +433,73 @@ cdef class Kvs:
 
         return kvs_pfx_len
 
+    def prefix_probe(
+        self,
+        const unsigned char [:]pfx,
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        Transaction txn=None,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+        """
+        @SUB@ hse.prefix_probe.__doc__
+        """
+        cnt, key, _, value, _ = self.prefix_probe_with_lengths(pfx, key_buf, value_buf, txn=txn)
+        return (
+            cnt,
+            key,
+            value
+        )
+
+    def prefix_probe_with_lengths(
+        self,
+        const unsigned char [:]pfx,
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        Transaction txn=None,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+        """
+        @SUB@ hse.prefix_probe_with_lengths.__doc__
+        """
+        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef const void *pfx_addr = NULL
+        cdef size_t pfx_len = 0
+        cdef hse_kvs_pfx_probe_cnt found = HSE_KVS_PFX_FOUND_ZERO
+        cdef void *key_buf_addr = NULL
+        cdef size_t key_buf_len = 0
+        cdef size_t key_len = 0
+        cdef void *value_buf_addr = NULL
+        cdef size_t value_buf_len = 0
+        cdef size_t value_len = 0
+        if pfx is not None and len(pfx) > 0:
+            pfx_addr = &pfx[0]
+            pfx_len = len(pfx)
+        if key_buf is not None and len(key_buf) > 0:
+            key_buf_addr = &key_buf[0]
+            key_buf_len = len(key_buf)
+        if value_buf is not None and len(value_buf) > 0:
+            value_buf_addr = &value_buf[0]
+            value_buf_len = len(value_buf)
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
+
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_prefix_probe(self._c_hse_kvs, 0, txn_addr,
+                pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len,
+                value_buf_addr, value_buf_len, &value_len)
+        if err != 0:
+            raise KvdbException(err)
+        if found == HSE_KVS_PFX_FOUND_ZERO:
+            return KvsPfxProbeCnt.ZERO, None, 0, None, 0
+
+        return (
+            KvsPfxProbeCnt(found),
+            bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
+            key_len,
+            bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
+            value_len
+        )
+
     def cursor(
         self,
         const unsigned char [:]filt=None,
@@ -442,6 +519,7 @@ cdef class Kvs:
         return cursor
 
 
+@unique
 class TransactionState(Enum):
     """
     @SUB@ hse.TransactionState.__doc__
