@@ -260,8 +260,6 @@ class PutFlag(IntFlag):
 @unique
 class CursorFlag(IntFlag):
     REVERSE = HSE_FLAG_CURSOR_REVERSE
-    STATIC_VIEW = HSE_FLAG_CURSOR_STATIC_VIEW
-    BIND_TXN = HSE_FLAG_CURSOR_BIND_TXN
 
 
 @unique
@@ -679,23 +677,18 @@ cdef class KvsCursor:
 
         return _iter()
 
-    def update(
+    def update_view(
         self,
-        KvdbTransaction txn=None,
         flags: CursorFlag=0,
     ) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
         """
         cdef unsigned int cflags = int(flags)
-        cdef hse_kvdb_txn *txn_addr = NULL
-
-        if txn:
-            txn_addr = txn._c_hse_kvdb_txn
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, cflags, txn_addr)
+            err = hse_kvs_cursor_update_view(self._c_hse_kvs_cursor, cflags)
         if err != 0:
             raise HseException(err)
 

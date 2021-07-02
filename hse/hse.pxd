@@ -18,8 +18,6 @@ cdef extern from "hse/flags.h":
     cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
 
     cdef unsigned int HSE_FLAG_CURSOR_REVERSE
-    cdef unsigned int HSE_FLAG_CURSOR_BIND_TXN
-    cdef unsigned int HSE_FLAG_CURSOR_STATIC_VIEW
 
 
 cdef extern from "hse/types.h":
@@ -155,10 +153,9 @@ cdef extern from "hse/hse.h":
         const void *filt,
         size_t filt_len,
         hse_kvs_cursor **cursor) nogil
-    hse_err_t hse_kvs_cursor_update(
+    hse_err_t hse_kvs_cursor_update_view(
         hse_kvs_cursor *cursor,
-        unsigned int flags,
-        hse_kvdb_txn *txn) nogil
+        unsigned int flags) nogil
     hse_err_t hse_kvs_cursor_seek(
         hse_kvs_cursor *cursor,
         unsigned int flags,

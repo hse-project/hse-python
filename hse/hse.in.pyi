@@ -112,8 +112,6 @@ class PutFlag(IntFlag):
 
 class CursorFlag(IntFlag):
     REVERSE = ...
-    STATIC_VIEW = ...
-    BIND_TXN = ...
 
 class KvsPfxProbeCnt(Enum):
     """
@@ -266,7 +264,7 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.items.__doc__
         """
         ...
-    def update(
+    def update_view(
         self,
         txn: Optional[KvdbTransaction] = ...,
         flags: CursorFlag = ...,
