@@ -59,7 +59,8 @@ class KvdbException(Exception):
         self.returncode = hse_err_to_errno(returncode)
         IF HSE_PYTHON_DEBUG != 0:
             cdef char buf[256]
-            self.message = hse_err_to_string(returncode, buf, 256, NULL).decode()
+            hse_err_to_string(returncode, buf, sizeof(buf))
+            self.message = buf.decode()
         ELSE:
             self.message = os.strerror(self.returncode)
 

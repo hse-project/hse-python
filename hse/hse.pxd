@@ -62,7 +62,7 @@ cdef extern from "hse/types.h":
 
 cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
-    cdef char *hse_err_to_string(hse_err_t err, char *buf, size_t buf_len, size_t *need_len)
+    cdef size_t hse_err_to_string(hse_err_t err, char *buf, size_t buf_len)
 
     hse_err_t hse_init(size_t paramc, const char *const *paramv)
     void hse_fini()
