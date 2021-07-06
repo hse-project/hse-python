@@ -49,7 +49,7 @@ invoked (and even before it returns), calling any other HSE functions will resul
 undefined behavior. This function is not thread safe.
 """
 
-[hse.KvdbException]
+[hse.HseException]
 __doc__ = """
 Raised when HSE encounters an error. Wrapper around `hse_err_t`.
 
@@ -326,10 +326,10 @@ is created. A cursor's direction is determined when it is created and is immutab
 Cursors are of one of three types: (1) free, (2) transaction snapshot, and (3)
 transaction bound. A cursor of type (1) is based on an ephemeral snapshot view of the
 KVS at the time it is created. New data is not visible to the cursor until
-`hse.Cursor.update()` is called on it. A cursor of type (2) takes on the
+`hse.KvsCursor.update()` is called on it. A cursor of type (2) takes on the
 transaction's ephemeral snapshot but cannot see any of the mutations made by its
 associated transaction. A cursor of type (3) is like type (2) but it always can see
-the mutations made by the transaction. Calling `hse.Cursor.update()` on a cursor of
+the mutations made by the transaction. Calling `hse.KvsCursor.update()` on a cursor of
 types (2) and (3) without changing the parameter fields is a no-op. This
 function is thread safe.
 
@@ -369,12 +369,12 @@ Args:
 `flags` - Flags for operation specialization
 """
 
-[hse.TransactionState]
+[hse.KvdbTransactionState]
 __doc__ = """
 State a transaction could be in
 """
 
-[hse.Transaction]
+[hse.KvdbTransaction]
 __doc__ = """
 The HSE KVDB provides transactions with operations spanning KVSs within a single
 KVDB. These transactions have snapshot isolation (a specific form of MVCC) with the
@@ -408,10 +408,10 @@ The general lifecycle of a transaction is as follows:
        +-----------+                 +----------+
 
 When a transaction is initially allocated, it starts in the INVALID state. When
-`hse.Transaction.begin()` is called with transaction in the INVALID, COMMITTED, or ABORTED
-states, it moves to the ACTIVE state. It is an error to call the `hse.Transaction.begin()`
+`hse.KvdbTransaction.begin()` is called with transaction in the INVALID, COMMITTED, or ABORTED
+states, it moves to the ACTIVE state. It is an error to call the `hse.KvdbTransaction.begin()`
 function on a transaction in the ACTIVE state. For a transaction in the ACTIVE state,
-only the functions `hse.Transaction.commit()` or `hse.Transaction.abort()` may be called (with the
+only the functions `hse.KvdbTransaction.commit()` or `hse.KvdbTransaction.abort()` may be called (with the
 last doing an abort prior to the free).
 
 When a transaction becomes ACTIVE, it establishes an ephemeral snapshot view of the
@@ -421,7 +421,7 @@ the context of the transaction are not visible outside of the transaction unless
 until it is committed. All such mutations become visible atomically.
 """
 
-[hse.Transaction.begin]
+[hse.KvdbTransaction.begin]
 __doc__ = """
 Initiate transaction
 
@@ -429,7 +429,7 @@ The call fails if the transaction handle refers to an ACTIVE transaction. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.commit]
+[hse.KvdbTransaction.commit]
 __doc__ = """
 Commit all the mutations of the referenced transaction
 
@@ -437,7 +437,7 @@ The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.abort]
+[hse.KvdbTransaction.abort]
 __doc__ = """
 Abort/rollback transaction
 
@@ -445,21 +445,21 @@ The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.state]
+[hse.KvdbTransaction.state]
 __doc__ = """
 Retrieve the state of the referenced transaction
 
 This function is thread safe with different transactions.
 """
 
-[hse.Cursor.destroy]
+[hse.KvsCursor.destroy]
 __doc__ = """
 Destroy cursor
 
 This function is thread safe.
 """
 
-[hse.Cursor.items]
+[hse.KvsCursor.items]
 __doc__ = """
 Convenience function to return an iterator over key/values in a cursor's view
 
@@ -468,7 +468,7 @@ Args:
 `max_count` - Limit for the number of results
 """
 
-[hse.Cursor.update]
+[hse.KvsCursor.update]
 __doc__ = """
 Update a plain cursor or modify any cursor
 
@@ -485,11 +485,11 @@ Args:
 `flags` - Flags for operation specialization
 """
 
-[hse.Cursor.seek]
+[hse.KvsCursor.seek]
 __doc__ = """
 Move the cursor to point at the key/value pair at or closest to `key`
 
-The next `hse.Cursor.read()` will start at this point. This function is
+The next `hse.KvsCursor.read()` will start at this point. This function is
 thread safe across disparate cursors.
 
 Args:
@@ -497,7 +497,7 @@ Args:
 `key` - Key to find
 """
 
-[hse.Cursor.seek_range]
+[hse.KvsCursor.seek_range]
 __doc__ = """
 Move the cursor to the closest match to key, gated by the given filter
 
@@ -514,7 +514,7 @@ Args:
 `filt_max` - Filter maximum
 """
 
-[hse.Cursor.read]
+[hse.KvsCursor.read]
 __doc__ = """
 Iteratively access the elements pointed to by the cursor
 
@@ -524,7 +524,7 @@ cursor. The returned key and value will be `None` in the event that the cursor i
 at EOF. This function is thread safe across disparate cursors.
 """
 
-[hse.Cursor.eof]
+[hse.KvsCursor.eof]
 __doc__ = """
 Flag for determining if the cursor has more data to read
 """

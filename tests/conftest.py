@@ -22,7 +22,7 @@ def kvdb(home: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
 
     try:
         hse.Kvdb.create(home)
-    except hse.KvdbException as e:
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:

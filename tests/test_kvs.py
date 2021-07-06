@@ -8,7 +8,7 @@ import pytest
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
         kvdb.kvs_create("kvs-test", "pfx_len=3", "sfx_len=1")
-    except hse.KvdbException as e:
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:

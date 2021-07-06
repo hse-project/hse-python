@@ -194,12 +194,12 @@ cdef class Kvs:
     cdef hse_kvs *_c_hse_kvs
 
 
-cdef class Transaction:
+cdef class KvdbTransaction:
     cdef hse_kvdb_txn *_c_hse_kvdb_txn
     cdef Kvdb kvdb
 
 
-cdef class Cursor:
+cdef class KvsCursor:
     cdef hse_kvs_cursor *_c_hse_kvs_cursor
     cdef cbool _eof
 

@@ -19,9 +19,9 @@ def fini() -> None:
     """
     ...
 
-class KvdbException(Exception):
+class HseException(Exception):
     """
-    @SUB@ hse.KvdbException.__doc__
+    @SUB@ hse.HseException.__doc__
     """
 
     returncode: int
@@ -99,7 +99,7 @@ class Kvdb:
         @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
-    def transaction(self) -> Transaction:
+    def transaction(self) -> KvdbTransaction:
         """
         @SUB@ hse.Kvdb.transaction.__doc__
         """
@@ -134,7 +134,7 @@ class Kvs:
         self,
         key: bytes,
         value: Optional[bytes],
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
         flags: PutFlag = ...,
     ) -> None:
         """
@@ -144,7 +144,7 @@ class Kvs:
     def get(
         self,
         key: bytes,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
         buf: bytearray = ...,
     ) -> Optional[bytes]:
         """
@@ -154,19 +154,19 @@ class Kvs:
     def get_with_length(
         self,
         key: bytes,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
         ...
-    def delete(self, key: bytes, txn: Optional[Transaction] = ...) -> None:
+    def delete(self, key: bytes, txn: Optional[KvdbTransaction] = ...) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
         ...
-    def prefix_delete(self, filt: bytes, txn: Optional[Transaction] = ...) -> int:
+    def prefix_delete(self, filt: bytes, txn: Optional[KvdbTransaction] = ...) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -176,7 +176,7 @@ class Kvs:
         pfx: bytes,
         key_buf: bytearray = ...,
         value_buf: bytearray = ...,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
         """
         @SUB@ hse.prefix_probe.__doc__
@@ -187,7 +187,7 @@ class Kvs:
         pfx: bytes,
         key_buf: bytearray = ...,
         value_buf: Optional[bytearray] = ...,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
         """
         @SUB@ hse.prefix_probe_with_lengths.__doc__
@@ -196,17 +196,17 @@ class Kvs:
     def cursor(
         self,
         filt: Optional[bytes] = ...,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
         flags: CursorFlag = ...,
-    ) -> Cursor:
+    ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
         """
         ...
 
-class TransactionState(Enum):
+class KvdbTransactionState(Enum):
     """
-    @SUB@ hse.TransactionState.__doc__
+    @SUB@ hse.KvdbTransactionState.__doc__
     """
 
     INVALID: int
@@ -214,12 +214,12 @@ class TransactionState(Enum):
     COMMITTED: int
     ABORTED: int
 
-class Transaction:
+class KvdbTransaction:
     """
-    @SUB@ hse.Transaction.__doc__
+    @SUB@ hse.KvdbTransaction.__doc__
     """
 
-    def __enter__(self) -> Transaction: ...
+    def __enter__(self) -> KvdbTransaction: ...
     def __exit__(
         self,
         exc_type: Optional[Type[BaseException]],
@@ -228,28 +228,28 @@ class Transaction:
     ) -> None: ...
     def begin(self) -> None:
         """
-        @SUB@ hse.Transaction.begin.__doc__
+        @SUB@ hse.KvdbTransaction.begin.__doc__
         """
         ...
     def commit(self) -> None:
         """
-        @SUB@ hse.Transaction.commit.__doc__
+        @SUB@ hse.KvdbTransaction.commit.__doc__
         """
         ...
     def abort(self) -> None:
         """
-        @SUB@ hse.Transaction.abort.__doc__
+        @SUB@ hse.KvdbTransaction.abort.__doc__
         """
         ...
     @property
-    def state(self) -> TransactionState:
+    def state(self) -> KvdbTransactionState:
         """
-        @SUB@ hse.Transaction.state.__doc__
+        @SUB@ hse.KvdbTransaction.state.__doc__
         """
         ...
 
-class Cursor:
-    def __enter__(self) -> Cursor: ...
+class KvsCursor:
+    def __enter__(self) -> KvsCursor: ...
     def __exit__(
         self,
         exc_type: Optional[Type[BaseException]],
@@ -258,44 +258,44 @@ class Cursor:
     ) -> None: ...
     def destroy(self) -> None:
         """
-        @SUB@ hse.Cursor.destroy.__doc__
+        @SUB@ hse.KvsCursor.destroy.__doc__
         """
         ...
     def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
-        @SUB@ hse.Cursor.items.__doc__
+        @SUB@ hse.KvsCursor.items.__doc__
         """
         ...
     def update(
         self,
-        txn: Optional[Transaction] = ...,
+        txn: Optional[KvdbTransaction] = ...,
         flags: CursorFlag = ...,
     ) -> None:
         """
-        @SUB@ hse.Cursor.update.__doc__
+        @SUB@ hse.KvsCursor.update.__doc__
         """
         ...
     def seek(self, key: Optional[bytes]) -> Optional[bytes]:
         """
-        @SUB@ hse.Cursor.seek.__doc__
+        @SUB@ hse.KvsCursor.seek.__doc__
         """
         ...
     def seek_range(
         self, filt_min: Optional[bytes], filt_max: Optional[bytes]
     ) -> Optional[bytes]:
         """
-        @SUB@ hse.Cursor.seek_range.__doc__
+        @SUB@ hse.KvsCursor.seek_range.__doc__
         """
         ...
     def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
-        @SUB@ hse.Cursor.read.__doc__
+        @SUB@ hse.KvsCursor.read.__doc__
         """
         ...
     @property
     def eof(self) -> bool:
         """
-        @SUB@ hse.Cursor.eof.__doc__
+        @SUB@ hse.KvsCursor.eof.__doc__
         """
         ...
 
