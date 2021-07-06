@@ -132,8 +132,8 @@ cdef extern from "hse/hse.h":
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
-    cdef int HSE_KVDB_COMP_FLAG_CANCEL
-    cdef int HSE_KVDB_COMP_FLAG_SAMP_LWM
+    cdef int HSE_FLAG_KVDB_COMPACT_CANCEL
+    cdef int HSE_FLAG_KVDB_COMPACT_SAMP_LWM
 
     hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
 

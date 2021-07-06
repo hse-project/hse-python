@@ -73,6 +73,12 @@ class SyncFlag(IntFlag):
     ASYNC = HSE_FLAG_SYNC_ASYNC
 
 
+@unique
+class KvdbCompactFlag(IntFlag):
+    CANCEL = HSE_FLAG_KVDB_COMPACT_CANCEL
+    SAMP_LWM = HSE_FLAG_KVDB_COMPACT_SAMP_LWM
+
+
 cdef class Kvdb:
     def __cinit__(self, home: Optional[os.PathLike[str]], *params: str):
         self._c_hse_kvdb = NULL
@@ -197,19 +203,15 @@ cdef class Kvdb:
         if err != 0:
             raise KvdbException(err)
 
-    def compact(self, cancel: bool=False, samp_lwm: bool=False) -> None:
+    def compact(self, flags: KvdbCompactFlag=0) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
         """
-        cdef int flags = 0
-        if cancel:
-            flags |= HSE_KVDB_COMP_FLAG_CANCEL
-        if samp_lwm:
-            flags |= HSE_KVDB_COMP_FLAG_SAMP_LWM
+        cdef unsigned int cflags = int(flags)
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_compact(self._c_hse_kvdb, flags)
+            err = hse_kvdb_compact(self._c_hse_kvdb, cflags)
         if err != 0:
             raise KvdbException(err)
 

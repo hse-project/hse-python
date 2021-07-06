@@ -182,6 +182,8 @@ Args:
 
 `cancel` - To cancel an ongoing compaction request for a KVDB\\n
 `samp_lwm` - To perform compaction to its fullest extent
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.compact_status]
@@ -190,6 +192,8 @@ Get status of an ongoing compaction activity
 
 The caller can examine the properties of the `KvdbCompactStatus` class to determine
 the current state of maintenance compaction. This function is thread safe.
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.storage_info]
