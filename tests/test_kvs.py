@@ -1,6 +1,6 @@
 import errno
 from typing import Generator, Optional
-import hse
+from hse2 import hse, limits
 import pytest
 
 
@@ -71,8 +71,8 @@ def test_prefix_probe(kvs: hse.Kvs):
 @pytest.mark.parametrize(
     "key_buf,value_buf",
     [
-        (bytearray(hse.limits.KVS_KEY_LEN_MAX), bytearray(256)),
-        (bytearray(hse.limits.KVS_KEY_LEN_MAX), None),
+        (bytearray(limits.KVS_KEY_LEN_MAX), bytearray(256)),
+        (bytearray(limits.KVS_KEY_LEN_MAX), None),
     ],
 )
 def test_prefix_probe_with_lengths(

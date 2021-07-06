@@ -1,5 +1,5 @@
 from typing import Generator, Optional
-import hse
+from hse2 import hse
 import pytest
 import errno
 

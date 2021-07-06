@@ -1,6 +1,6 @@
 import errno
 from typing import Generator
-import hse
+from hse2 import hse
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.config import Config

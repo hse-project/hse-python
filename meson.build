@@ -65,7 +65,7 @@ hse_dep = dependency(
     ],
 )
 
-subdir('hse')
+subdir('hse2')
 
 if get_option('tests')
     subdir('tests')
@@ -81,7 +81,5 @@ run_target(
     }),
     depends: [
         extension_modules,
-        init_py,
-        py_typed,
     ]
 )

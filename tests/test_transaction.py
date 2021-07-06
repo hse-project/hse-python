@@ -1,5 +1,4 @@
-
-import hse
+from hse2 import hse
 
 def test_state_transitions(kvdb: hse.Kvdb):
     txn = kvdb.transaction()

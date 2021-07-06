@@ -1,4 +1,4 @@
-import hse
+from hse2 import hse
 import pytest
 from typing import Generator
 import errno

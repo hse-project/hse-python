@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import List
-import hse
-from hse import limits
+from hse2 import hse, limits
 import sys
 import argparse
 from functools import partial
