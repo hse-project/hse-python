@@ -65,7 +65,7 @@ def test_update(kvs: hse.Kvs, reverse: hse.CursorFlag):
         assert sum(1 for _ in cursor.items()) == 5
         assert cursor.read() == (None, None)
 
-        cursor.update(flags=reverse)
+        cursor.update_view()
 
         kv = cursor.read()
         if not reverse:
