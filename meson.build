@@ -52,8 +52,8 @@ endif
 project_build_root = meson.project_build_root()
 
 hse_dep = dependency(
-    'hse-1',
-    version: '>=1.10',
+    'hse-2',
+    version: '>=2.0.0',
     required: true,
     fallback: ['hse', 'hse_dep'],
     default_options: [
