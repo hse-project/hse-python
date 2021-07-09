@@ -52,8 +52,8 @@ endif
 project_build_root = meson.project_build_root()
 
 hse_dep = dependency(
-    'hse-1',
-    version: '>=1.10',
+    'hse-2',
+    version: '>=2.0.0',
     required: true,
     fallback: ['hse', 'hse_dep'],
     default_options: [
@@ -65,7 +65,7 @@ hse_dep = dependency(
     ],
 )
 
-subdir('hse')
+subdir('hse2')
 
 if get_option('tests')
     subdir('tests')
@@ -79,4 +79,7 @@ run_target(
     env: environment({
         'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
     }),
+    depends: [
+        extension_modules,
+    ]
 )

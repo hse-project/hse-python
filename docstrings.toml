@@ -33,6 +33,10 @@ Initialize the HSE subsystem
 This function initializes a range of different internal HSE structures. It must be
 called before any other HSE functions are used. It is not thread safe and is
 idempotent.
+
+Args:
+
+`params` - key=value parameters
 """
 
 [hse.fini]
@@ -45,7 +49,7 @@ invoked (and even before it returns), calling any other HSE functions will resul
 undefined behavior. This function is not thread safe.
 """
 
-[hse.KvdbException]
+[hse.HseException]
 __doc__ = """
 Raised when HSE encounters an error. Wrapper around `hse_err_t`.
 
@@ -62,7 +66,7 @@ No client thread may enter the HSE KVDB API with the referenced KVDB after this
 function starts. This function is not thread safe.
 """
 
-[hse.Kvdb.make]
+[hse.Kvdb.create]
 __doc__ = """
 Create a new KVDB instance
 
@@ -100,7 +104,7 @@ Args:
 `params` - key=value parameters
 """
 
-[hse.Kvdb.names]
+[hse.Kvdb.kvs_names]
 __doc__ = """
 Get the names of the KVSs within the given KVDB
 
@@ -108,7 +112,7 @@ Key-value stores (KVSs) are opened by name. This function allocates a list of
 strings, each containing the name of a KVS. This function is thread safe.
 """
 
-[hse.Kvdb.kvs_make]
+[hse.Kvdb.kvs_create]
 __doc__ = """
 Create a new KVS within the referenced KVDB
 
@@ -149,12 +153,11 @@ Args:
 
 [hse.Kvdb.sync]
 __doc__ = """
-Flush data in all of the referenced KVDB's KVSs to stable media and return
-"""
+Sync data in all of the referenced KVDB's KVSs to stable media and return
 
-[hse.Kvdb.flush]
-__doc__ = """
-Initiate data flush in all of the referenced KVDB's KVSs
+Args:
+
+`flags` - Flags for operation specialization
 """
 
 [hse.Kvdb.compact]
@@ -179,6 +182,8 @@ Args:
 
 `cancel` - To cancel an ongoing compaction request for a KVDB\\n
 `samp_lwm` - To perform compaction to its fullest extent
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.compact_status]
@@ -187,6 +192,8 @@ Get status of an ongoing compaction activity
 
 The caller can examine the properties of the `KvdbCompactStatus` class to determine
 the current state of maintenance compaction. This function is thread safe.
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.storage_info]
@@ -218,8 +225,8 @@ __doc__ = """
 Put a KV pair into KVS
 
 If the key already exists in the KVS then the value is effectively overwritten. The
-key length must be in the range [1, `hse.KVS_KLEN_MAX`] while the value length must be
-in the range [0, `hse.KVS_VLEN_MAX`]. See the section on transactions for information
+key length must be in the range [1, `limits.KVS_KEY_LEN_MAX`] while the value length must be
+in the range [0, `limits.KVS_VALUE_LEN_MAX`]. See the section on transactions for information
 on how puts within transactions are handled. This function is thread safe.
 
 The HSE KVDB attempts to maintain reasonable QoS and for high-throughput clients this
@@ -235,8 +242,8 @@ Args:
 
 `key` - Key to put into KVS\\n
 `value` - Value associated with key\\n
-`priority` - Operation won't be throttled\\n
-`txn` - Transaction context
+`txn` - Transaction context\\n
+`flags` - Flags for operation specialization
 """
 
 [hse.Kvs.get]
@@ -251,7 +258,7 @@ Args:
 
 `key` - Key to get from KVS\\n
 `txn` - Transaction context\\n
-`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VALUE_LEN_MAX`
 """
 
 [hse.Kvs.get_with_length]
@@ -266,7 +273,7 @@ Args:
 
 `key` - Key to get from KVS\\n
 `txn` - Transaction context\\n
-`buf` - Buffer to store the value in, defaults to `hse.KVS_VLEN_MAX`
+`buf` - Buffer to store the value in, defaults to `hse.KVS_VALUE_LEN_MAX`
 """
 
 [hse.Kvs.delete]
@@ -319,10 +326,10 @@ is created. A cursor's direction is determined when it is created and is immutab
 Cursors are of one of three types: (1) free, (2) transaction snapshot, and (3)
 transaction bound. A cursor of type (1) is based on an ephemeral snapshot view of the
 KVS at the time it is created. New data is not visible to the cursor until
-`hse.Cursor.update()` is called on it. A cursor of type (2) takes on the
+`hse.KvsCursor.update()` is called on it. A cursor of type (2) takes on the
 transaction's ephemeral snapshot but cannot see any of the mutations made by its
 associated transaction. A cursor of type (3) is like type (2) but it always can see
-the mutations made by the transaction. Calling `hse.Cursor.update()` on a cursor of
+the mutations made by the transaction. Calling `hse.KvsCursor.update()` on a cursor of
 types (2) and (3) without changing the parameter fields is a no-op. This
 function is thread safe.
 
@@ -358,18 +365,16 @@ mutations that occurred during the lifespan of the transaction visible as well.
 Args:
 
 `filt` - Iteration limited to keys matching this prefix filter\\n
-`reverse` - Reverse cursor\\n
-`static_view` - Bound cursor's view is static\\n
-`bind_txn` - Cursor bound to transaction\\n
-`txn` - Transaction context
+`txn` - Transaction context\\n
+`flags` - Flags for operation specialization
 """
 
-[hse.TransactionState]
+[hse.KvdbTransactionState]
 __doc__ = """
 State a transaction could be in
 """
 
-[hse.Transaction]
+[hse.KvdbTransaction]
 __doc__ = """
 The HSE KVDB provides transactions with operations spanning KVSs within a single
 KVDB. These transactions have snapshot isolation (a specific form of MVCC) with the
@@ -403,10 +408,10 @@ The general lifecycle of a transaction is as follows:
        +-----------+                 +----------+
 
 When a transaction is initially allocated, it starts in the INVALID state. When
-`hse.Transaction.begin()` is called with transaction in the INVALID, COMMITTED, or ABORTED
-states, it moves to the ACTIVE state. It is an error to call the `hse.Transaction.begin()`
+`hse.KvdbTransaction.begin()` is called with transaction in the INVALID, COMMITTED, or ABORTED
+states, it moves to the ACTIVE state. It is an error to call the `hse.KvdbTransaction.begin()`
 function on a transaction in the ACTIVE state. For a transaction in the ACTIVE state,
-only the functions `hse.Transaction.commit()` or `hse.Transaction.abort()` may be called (with the
+only the functions `hse.KvdbTransaction.commit()` or `hse.KvdbTransaction.abort()` may be called (with the
 last doing an abort prior to the free).
 
 When a transaction becomes ACTIVE, it establishes an ephemeral snapshot view of the
@@ -416,7 +421,7 @@ the context of the transaction are not visible outside of the transaction unless
 until it is committed. All such mutations become visible atomically.
 """
 
-[hse.Transaction.begin]
+[hse.KvdbTransaction.begin]
 __doc__ = """
 Initiate transaction
 
@@ -424,7 +429,7 @@ The call fails if the transaction handle refers to an ACTIVE transaction. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.commit]
+[hse.KvdbTransaction.commit]
 __doc__ = """
 Commit all the mutations of the referenced transaction
 
@@ -432,7 +437,7 @@ The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.abort]
+[hse.KvdbTransaction.abort]
 __doc__ = """
 Abort/rollback transaction
 
@@ -440,21 +445,21 @@ The call fails if the referenced transaction is not in the ACTIVE state. This
 function is thread safe with different transactions.
 """
 
-[hse.Transaction.state]
+[hse.KvdbTransaction.state]
 __doc__ = """
 Retrieve the state of the referenced transaction
 
 This function is thread safe with different transactions.
 """
 
-[hse.Cursor.destroy]
+[hse.KvsCursor.destroy]
 __doc__ = """
 Destroy cursor
 
 This function is thread safe.
 """
 
-[hse.Cursor.items]
+[hse.KvsCursor.items]
 __doc__ = """
 Convenience function to return an iterator over key/values in a cursor's view
 
@@ -463,7 +468,7 @@ Args:
 `max_count` - Limit for the number of results
 """
 
-[hse.Cursor.update]
+[hse.KvsCursor.update]
 __doc__ = """
 Update a plain cursor or modify any cursor
 
@@ -476,17 +481,15 @@ across disparate cursors.
 
 Args:
 
-`reverse` - Reverse cursor\\n
-`static_view` - Bound cursor's view is static\\n
-`bind_txn` - Cursor bound to transaction\\n
 `txn` - Transaction context
+`flags` - Flags for operation specialization
 """
 
-[hse.Cursor.seek]
+[hse.KvsCursor.seek]
 __doc__ = """
 Move the cursor to point at the key/value pair at or closest to `key`
 
-The next `hse.Cursor.read()` will start at this point. This function is
+The next `hse.KvsCursor.read()` will start at this point. This function is
 thread safe across disparate cursors.
 
 Args:
@@ -494,7 +497,7 @@ Args:
 `key` - Key to find
 """
 
-[hse.Cursor.seek_range]
+[hse.KvsCursor.seek_range]
 __doc__ = """
 Move the cursor to the closest match to key, gated by the given filter
 
@@ -511,7 +514,7 @@ Args:
 `filt_max` - Filter maximum
 """
 
-[hse.Cursor.read]
+[hse.KvsCursor.read]
 __doc__ = """
 Iteratively access the elements pointed to by the cursor
 
@@ -521,7 +524,7 @@ cursor. The returned key and value will be `None` in the event that the cursor i
 at EOF. This function is thread safe across disparate cursors.
 """
 
-[hse.Cursor.eof]
+[hse.KvsCursor.eof]
 __doc__ = """
 Flag for determining if the cursor has more data to read
 """
@@ -582,25 +585,6 @@ __doc__ = """
 used storage space for a kvdb
 """
 
-[hse.config_merge]
-__doc__ = """
-Merge multiple config strings into one
-
-Assumes both inputs are valid config strings. Caller must free merged when
-done. This function is thread safe.
-
-Args:
-
-`configs`: Configuration strings
-"""
-
-[hse.config_valid]
-__doc__ = """
-Determine if a configuration is valid
-
-This function is thread safe.
-"""
-
 [limits]
 __doc__ = """
 Global Limits
@@ -611,7 +595,7 @@ __doc__ = """
 Maximum number of KVS's contained within one KVDB
 """
 
-[limits.KVS_KLEN_MAX]
+[limits.KVS_KEY_LEN_MAX]
 __doc__ = """
 A common requirement for key length for the software above HSE KVDB is 1024.
 Combined with a discriminant and (potentially) a chunk key, this pushes us to
@@ -620,12 +604,12 @@ can have at most 3 keys of such large size in a 4k page. Lopping off 64-bytes
 for other data, and we can have 3 keys of 1344 bytes.
 """
 
-[limits.KVS_VLEN_MAX]
+[limits.KVS_VALUE_LEN_MAX]
 __doc__ = """
 Max value length is 1MiB
 """
 
-[limits.KVS_MAX_PFXLEN]
+[limits.KVS_PFX_LEN_MAX]
 __doc__ = """
 Max key prefix length
 """
@@ -635,22 +619,20 @@ __doc__ = """
 Max KVS name lengths
 """
 
-[experimental]
-__doc__ = """
-Experimental APIs which may or may not changed, added, or deleted
-between releases
-"""
-
-[experimental.KvsPfxProbeCnt]
+[hse.KvsPfxProbeCnt]
 __doc__ = """
 Enum representing how many results were found in the probe operation.
+
+THIS CLASS IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
-[experimental.kvs_prefix_probe]
+[hse.prefix_probe]
 __doc__ = """
 Probe for prefix
 
 Outputs how many matches were encountered - zero, one or multiple.
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 
 Args:
 
@@ -661,12 +643,14 @@ Args:
 `txn` - Transaction context
 """
 
-[experimental.kvs_prefix_probe_with_lengths]
+[hse.prefix_probe_with_lengths]
 __doc__ = """
 Probe for prefix
 
 Outputs how many matches were encountered - zero, one or multiple. Returns
 lengths of key and value in addition to the `bytes` objects.
+
+THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 
 Args:
 

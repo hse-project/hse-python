@@ -1,5 +1,5 @@
 from typing import Generator, Optional
-import hse
+from hse2 import hse
 import pytest
 import errno
 
@@ -7,8 +7,8 @@ import errno
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_make("cursor-test", "pfx_len=3")
-    except hse.KvdbException as e:
+        kvdb.kvs_create("cursor-test", "pfx_len=3")
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
@@ -57,15 +57,15 @@ def test_seek_range(kvs: hse.Kvs, filter: Optional[bytes]):
         assert cursor.eof
 
 
-@pytest.mark.parametrize("reverse", [(True), (False)])
-def test_update(kvs: hse.Kvs, reverse: bool):
-    with kvs.cursor(reverse=reverse) as cursor:
+@pytest.mark.parametrize("reverse", [(0), (hse.CursorFlag.REVERSE)])
+def test_update(kvs: hse.Kvs, reverse: hse.CursorFlag):
+    with kvs.cursor(flags=reverse) as cursor:
         kvs.put(b"key5", b"value5")
 
         assert sum(1 for _ in cursor.items()) == 5
         assert cursor.read() == (None, None)
 
-        cursor.update(reverse=reverse)
+        cursor.update_view()
 
         kv = cursor.read()
         if not reverse:
@@ -77,7 +77,7 @@ def test_update(kvs: hse.Kvs, reverse: bool):
 
 
 def test_reverse(kvs: hse.Kvs):
-    with kvs.cursor(reverse=True) as cursor:
+    with kvs.cursor(flags=hse.CursorFlag.REVERSE) as cursor:
         for i in reversed(range(5)):
             assert (
                 cursor.read() == (f"key{i}".encode(), f"value{i}".encode())

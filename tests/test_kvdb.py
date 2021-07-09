@@ -1,4 +1,4 @@
-import hse
+from hse2 import hse
 import pytest
 from typing import Generator
 import errno
@@ -7,8 +7,8 @@ import errno
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_make("kvdb-test", "pfx_len=3")
-    except hse.KvdbException as e:
+        kvdb.kvs_create("kvdb-test", "pfx_len=3")
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
@@ -23,10 +23,6 @@ def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
 
 def test_sync(kvdb: hse.Kvdb):
     kvdb.sync()
-
-
-def test_flush(kvdb: hse.Kvdb):
-    kvdb.flush()
 
 
 @pytest.mark.skip(reason="Hard to control when compaction occurs")

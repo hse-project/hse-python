@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 from typing import List
-import hse
-from hse import limits
+from hse2 import hse, limits
 import sys
 import argparse
 from functools import partial
 
 
 # This example demonstrates how one could add key-value pairs where the value
-# length could be larger than the allowed maximum hse.KVS_VLEN_MAX.
+# length could be larger than the allowed maximum limits.KVS_VALUE_LEN_MAX.
 #
 # To put keys, this example uses files passed to it on the commandline. Each
 # file's name forms the prefix of a key and its contents are chunked into the
@@ -26,7 +25,7 @@ from functools import partial
 #     ...
 #     /tmp/foo00000NNN
 #
-# for chunks of size hse.KVS_VLEN_MAX read from /tmp/foo. Similarly, the file
+# for chunks of size limits.KVS_VALUE_LEN_MAX read from /tmp/foo. Similarly, the file
 # /tmp/bar will be split into multiple chunks starting with keys starting at
 # /tmp/bar00000000
 #
@@ -57,7 +56,7 @@ def extract_kv_to_files(kvs: hse.Kvs, files: List[str]) -> None:
 def put_files_as_kv(kvs: hse.Kvs, keys: List[str]) -> None:
     for key in keys:
         with open(key, "rb") as f:
-            for i, chunk in enumerate(iter(partial(f.read, limits.KVS_VLEN_MAX), b"")):
+            for i, chunk in enumerate(iter(partial(f.read, limits.KVS_VALUE_LEN_MAX), b"")):
                 kvs.put(f"{key}|{i:08x}".encode(), chunk)
 
 

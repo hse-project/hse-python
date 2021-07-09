@@ -6,7 +6,7 @@ import errno
 import os
 cimport cython
 cimport limits
-from enum import Enum
+from enum import Enum, IntFlag, unique
 from types import TracebackType
 from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable
 from libc.stdlib cimport malloc, free
@@ -18,13 +18,16 @@ from libc.stdlib cimport malloc, free
 # issues within the Python bindings.
 
 
-def init() -> None:
+def init(*params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
-    cdef hse_err_t err = hse_init()
+    cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
+    cdef hse_err_t err = hse_init(len(params), <const char * const*>paramv)
+    if paramv:
+        free(paramv)
     if err != 0:
-        raise KvdbException(err)
+        raise HseException(err)
 
 
 def fini() -> None:
@@ -48,20 +51,32 @@ cdef char **to_paramv(tuple params) except NULL:
     return paramv
 
 
-class KvdbException(Exception):
+class HseException(Exception):
     """
-    @SUB@ hse.KvdbException.__doc__
+    @SUB@ hse.HseException.__doc__
     """
     def __init__(self, hse_err_t returncode):
         self.returncode = hse_err_to_errno(returncode)
         IF HSE_PYTHON_DEBUG != 0:
             cdef char buf[256]
-            self.message = hse_err_to_string(returncode, buf, 256, NULL).decode()
+            hse_strerror(returncode, buf, sizeof(buf))
+            self.message = buf.decode()
         ELSE:
             self.message = os.strerror(self.returncode)
 
     def __str__(self):
         return self.message
+
+
+@unique
+class SyncFlag(IntFlag):
+    ASYNC = HSE_FLAG_SYNC_ASYNC
+
+
+@unique
+class KvdbCompactFlag(IntFlag):
+    CANCEL = HSE_FLAG_KVDB_COMPACT_CANCEL
+    SAMP_LWM = HSE_FLAG_KVDB_COMPACT_SAMP_LWM
 
 
 cdef class Kvdb:
@@ -76,7 +91,7 @@ cdef class Kvdb:
         if paramv:
             free(paramv)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def __dealloc__(self):
         self.close()
@@ -90,23 +105,23 @@ cdef class Kvdb:
 
         cdef hse_err_t err = hse_kvdb_close(self._c_hse_kvdb)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
         self._c_hse_kvdb = NULL
 
     @staticmethod
-    def make(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
+    def create(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.make.__doc__
+        @SUB@ hse.Kvdb.create.__doc__
         """
         home_bytes = os.fspath(home).encode() if home else None
         cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_make(home_addr, len(params), <const char * const*>paramv)
+        cdef hse_err_t err = hse_kvdb_create(home_addr, len(params), <const char * const*>paramv)
         if paramv:
             free(paramv)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     @staticmethod
     def drop(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
@@ -121,7 +136,7 @@ cdef class Kvdb:
         if paramv:
             free(paramv)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     @staticmethod
     def open(home: Optional[os.PathLike[str]]=None, *params: str) -> Kvdb:
@@ -131,39 +146,37 @@ cdef class Kvdb:
         return Kvdb(home, *params)
 
     @property
-    def names(self) -> List[str]:
+    def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.names.__doc__
+        @SUB@ hse.Kvdb._kvs_names.__doc__
         """
-        cdef unsigned int count = 0
-        cdef char **kvs_list = NULL
-        cdef hse_err_t err = hse_kvdb_get_names(self._c_hse_kvdb, &count, &kvs_list)
+        cdef size_t namec = 0
+        cdef char **namev = NULL
+        cdef hse_err_t err = hse_kvdb_kvs_names_get(self._c_hse_kvdb, &namec, &namev)
         if err != 0:
-            raise KvdbException(err)
-        if count > 0 and not kvs_list:
-            raise MemoryError()
+            raise HseException(err)
 
         result = []
-        for i in range(count):
-            result.append(kvs_list[i].decode())
+        for i in range(namec):
+            result.append(namev[i].decode())
 
-        hse_kvdb_free_names(self._c_hse_kvdb, kvs_list)
+        hse_kvdb_kvs_names_free(self._c_hse_kvdb, namev)
 
         return result
 
-    def kvs_make(self, str name, *params: str) -> None:
+    def kvs_create(self, str name, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_make.__doc__
+        @SUB@ hse.Kvdb.kvs_create.__doc__
         """
         name_bytes = name.encode() if name else None
         cdef const char *name_addr = <char *>name_bytes if name_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_kvs_make(
+        cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def kvs_drop(self, str kvs_name) -> None:
         """
@@ -171,7 +184,7 @@ cdef class Kvdb:
         """
         cdef hse_err_t err = hse_kvdb_kvs_drop(self._c_hse_kvdb, kvs_name.encode())
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def kvs_open(self, str kvs_name, *params: str) -> Kvs:
         """
@@ -179,41 +192,28 @@ cdef class Kvdb:
         """
         return Kvs(self, kvs_name, *params)
 
-    def sync(self) -> None:
+    def sync(self, flags: SyncFlag=0) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
+        cdef unsigned int cflags = int(flags)
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_sync(self._c_hse_kvdb)
+            err = hse_kvdb_sync(self._c_hse_kvdb, cflags)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
-    def flush(self) -> None:
-        """
-        @SUB@ hse.Kvdb.flush.__doc__
-        """
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvdb_flush(self._c_hse_kvdb)
-        if err != 0:
-            raise KvdbException(err)
-
-    def compact(self, cancel: bool=False, samp_lwm: bool=False) -> None:
+    def compact(self, flags: KvdbCompactFlag=0) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
         """
-        cdef int flags = 0
-        if cancel:
-            flags |= HSE_KVDB_COMP_FLAG_CANCEL
-        if samp_lwm:
-            flags |= HSE_KVDB_COMP_FLAG_SAMP_LWM
+        cdef unsigned int cflags = int(flags)
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_compact(self._c_hse_kvdb, flags)
+            err = hse_kvdb_compact(self._c_hse_kvdb, cflags)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     @property
     def compact_status(self) -> KvdbCompactStatus:
@@ -225,7 +225,7 @@ cdef class Kvdb:
         with nogil:
             err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
         return status
 
     @property
@@ -238,16 +238,38 @@ cdef class Kvdb:
         with nogil:
             err = hse_kvdb_storage_info_get(self._c_hse_kvdb, &info._c_hse_kvdb_storage_info)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
         return info
 
-    def transaction(self) -> Transaction:
+    def transaction(self) -> KvdbTransaction:
         """
         @SUB@ hse.Kvdb.transaction.__doc__
         """
-        txn = Transaction(self)
+        txn = KvdbTransaction(self)
 
         return txn
+
+
+@unique
+class PutFlag(IntFlag):
+    PRIORITY = HSE_FLAG_PUT_PRIORITY
+    VALUE_COMPRESSION_ON = HSE_FLAG_PUT_VALUE_COMPRESSION_ON
+    VALUE_COMPRESSION_OFF = HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
+
+
+@unique
+class CursorFlag(IntFlag):
+    REVERSE = HSE_FLAG_CURSOR_REVERSE
+
+
+@unique
+class KvsPfxProbeCnt(Enum):
+    """
+    @SUB@ hse.KvsPfxProbeCnt.__doc__
+    """
+    ZERO = HSE_KVS_PFX_FOUND_ZERO
+    ONE = HSE_KVS_PFX_FOUND_ONE
+    MUL = HSE_KVS_PFX_FOUND_MUL
 
 
 cdef class Kvs:
@@ -261,7 +283,7 @@ cdef class Kvs:
         cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv, &self._c_hse_kvs)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def __dealloc__(self):
         self.close()
@@ -275,23 +297,28 @@ cdef class Kvs:
 
         cdef hse_err_t err = hse_kvdb_kvs_close(self._c_hse_kvs)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
         self._c_hse_kvs = NULL
 
-    def put(self, const unsigned char [:]key, const unsigned char [:]value, priority: bool=False, Transaction txn=None) -> None:
+    def put(
+            self,
+            const unsigned char [:]key,
+            const unsigned char [:]value,
+            KvdbTransaction txn=None,
+            flags: PutFlag=0,
+        ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if priority or txn else NULL
-        if priority:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_PRIORITY
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
-
+        cdef unsigned int cflags = int(flags)
+        cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         cdef const void *value_addr = NULL
         cdef size_t value_len = 0
+
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
         if key is not None:
             key_addr = &key[0]
             key_len = key.shape[0]
@@ -301,32 +328,40 @@ cdef class Kvs:
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvs_put(self._c_hse_kvs, opspec, key_addr, key_len, value_addr, value_len)
-        if opspec:
-            free(opspec)
+            err = hse_kvs_put(self._c_hse_kvs, cflags, txn_addr, key_addr, key_len, value_addr, value_len)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
-    def get(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX)) -> Optional[bytes]:
+    def get(
+            self,
+            const unsigned char [:]key,
+            KvdbTransaction txn=None,
+            unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        ) -> Optional[bytes]:
         """
         @SUB@ hse.Kvs.get.__doc__
         """
         value, _ = self.get_with_length(key, txn=txn, buf=buf)
         return value
 
-
-    def get_with_length(self, const unsigned char [:]key, Transaction txn=None, unsigned char [:]buf=bytearray(limits.HSE_KVS_VLEN_MAX)) -> Tuple[Optional[bytes], int]:
+    def get_with_length(
+            self,
+            const unsigned char [:]key,
+            KvdbTransaction txn=None,
+            unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if txn else NULL
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
-
+        cdef unsigned int cflags = 0
+        cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         cdef void *buf_addr = NULL
         cdef size_t buf_len = 0
+
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
         if key is not None:
             key_addr = &key[0]
             key_len = key.shape[0]
@@ -338,11 +373,10 @@ cdef class Kvs:
         cdef size_t value_len = 0
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvs_get(self._c_hse_kvs, opspec, key_addr, key_len, &found, buf_addr, buf_len, &value_len)
-        if opspec:
-            free(opspec)
+            err = hse_kvs_get(self._c_hse_kvs, cflags, txn_addr, key_addr,
+                key_len, &found, buf_addr, buf_len, &value_len)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
         if not found:
             return None, 0
 
@@ -354,42 +388,38 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, priority: bool=False, Transaction txn=None) -> None:
+    def delete(self, const unsigned char [:]key, KvdbTransaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if priority or txn else NULL
-        if priority:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_PRIORITY
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
-
+        cdef unsigned int cflags = 0
+        cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
+
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
         if key is not None:
             key_addr = &key[0]
             key_len = key.shape[0]
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvs_delete(self._c_hse_kvs, opspec, key_addr, key_len)
-        if opspec:
-            free(opspec)
+            err = hse_kvs_delete(self._c_hse_kvs, cflags, txn_addr, key_addr, key_len)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
-    def prefix_delete(self, const unsigned char [:]filt, priority: bool=False, txn: Transaction=None) -> int:
+    def prefix_delete(self, const unsigned char [:]filt, txn: KvdbTransaction=None) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if priority or txn else NULL
-        if priority:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_PRIORITY
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
-
+        cdef unsigned int cflags = 0
+        cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
+
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
         if filt is not None:
             filt_addr = &filt[0]
             filt_len = filt.shape[0]
@@ -397,39 +427,103 @@ cdef class Kvs:
         cdef hse_err_t err = 0
         cdef size_t kvs_pfx_len = 0
         with nogil:
-            err = hse_kvs_prefix_delete(self._c_hse_kvs, opspec, filt_addr, filt_len, &kvs_pfx_len)
-        if opspec:
-            free(opspec)
+            err = hse_kvs_prefix_delete(self._c_hse_kvs, cflags, txn_addr, filt_addr,
+                filt_len, &kvs_pfx_len)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
         return kvs_pfx_len
+
+    def prefix_probe(
+        self,
+        const unsigned char [:]pfx,
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        KvdbTransaction txn=None,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+        """
+        @SUB@ hse.prefix_probe.__doc__
+        """
+        cnt, key, _, value, _ = self.prefix_probe_with_lengths(pfx, key_buf, value_buf, txn=txn)
+        return (
+            cnt,
+            key,
+            value
+        )
+
+    def prefix_probe_with_lengths(
+        self,
+        const unsigned char [:]pfx,
+        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+        KvdbTransaction txn=None,
+    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+        """
+        @SUB@ hse.prefix_probe_with_lengths.__doc__
+        """
+        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef const void *pfx_addr = NULL
+        cdef size_t pfx_len = 0
+        cdef hse_kvs_pfx_probe_cnt found = HSE_KVS_PFX_FOUND_ZERO
+        cdef void *key_buf_addr = NULL
+        cdef size_t key_buf_len = 0
+        cdef size_t key_len = 0
+        cdef void *value_buf_addr = NULL
+        cdef size_t value_buf_len = 0
+        cdef size_t value_len = 0
+        if pfx is not None and len(pfx) > 0:
+            pfx_addr = &pfx[0]
+            pfx_len = len(pfx)
+        if key_buf is not None and len(key_buf) > 0:
+            key_buf_addr = &key_buf[0]
+            key_buf_len = len(key_buf)
+        if value_buf is not None and len(value_buf) > 0:
+            value_buf_addr = &value_buf[0]
+            value_buf_len = len(value_buf)
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
+
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_prefix_probe(self._c_hse_kvs, 0, txn_addr,
+                pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len,
+                value_buf_addr, value_buf_len, &value_len)
+        if err != 0:
+            raise HseException(err)
+        if found == HSE_KVS_PFX_FOUND_ZERO:
+            return KvsPfxProbeCnt.ZERO, None, 0, None, 0
+
+        return (
+            KvsPfxProbeCnt(found),
+            bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
+            key_len,
+            bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
+            value_len
+        )
 
     def cursor(
         self,
         const unsigned char [:]filt=None,
-        reverse: bool=False,
-        static_view: bool=False,
-        bind_txn: bool=False,
-        Transaction txn=None
-    ) -> Cursor:
+        KvdbTransaction txn=None,
+        flags: CursorFlag=0,
+    ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
         """
-        cursor: Cursor = Cursor(
+        cursor: KvsCursor = KvsCursor(
             self,
             filt,
-            reverse=reverse,
-            static_view=static_view,
-            bind_txn=bind_txn,
-            txn=txn)
+            txn=txn,
+            flags=flags,
+        )
 
         return cursor
 
 
-class TransactionState(Enum):
+@unique
+class KvdbTransactionState(Enum):
     """
-    @SUB@ hse.TransactionState.__doc__
+    @SUB@ hse.KvdbTransactionState.__doc__
     """
     INVALID = HSE_KVDB_TXN_INVALID
     ACTIVE = HSE_KVDB_TXN_ACTIVE
@@ -438,9 +532,9 @@ class TransactionState(Enum):
 
 
 @cython.no_gc_clear
-cdef class Transaction:
+cdef class KvdbTransaction:
     """
-    @SUB@ hse.Transaction.__doc__
+    @SUB@ hse.KvdbTransaction.__doc__
     """
     def __cinit__(self, Kvdb kvdb):
         self.kvdb = kvdb
@@ -470,7 +564,7 @@ cdef class Transaction:
             self.abort()
             return
 
-        if self.state == TransactionState.ACTIVE:
+        if self.state == KvdbTransactionState.ACTIVE:
             self.commit()
 
         with nogil:
@@ -479,73 +573,62 @@ cdef class Transaction:
 
     def begin(self) -> None:
         """
-        @SUB@ hse.Transaction.begin.__doc__
+        @SUB@ hse.KvdbTransaction.begin.__doc__
         """
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvdb_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def commit(self) -> None:
         """
-        @SUB@ hse.Transaction.commit.__doc__
+        @SUB@ hse.KvdbTransaction.commit.__doc__
         """
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvdb_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def abort(self) -> None:
         """
-        @SUB@ hse.Transaction.abort.__doc__
+        @SUB@ hse.KvdbTransaction.abort.__doc__
         """
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvdb_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     @property
-    def state(self) -> TransactionState:
+    def state(self) -> KvdbTransactionState:
         """
-        @SUB@ hse.Transaction.state.__doc__
+        @SUB@ hse.KvdbTransaction.state.__doc__
         """
         cdef hse_kvdb_txn_state = HSE_KVDB_TXN_INVALID
         with nogil:
             state = hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-        return TransactionState(state)
+        return KvdbTransactionState(state)
 
 
-cdef class Cursor:
-    """
-    See the concepts and best practices sections on the HSE website at
-    https://hse-project.github.io/
-    """
+cdef class KvsCursor:
     def __cinit__(
         self,
         Kvs kvs,
         const unsigned char [:]filt=None,
-        reverse: bool=False,
-        static_view: bool=False,
-        bind_txn: bool=False,
-        Transaction txn=None):
+        KvdbTransaction txn=None,
+        flags: CursorFlag=0,
+    ):
         self._eof = False
 
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
-
-        if reverse:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_REVERSE
-        if static_view:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_STATIC_VIEW
-        if bind_txn:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_BIND_TXN
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
-
+        cdef unsigned int cflags = int(flags)
+        cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
+
+        if txn:
+            txn_addr = txn._c_hse_kvdb_txn
         if filt is not None:
             filt_addr = &filt[0]
             filt_len = filt.shape[0]
@@ -553,15 +636,14 @@ cdef class Cursor:
         with nogil:
             err = hse_kvs_cursor_create(
                 kvs._c_hse_kvs,
-                opspec,
+                cflags,
+                txn_addr,
                 filt_addr,
                 filt_len,
                 &self._c_hse_kvs_cursor
             )
-        if opspec:
-            free(opspec)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def __dealloc__(self):
         self.destroy()
@@ -574,7 +656,7 @@ cdef class Cursor:
 
     def destroy(self):
         """
-        @SUB@ hse.Cursor.destroy.__doc__
+        @SUB@ hse.KvsCursor.destroy.__doc__
         """
         if self._c_hse_kvs_cursor:
             with nogil:
@@ -583,7 +665,7 @@ cdef class Cursor:
 
     def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
-        @SUB@ hse.Cursor.items.__doc__
+        @SUB@ hse.KvsCursor.items.__doc__
         """
         def _iter():
             while True:
@@ -595,33 +677,26 @@ cdef class Cursor:
 
         return _iter()
 
-    def update(self, reverse: bool=False, static_view: bool=False, bind_txn: bool=False, Transaction txn=None) -> None:
+    def update_view(
+        self,
+        flags: CursorFlag=0,
+    ) -> None:
         """
-        @SUB@ hse.Cursor.update.__doc__
+        @SUB@ hse.KvsCursor.update.__doc__
         """
-        cdef hse_kvdb_opspec *opspec = HSE_KVDB_OPSPEC_INIT() if reverse or static_view or bind_txn or txn else NULL
-
-        if reverse:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_REVERSE
-        if static_view:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_STATIC_VIEW
-        if bind_txn:
-            opspec.kop_flags |= HSE_KVDB_KOP_FLAG_BIND_TXN
-        if txn:
-            opspec.kop_txn = txn._c_hse_kvdb_txn
+        cdef unsigned int cflags = int(flags)
 
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvs_cursor_update(self._c_hse_kvs_cursor, opspec)
-        if opspec:
-            free(opspec)
+            err = hse_kvs_cursor_update_view(self._c_hse_kvs_cursor, cflags)
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
     def seek(self, const unsigned char [:]key) -> Optional[bytes]:
         """
-        @SUB@ hse.Cursor.seek.__doc__
+        @SUB@ hse.KvsCursor.seek.__doc__
         """
+        cdef unsigned int cflags = 0
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         if key is not None:
@@ -634,14 +709,14 @@ cdef class Cursor:
         with nogil:
             err = hse_kvs_cursor_seek(
                 self._c_hse_kvs_cursor,
-                NULL,
+                cflags,
                 key_addr,
                 key_len,
                 &found,
                 &found_len
             )
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
         if not found:
             return None
@@ -650,8 +725,9 @@ cdef class Cursor:
 
     def seek_range(self, const unsigned char [:]filt_min, const unsigned char [:]filt_max) -> Optional[bytes]:
         """
-        @SUB@ hse.Cursor.seek_range.__doc__
+        @SUB@ hse.KvsCursor.seek_range.__doc__
         """
+        cdef unsigned int cflags = 0
         cdef const void *filt_min_addr = NULL
         cdef size_t filt_min_len = 0
         cdef const void *filt_max_addr = NULL
@@ -669,7 +745,7 @@ cdef class Cursor:
         with nogil:
             err = hse_kvs_cursor_seek_range(
                 self._c_hse_kvs_cursor,
-                NULL,
+                cflags,
                 filt_min_addr,
                 filt_min_len,
                 filt_max_addr,
@@ -678,7 +754,7 @@ cdef class Cursor:
                 &found_len
             )
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
         if not found:
             return None
@@ -687,8 +763,9 @@ cdef class Cursor:
 
     def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
-        @SUB@ hse.Cursor.read.__doc__
+        @SUB@ hse.KvsCursor.read.__doc__
         """
+        cdef unsigned int cflags = 0
         cdef const void *key = NULL
         cdef const void *value = NULL
         cdef size_t key_len = 0
@@ -698,7 +775,7 @@ cdef class Cursor:
         with nogil:
             err = hse_kvs_cursor_read(
                 self._c_hse_kvs_cursor,
-                NULL,
+                cflags,
                 &key,
                 &key_len,
                 &value,
@@ -706,7 +783,7 @@ cdef class Cursor:
                 &eof
             )
         if err != 0:
-            raise KvdbException(err)
+            raise HseException(err)
 
         self._eof = eof
         if eof:

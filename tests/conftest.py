@@ -1,6 +1,6 @@
 import errno
 from typing import Generator
-import hse
+from hse2 import hse
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.config import Config
@@ -21,8 +21,8 @@ def kvdb(home: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
     hse.init()
 
     try:
-        hse.Kvdb.make(home)
-    except hse.KvdbException as e:
+        hse.Kvdb.create(home)
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:

@@ -1,14 +1,14 @@
 import errno
-from typing import Generator
-import hse
+from typing import Generator, Optional
+from hse2 import hse, limits
 import pytest
 
 
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_make("kvs-test", "pfx_len=3")
-    except hse.KvdbException as e:
+        kvdb.kvs_create("kvs-test", "pfx_len=3", "sfx_len=1")
+    except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
@@ -22,14 +22,14 @@ def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
 
 
 def test_key_operations(kvs: hse.Kvs):
-    kvs.put(b"key", b"value")
-    assert kvs.get(b"key") == b"value"
+    kvs.put(b"key1", b"value")
+    assert kvs.get(b"key1") == b"value"
 
     buf = bytearray(5)
-    assert kvs.get(b"key", buf=buf) == b"value"
+    assert kvs.get(b"key1", buf=buf) == b"value"
 
-    kvs.delete(b"key")
-    assert kvs.get(b"key") == None
+    kvs.delete(b"key1")
+    assert kvs.get(b"key1") == None
 
 
 def test_prefix_delete(kvs: hse.Kvs):
@@ -43,10 +43,51 @@ def test_prefix_delete(kvs: hse.Kvs):
 
 
 def test_get_with_length(kvs: hse.Kvs):
-    kvs.put(b"key", b"value")
-    assert kvs.get_with_length(b"key") == (b"value", 5)
-    assert kvs.get_with_length(b"key", buf=None) == (None, 5)
-    kvs.delete(b"key")
+    kvs.put(b"key1", b"value")
+    assert kvs.get_with_length(b"key1") == (b"value", 5)
+    assert kvs.get_with_length(b"key1", buf=None) == (None, 5)
+    kvs.delete(b"key1")
+
+
+def test_prefix_probe(kvs: hse.Kvs):
+    kvs.put(b"key1", b"value1")
+    kvs.put(b"abc1", b"value1")
+    kvs.put(b"abc2", b"value2")
+
+    cnt, *kv = kvs.prefix_probe(b"key")
+    assert cnt == hse.KvsPfxProbeCnt.ONE
+    assert kv == [b"key1", b"value1"]
+
+    cnt, *kv = kvs.prefix_probe(b"abc")
+    assert cnt == hse.KvsPfxProbeCnt.MUL
+    assert kv == [b"abc1", b"value1"]
+
+    cnt, *_ = kvs.prefix_probe(b"xyz")
+    assert cnt == hse.KvsPfxProbeCnt.ZERO
+
+    kvs.prefix_delete(b"key")
+
+
+@pytest.mark.parametrize(
+    "key_buf,value_buf",
+    [
+        (bytearray(limits.KVS_KEY_LEN_MAX), bytearray(256)),
+        (bytearray(limits.KVS_KEY_LEN_MAX), None),
+    ],
+)
+def test_prefix_probe_with_lengths(
+    kvs: hse.Kvs, key_buf: bytearray, value_buf: Optional[bytearray]
+):
+    kvs.put(b"key1", b"value1")
+
+    cnt, _, key_len, _, value_len = kvs.prefix_probe_with_lengths(
+        b"key", key_buf=key_buf, value_buf=value_buf
+    )
+    assert cnt == hse.KvsPfxProbeCnt.ONE
+    assert key_len == 4
+    assert value_len == 6
+
+    kvs.prefix_delete(b"key")
 
 
 @pytest.mark.xfail(strict=True)
