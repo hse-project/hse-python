@@ -14,7 +14,6 @@ cdef extern from "Python.h":
 
 cdef extern from "hse/flags.h":
     cdef unsigned int HSE_FLAG_PUT_PRIORITY
-    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_ON
     cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
 
     cdef unsigned int HSE_FLAG_CURSOR_REVERSE
