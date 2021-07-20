@@ -15,9 +15,8 @@ compiler_directives = [
 ]
 
 compile_time_env = [
-    'HSE_PYTHON_DEBUG=@0@'.format(
-        get_option('buildtype').startswith('debug') ? 1 : 0
-    ),
+    'HSE_PYTHON_DEBUG=@0@'.format(get_option('buildtype').startswith('debug').to_int()),
+    'HSE_PYTHON_EXPERIMENTAL=@0@'.format(get_option('experimental').to_int())
 ]
 
 extra_cython_args = []
@@ -78,8 +77,22 @@ endforeach
 extension_modules = []
 foreach m : modules
     pyi = custom_target(
-        '@0@-pyi'.format(m),
+        '@0@-pyi-pp'.format(m),
         input: meson.current_source_dir() / '@0@.in.pyi'.format(m),
+        command: [
+            pp,
+            get_option('experimental') ? ['--experimental'] : [],
+            '--file',
+            '@INPUT@',
+            '--output',
+            '@OUTPUT@',
+        ],
+        output: '@0@.pyi.pp'.format(m),
+    )
+
+    pyi = custom_target(
+        '@0@-pyi'.format(m),
+        input: pyi,
         command: [
             docstrings,
             '--file',

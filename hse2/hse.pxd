@@ -61,22 +61,22 @@ cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
     cdef size_t hse_strerror(hse_err_t err, char *buf, size_t buf_len)
 
-    hse_err_t hse_init(size_t paramc, const char *const *paramv)
+    hse_err_t hse_init(const char *home, size_t paramc, const char *const *paramv)
     void hse_fini()
 
-    hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, char **paramv)
-    hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, char **paramv)
-    hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, char **paramv, hse_kvdb **kvdb)
+    hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, const char *const *paramv)
+    hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, const char *const *)
+    hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, const char *const *, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
     hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
     void hse_kvdb_kvs_names_free(hse_kvdb *kvdb, char **namev) nogil
-    hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, char **paramv)
+    hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, const char *const *)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
         hse_kvdb * kvdb,
         const char *kvs_name,
         size_t paramc,
-        char **paramv,
+        const char *const *,
         hse_kvs **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
 
