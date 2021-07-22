@@ -18,12 +18,16 @@ from libc.stdlib cimport malloc, free
 # issues within the Python bindings.
 
 
-def init(*params: str) -> None:
+def init(home: Optional[Union[str, os.PathLike[str]]], *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
+    home_bytes = os.fspath(home).encode() if home else None
+    cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
     cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
-    cdef hse_err_t err = hse_init(len(params), <const char * const*>paramv)
+
+    cdef hse_err_t err = hse_init(home_addr, len(params), <const char * const*>paramv)
+
     if paramv:
         free(paramv)
     if err != 0:
@@ -72,15 +76,15 @@ class HseException(Exception):
 class SyncFlag(IntFlag):
     ASYNC = HSE_FLAG_SYNC_ASYNC
 
-
-@unique
-class KvdbCompactFlag(IntFlag):
-    CANCEL = HSE_FLAG_KVDB_COMPACT_CANCEL
-    SAMP_LWM = HSE_FLAG_KVDB_COMPACT_SAMP_LWM
+IF HSE_PYTHON_EXPERIMENTAL == 1:
+    @unique
+    class KvdbCompactFlag(IntFlag):
+        CANCEL = HSE_FLAG_KVDB_COMPACT_CANCEL
+        SAMP_LWM = HSE_FLAG_KVDB_COMPACT_SAMP_LWM\
 
 
 cdef class Kvdb:
-    def __cinit__(self, home: Optional[os.PathLike[str]], *params: str):
+    def __cinit__(self, home: Optional[Union[str, os.PathLike[str]]], *params: str):
         self._c_hse_kvdb = NULL
 
         home_bytes = os.fspath(home).encode() if home else None
@@ -109,7 +113,7 @@ cdef class Kvdb:
         self._c_hse_kvdb = NULL
 
     @staticmethod
-    def create(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
+    def create(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> None:
         """
         @SUB@ hse.Kvdb.create.__doc__
         """
@@ -124,7 +128,7 @@ cdef class Kvdb:
             raise HseException(err)
 
     @staticmethod
-    def drop(home: Optional[os.PathLike[str]]=None, *params: str) -> None:
+    def drop(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """
@@ -139,7 +143,7 @@ cdef class Kvdb:
             raise HseException(err)
 
     @staticmethod
-    def open(home: Optional[os.PathLike[str]]=None, *params: str) -> Kvdb:
+    def open(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
@@ -192,41 +196,42 @@ cdef class Kvdb:
         """
         return Kvs(self, kvs_name, *params)
 
-    def sync(self, flags: SyncFlag=0) -> None:
+    def sync(self, flags: Optional[SyncFlag] = None) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
-        cdef unsigned int cflags = int(flags)
+        cdef unsigned int cflags = int(flags) if flags else 0
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvdb_sync(self._c_hse_kvdb, cflags)
         if err != 0:
             raise HseException(err)
 
-    def compact(self, flags: KvdbCompactFlag=0) -> None:
-        """
-        @SUB@ hse.Kvdb.compact.__doc__
-        """
-        cdef unsigned int cflags = int(flags)
+    IF HSE_PYTHON_EXPERIMENTAL == 1:
+        def compact(self, flags: Optional[KvdbCompactFlag] = None) -> None:
+            """
+            @SUB@ hse.Kvdb.compact.__doc__
+            """
+            cdef unsigned int cflags = int(flags) if flags else 0
 
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvdb_compact(self._c_hse_kvdb, cflags)
-        if err != 0:
-            raise HseException(err)
+            cdef hse_err_t err = 0
+            with nogil:
+                err = hse_kvdb_compact(self._c_hse_kvdb, cflags)
+            if err != 0:
+                raise HseException(err)
 
-    @property
-    def compact_status(self) -> KvdbCompactStatus:
-        """
-        @SUB@ hse.Kvdb.compact_status.__doc__
-        """
-        status: KvdbCompactStatus = KvdbCompactStatus()
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
-        if err != 0:
-            raise HseException(err)
-        return status
+        @property
+        def compact_status(self) -> KvdbCompactStatus:
+            """
+            @SUB@ hse.Kvdb.compact_status.__doc__
+            """
+            status: KvdbCompactStatus = KvdbCompactStatus()
+            cdef hse_err_t err = 0
+            with nogil:
+                err = hse_kvdb_compact_status_get(self._c_hse_kvdb, &status._c_hse_kvdb_compact_status)
+            if err != 0:
+                raise HseException(err)
+            return status
 
     @property
     def storage_info(self) -> KvdbStorageInfo:
@@ -261,14 +266,15 @@ class CursorFlag(IntFlag):
     REVERSE = HSE_FLAG_CURSOR_REVERSE
 
 
-@unique
-class KvsPfxProbeCnt(Enum):
-    """
-    @SUB@ hse.KvsPfxProbeCnt.__doc__
-    """
-    ZERO = HSE_KVS_PFX_FOUND_ZERO
-    ONE = HSE_KVS_PFX_FOUND_ONE
-    MUL = HSE_KVS_PFX_FOUND_MUL
+IF HSE_PYTHON_EXPERIMENTAL == 1:
+    @unique
+    class KvsPfxProbeCnt(Enum):
+        """
+        @SUB@ hse.KvsPfxProbeCnt.__doc__
+        """
+        ZERO = HSE_KVS_PFX_FOUND_ZERO
+        ONE = HSE_KVS_PFX_FOUND_ONE
+        MUL = HSE_KVS_PFX_FOUND_MUL
 
 
 cdef class Kvs:
@@ -304,12 +310,12 @@ cdef class Kvs:
             const unsigned char [:]key,
             const unsigned char [:]value,
             KvdbTransaction txn=None,
-            flags: PutFlag=0,
+            flags: Optional[PutFlag]=None,
         ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
         """
-        cdef unsigned int cflags = int(flags)
+        cdef unsigned int cflags = int(flags) if flags else 0
         cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
@@ -433,72 +439,73 @@ cdef class Kvs:
 
         return kvs_pfx_len
 
-    def prefix_probe(
-        self,
-        const unsigned char [:]pfx,
-        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
-        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
-        KvdbTransaction txn=None,
-    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
-        """
-        @SUB@ hse.prefix_probe.__doc__
-        """
-        cnt, key, _, value, _ = self.prefix_probe_with_lengths(pfx, key_buf, value_buf, txn=txn)
-        return (
-            cnt,
-            key,
-            value
-        )
+    IF HSE_PYTHON_EXPERIMENTAL == 1:
+        def prefix_probe(
+            self,
+            const unsigned char [:]pfx,
+            unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+            unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+            KvdbTransaction txn=None,
+        ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
+            """
+            @SUB@ hse.prefix_probe.__doc__
+            """
+            cnt, key, _, value, _ = self.prefix_probe_with_lengths(pfx, key_buf, value_buf, txn=txn)
+            return (
+                cnt,
+                key,
+                value
+            )
 
-    def prefix_probe_with_lengths(
-        self,
-        const unsigned char [:]pfx,
-        unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
-        unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
-        KvdbTransaction txn=None,
-    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
-        """
-        @SUB@ hse.prefix_probe_with_lengths.__doc__
-        """
-        cdef hse_kvdb_txn *txn_addr = NULL
-        cdef const void *pfx_addr = NULL
-        cdef size_t pfx_len = 0
-        cdef hse_kvs_pfx_probe_cnt found = HSE_KVS_PFX_FOUND_ZERO
-        cdef void *key_buf_addr = NULL
-        cdef size_t key_buf_len = 0
-        cdef size_t key_len = 0
-        cdef void *value_buf_addr = NULL
-        cdef size_t value_buf_len = 0
-        cdef size_t value_len = 0
-        if pfx is not None and len(pfx) > 0:
-            pfx_addr = &pfx[0]
-            pfx_len = len(pfx)
-        if key_buf is not None and len(key_buf) > 0:
-            key_buf_addr = &key_buf[0]
-            key_buf_len = len(key_buf)
-        if value_buf is not None and len(value_buf) > 0:
-            value_buf_addr = &value_buf[0]
-            value_buf_len = len(value_buf)
-        if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+        def prefix_probe_with_lengths(
+            self,
+            const unsigned char [:]pfx,
+            unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
+            unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
+            KvdbTransaction txn=None,
+        ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
+            """
+            @SUB@ hse.prefix_probe_with_lengths.__doc__
+            """
+            cdef hse_kvdb_txn *txn_addr = NULL
+            cdef const void *pfx_addr = NULL
+            cdef size_t pfx_len = 0
+            cdef hse_kvs_pfx_probe_cnt found = HSE_KVS_PFX_FOUND_ZERO
+            cdef void *key_buf_addr = NULL
+            cdef size_t key_buf_len = 0
+            cdef size_t key_len = 0
+            cdef void *value_buf_addr = NULL
+            cdef size_t value_buf_len = 0
+            cdef size_t value_len = 0
+            if pfx is not None and len(pfx) > 0:
+                pfx_addr = &pfx[0]
+                pfx_len = len(pfx)
+            if key_buf is not None and len(key_buf) > 0:
+                key_buf_addr = &key_buf[0]
+                key_buf_len = len(key_buf)
+            if value_buf is not None and len(value_buf) > 0:
+                value_buf_addr = &value_buf[0]
+                value_buf_len = len(value_buf)
+            if txn:
+                txn_addr = txn._c_hse_kvdb_txn
 
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvs_prefix_probe(self._c_hse_kvs, 0, txn_addr,
-                pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len,
-                value_buf_addr, value_buf_len, &value_len)
-        if err != 0:
-            raise HseException(err)
-        if found == HSE_KVS_PFX_FOUND_ZERO:
-            return KvsPfxProbeCnt.ZERO, None, 0, None, 0
+            cdef hse_err_t err = 0
+            with nogil:
+                err = hse_kvs_prefix_probe(self._c_hse_kvs, 0, txn_addr,
+                    pfx_addr, pfx_len, &found, key_buf_addr, key_buf_len, &key_len,
+                    value_buf_addr, value_buf_len, &value_len)
+            if err != 0:
+                raise HseException(err)
+            if found == HSE_KVS_PFX_FOUND_ZERO:
+                return KvsPfxProbeCnt.ZERO, None, 0, None, 0
 
-        return (
-            KvsPfxProbeCnt(found),
-            bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
-            key_len,
-            bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
-            value_len
-        )
+            return (
+                KvsPfxProbeCnt(found),
+                bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
+                key_len,
+                bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
+                value_len
+            )
 
     def cursor(
         self,
@@ -617,11 +624,11 @@ cdef class KvsCursor:
         Kvs kvs,
         const unsigned char [:]filt=None,
         KvdbTransaction txn=None,
-        flags: CursorFlag=0,
+        flags: Optional[CursorFlag]=None,
     ):
         self._eof = False
 
-        cdef unsigned int cflags = int(flags)
+        cdef unsigned int cflags = int(flags) if flags else 0
         cdef hse_kvdb_txn *txn_addr = NULL
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
@@ -678,12 +685,12 @@ cdef class KvsCursor:
 
     def update_view(
         self,
-        flags: CursorFlag=0,
+        flags: Optional[CursorFlag]=None,
     ) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
         """
-        cdef unsigned int cflags = int(flags)
+        cdef unsigned int cflags = int(flags) if flags else 0
 
         cdef hse_err_t err = 0
         with nogil:
@@ -795,44 +802,45 @@ cdef class KvsCursor:
         return self._eof
 
 
-cdef class KvdbCompactStatus:
-    """
-    @SUB@ hse.KvdbCompactStatus.__doc__
-    """
-    @property
-    def samp_lwm(self) -> int:
+IF HSE_PYTHON_EXPERIMENTAL == 1:
+    cdef class KvdbCompactStatus:
         """
-        @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+        @SUB@ hse.KvdbCompactStatus.__doc__
         """
-        return self._c_hse_kvdb_compact_status.kvcs_samp_lwm
+        @property
+        def samp_lwm(self) -> int:
+            """
+            @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+            """
+            return self._c_hse_kvdb_compact_status.kvcs_samp_lwm
 
-    @property
-    def samp_hwm(self) -> int:
-        """
-        @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
-        """
-        return self._c_hse_kvdb_compact_status.kvcs_samp_hwm
+        @property
+        def samp_hwm(self) -> int:
+            """
+            @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
+            """
+            return self._c_hse_kvdb_compact_status.kvcs_samp_hwm
 
-    @property
-    def samp_curr(self) -> int:
-        """
-        @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
-        """
-        return self._c_hse_kvdb_compact_status.kvcs_samp_curr
+        @property
+        def samp_curr(self) -> int:
+            """
+            @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
+            """
+            return self._c_hse_kvdb_compact_status.kvcs_samp_curr
 
-    @property
-    def active(self) -> int:
-        """
-        @SUB@ hse.KvdbCompactStatus.active.__doc__
-        """
-        return self._c_hse_kvdb_compact_status.kvcs_active
+        @property
+        def active(self) -> int:
+            """
+            @SUB@ hse.KvdbCompactStatus.active.__doc__
+            """
+            return self._c_hse_kvdb_compact_status.kvcs_active
 
-    @property
-    def canceled(self) -> int:
-        """
-        @SUB@ hse.KvdbCompactStatus.canceled.__doc__
-        """
-        return self._c_hse_kvdb_compact_status.kvcs_canceled
+        @property
+        def canceled(self) -> int:
+            """
+            @SUB@ hse.KvdbCompactStatus.canceled.__doc__
+            """
+            return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
 cdef class KvdbStorageInfo:

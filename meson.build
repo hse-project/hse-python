@@ -12,6 +12,7 @@ fs = import('fs')
 pymod = import('python')
 
 docstrings = find_program('docstrings.py', required: true)
+pp = find_program('pp.py', required: true)
 cython = find_program('cython', required: true)
 python = pymod.find_installation(
     'python3',

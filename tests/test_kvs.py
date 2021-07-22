@@ -49,6 +49,7 @@ def test_get_with_length(kvs: hse.Kvs):
     kvs.delete(b"key1")
 
 
+@pytest.mark.experimental
 def test_prefix_probe(kvs: hse.Kvs):
     kvs.put(b"key1", b"value1")
     kvs.put(b"abc1", b"value1")
@@ -68,6 +69,7 @@ def test_prefix_probe(kvs: hse.Kvs):
     kvs.prefix_delete(b"key")
 
 
+@pytest.mark.experimental
 @pytest.mark.parametrize(
     "key_buf,value_buf",
     [

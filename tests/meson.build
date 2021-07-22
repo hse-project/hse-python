@@ -45,6 +45,7 @@ foreach s : suites
             meson.current_source_dir() / 'test_@0@.py'.format(s),
             '--home',
             home_dir,
+            get_option('experimental') ? ['--experimental'] : [],
         ],
         env: env,
         suite: ['unit'],

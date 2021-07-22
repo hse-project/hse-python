@@ -7,7 +7,7 @@ from enum import Enum, IntFlag
 from types import TracebackType
 from typing import Iterator, List, Optional, Tuple, Type, Any, Union
 
-def init(*params: str) -> None:
+def init(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
@@ -77,11 +77,12 @@ class Kvdb:
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
         ...
-    def sync(self, flags: SyncFlag = ...) -> None:
+    def sync(self, flags: Optional[SyncFlag] = ...) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
         ...
+#ifdef HSE_PYTHON_EXPERIMENTAL
     def compact(self, cancel: bool = ..., samp_lwm: bool = ...) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
@@ -93,6 +94,7 @@ class Kvdb:
         @SUB@ hse.Kvdb.compact_status.__doc__
         """
         ...
+#endif
     @property
     def storage_info(self) -> KvdbStorageInfo:
         """
@@ -112,6 +114,7 @@ class PutFlag(IntFlag):
 class CursorFlag(IntFlag):
     REVERSE = ...
 
+#ifdef HSE_PYTHON_EXPERIMENTAL
 class KvsPfxProbeCnt(Enum):
     """
     @SUB@ hse.KvsPfxProbeCnt.__doc__
@@ -120,6 +123,7 @@ class KvsPfxProbeCnt(Enum):
     ZERO = ...
     ONE = ...
     MUL = ...
+#endif
 
 class Kvs:
     def close(self) -> None:
@@ -132,7 +136,7 @@ class Kvs:
         key: bytes,
         value: Optional[bytes],
         txn: Optional[KvdbTransaction] = ...,
-        flags: PutFlag = ...,
+        flags: Optional[PutFlag] = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
@@ -168,6 +172,7 @@ class Kvs:
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
         ...
+#ifdef HSE_PYTHON_EXPERIMENTAL
     def prefix_probe(
         self,
         pfx: bytes,
@@ -190,11 +195,12 @@ class Kvs:
         @SUB@ hse.prefix_probe_with_lengths.__doc__
         """
         ...
+#endif
     def cursor(
         self,
         filt: Optional[bytes] = ...,
         txn: Optional[KvdbTransaction] = ...,
-        flags: CursorFlag = ...,
+        flags: Optional[CursorFlag] = ...,
     ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
@@ -266,7 +272,7 @@ class KvsCursor:
     def update_view(
         self,
         txn: Optional[KvdbTransaction] = ...,
-        flags: CursorFlag = ...,
+        flags: Optional[CursorFlag] = ...,
     ) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
@@ -296,6 +302,7 @@ class KvsCursor:
         """
         ...
 
+#ifdef HSE_PYTHON_EXPERIMENTAL
 class KvdbCompactStatus:
     """
     @SUB@ hse.KvdbCompactStatus.__doc__
@@ -331,6 +338,7 @@ class KvdbCompactStatus:
         @SUB@ hse.KvdbCompactStatus.canceled.__doc__
         """
         ...
+#endif
 
 class KvdbStorageInfo:
     """
