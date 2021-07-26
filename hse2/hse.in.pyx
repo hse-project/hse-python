@@ -18,15 +18,15 @@ from libc.stdlib cimport malloc, free
 # issues within the Python bindings.
 
 
-def init(home: Optional[Union[str, os.PathLike[str]]], *params: str) -> None:
+def init(runtime_home: Optional[Union[str, os.PathLike[str]]], *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
-    home_bytes = os.fspath(home).encode() if home else None
-    cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+    runtime_home_bytes = os.fspath(runtime_home).encode() if runtime_home else None
+    cdef const char *runtime_home_addr = <char *>runtime_home_bytes if runtime_home_bytes else NULL
     cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-    cdef hse_err_t err = hse_init(home_addr, len(params), <const char * const*>paramv)
+    cdef hse_err_t err = hse_init(runtime_home_addr, len(params), <const char * const*>paramv)
 
     if paramv:
         free(paramv)

@@ -61,7 +61,7 @@ cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
     cdef size_t hse_strerror(hse_err_t err, char *buf, size_t buf_len)
 
-    hse_err_t hse_init(const char *home, size_t paramc, const char *const *paramv)
+    hse_err_t hse_init(const char *runtime_home, size_t paramc, const char *const *paramv)
     void hse_fini()
 
     hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, const char *const *paramv)
