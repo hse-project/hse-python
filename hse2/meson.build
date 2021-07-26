@@ -162,6 +162,7 @@ foreach m : modules
             hse_dep,
             python.dependency(),
         ],
+        gnu_symbol_visibility: 'hidden',
         subdir: 'hse',
         install: true,
     )
