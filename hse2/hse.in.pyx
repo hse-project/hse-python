@@ -18,7 +18,7 @@ from libc.stdlib cimport malloc, free
 # issues within the Python bindings.
 
 
-def init(runtime_home: Optional[Union[str, os.PathLike[str]]], *params: str) -> None:
+def init(runtime_home: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
