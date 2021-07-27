@@ -1,12 +1,20 @@
 project(
     'hse-python',
-    version: '1.0.0',
+    version: '2.0.0',
     default_options: [
         'buildtype=debugoptimized',
         'warning_level=2',
     ],
     meson_version: '>=0.57',
 )
+
+version_components = meson.project_version().split('.')
+
+hse_python_major_version = version_components[0]
+hse_python_minor_version = version_components[1]
+hse_python_patch_version = version_components[2]
+
+hse_python_module_name = 'hse@0@'.format(hse_python_major_version)
 
 fs = import('fs')
 pymod = import('python')
