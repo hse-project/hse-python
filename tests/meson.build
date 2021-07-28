@@ -18,6 +18,12 @@ if not fs.exists(tests_dir)
     )
 endif
 
+add_test_setup(
+    'ci',
+    env: env,
+    is_default: not meson.is_subproject()
+)
+
 suites = [
     'cursor',
     'kvdb',
