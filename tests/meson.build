@@ -27,7 +27,7 @@ add_test_setup(
 suites = [
     'cursor',
     'kvdb',
-    'kvs', 
+    'kvs',
     'limits',
     'transaction',
     'version',
