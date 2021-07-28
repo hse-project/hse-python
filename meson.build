@@ -70,7 +70,7 @@ hse_dep = dependency(
         'tests=[]',
         'tools=false',
         'samples=false',
-        'bindings-python=false',
+        'bindings=none',
     ],
 )
 
