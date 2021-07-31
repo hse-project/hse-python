@@ -16,3 +16,4 @@ subprojects/*
 !subprojects/packagefiles/
 *build*/
 !subprojects/hse.wrap
+*~
