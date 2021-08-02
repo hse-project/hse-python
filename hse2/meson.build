@@ -1,3 +1,5 @@
+cp = find_program('cp')
+
 compiler_directives = [
     'boundscheck=false',
     'wraparound=false',
@@ -30,7 +32,7 @@ init_py = custom_target(
     input: '__init__.py',
     output: '__init__.py',
     command: [
-        'cp',
+        cp,
         '@INPUT@',
         '@OUTPUT@',
     ],
@@ -43,7 +45,7 @@ py_typed = custom_target(
     input: 'py.typed',
     output: 'py.typed',
     command: [
-        'cp',
+        cp,
         '@INPUT@',
         '@OUTPUT@',
     ],
@@ -64,7 +66,7 @@ foreach m : modules
         '@0@-pxd'.format(m),
         input: '@0@.pxd'.format(m),
         command: [
-            'cp',
+            cp,
             '@INPUT@',
             '@OUTPUT@',
         ],
