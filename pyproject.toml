@@ -1,11 +1,20 @@
-[build-system]
-requires = ["mesonpep517", "toml", "Cython", "pytest", "pytest-tap"]
-build-backend = "mesonpep517.buildapi"
-
-[tool.mesonpep517.metadata]
-author = "Micron Technology, Inc."
-summary = "Fast key-value storage for SSDs and persistent memory"
-description-file = "README.md"
+[project]
+name = "hse-python"
+version = "2.0.0"
+description = "Fast key-value storage for SSDs and persistent memory"
+authors = [{ name = "Micron Technology" }]
+maintainers = [{ name = "Micron Technology" }]
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.6"
+# keywords = [
+	# "micron",
+	# "hse",
+	# "bindings",
+	# "heterogeneous-memory",
+	# "storage",
+	# "engine",
+# ]
 classifiers = [
 	"License :: OSI Approved :: Apache Software License",
 	"Operating System :: POSIX :: Linux",
@@ -15,13 +24,29 @@ classifiers = [
 	"Topic :: Database :: Database Engines/Servers",
 	"Typing :: Typed",
 ]
-requires-python = ">=3.6"
-home-page = "https://github.com/hse-project/hse-python"
-project-urls = [
-	"HSE, https://github.com/hse-project/hse",
-	"Issue Tracker, https://github.com/hse-project/hse-python",
+
+[project.urls]
+HSE = "https://hse-project.github.io/"
+Repository = "https://github.com/hse-project/hse-python"
+
+[project.optional-dependencies]
+formatting = [
+	"black >= 20.8b1",
 ]
-module = "hse"
+
+[build-system]
+requires = [
+	"meson >= 0.58.2",
+	"ninja >= 1.10.0",
+	"git+https://gitlab.com/thiblahute/mesonpep517@master#egg=mesonpep517",
+	"build >= 0.5.1",
+	"Cython >= 0.29.23",
+	"pytest >= 6.2.4",
+	"pytest-tap >= 3.2",
+]
+build-backend = "mesonpep517.buildapi"
+
+[tool.mesonpep517.metadata]
 meson-options = [
 	"-Dtests=false",
 ]
