@@ -60,5 +60,6 @@ foreach s : suites
             extension_modules,
             init_py,
         ],
+        timeout: 60
     )
 endforeach
