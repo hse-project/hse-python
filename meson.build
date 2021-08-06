@@ -72,6 +72,8 @@ hse_dep = dependency(
         'tools=false',
         'samples=false',
         'bindings=none',
+        'db_bench=false',
+        'experimental=@0@'.format(get_option('experimental')),
     ],
 )
 
