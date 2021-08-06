@@ -3,5 +3,5 @@ url = ssh://git@bitbucket.micron.com/hse/hse.git
 revision = master
 
 [provide]
-dependency_names = hse-1
-program_names = hse1
+dependency_names = hse-2
+program_names = hse2
