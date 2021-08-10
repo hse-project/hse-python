@@ -5,7 +5,7 @@ import pathlib
 import sys
 
 
-def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool):
+def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool = False):
     lines = file.read_text().splitlines(keepends=True)
     with open(output, "w") as out:
         while lines:

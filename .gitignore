@@ -3,15 +3,15 @@
 dist/
 *.egg-info/
 __pycache__
-venv/
+*venv*/
 typings/
 *.pyx
 !*.in.pyx
 *.pyi
 !*.in.pyi
+*.pp
 .pytest_cache/
 hse/*.html
-tests/kvdb-export/
 subprojects/*
 !subprojects/packagefiles/
 *build*/

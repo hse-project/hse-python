@@ -12,6 +12,7 @@ import re
 import toml
 import sys
 import argparse
+import pathlib
 from typing import Any, Dict, List, MutableMapping, Tuple, cast
 from io import StringIO
 
@@ -35,7 +36,7 @@ def __flatten(
     return dict(items)
 
 
-def insert(input_file: str, output_file: str, docstrings_toml: str) -> None:
+def insert(input_file: pathlib.Path, output_file: pathlib.Path, docstrings_toml: pathlib.Path) -> None:
     """
     Insert docstrings into a file out of place. `file.py.in` will output to
     `file.py`. If the input file has an older modified time than the previously
@@ -95,10 +96,11 @@ if __name__ == "__main__":
         "--docstrings",
         nargs=1,
         required=True,
+        type=pathlib.Path,
         help="Path to docstrings.toml file",
     )
     parser.add_argument(
-        "-f", "--file", nargs=1, required=True, help="Files to manipulate"
+        "-f", "--file", nargs=1, required=True, type=pathlib.Path, help="Files to manipulate"
     )
     ns = parser.parse_args(sys.argv[1:])
 

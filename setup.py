@@ -6,35 +6,36 @@ from setuptools.extension import Library
 
 
 HERE = pathlib.Path(__file__).parent
-HSE_PACKAGE = HERE / "hse"
+HSE_PACKAGE = HERE / "hse2"
 
 
 # Distribute the generated C source files so that consumers don't necessarily
 # need Cython on their system to build the extensions.
 
 
-USE_CYTHON = os.environ.get("USE_CYTHON")
+USE_CYTHON = bool(os.environ.get("USE_CYTHON", 0))
 SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 COMPILE_TIME_ENV = {
-    "HSE_PYTHON_DEBUG": 1 if os.environ.get("HSE_PYTHON_DEBUG") != None else 0,
+    "HSE_PYTHON_DEBUG": bool(os.environ.get("HSE_PYTHON_DEBUG", 0)),
+    "HSE_PYTHON_EXPERIMENTAL": bool(os.environ.get("HSE_PYTHON_EXPERIMENTAL", 0)),
 }
 
 
 extensions: List[Extension] = [
     Extension(
-        "hse.hse",
+        "hse2.hse",
         [str(HSE_PACKAGE / f"hse.{SOURCE_EXTENSION}")],
-        libraries=["hse-1"],
+        libraries=["hse-2"],
     ),
     Extension(
-        "hse.limits",
+        "hse2.limits",
         [str(HSE_PACKAGE / f"limits.{SOURCE_EXTENSION}")],
-        libraries=["hse-1"],
+        libraries=["hse-2"],
     ),
     Extension(
-        "hse.version",
+        "hse2.version",
         [str(HSE_PACKAGE / f"version.{SOURCE_EXTENSION}")],
-        libraries=["hse-1"],
+        libraries=["hse-2"],
     ),
 ]
 
@@ -50,44 +51,50 @@ if USE_CYTHON:
     # Help tools like Valgrind out
     Options.generate_cleanup_code = True
 
-    def docstring_cythonize(modules: List[Extension]) -> List[Any]:
-        if USE_CYTHON:
-            import docstrings
+    def precythonize(modules: List[Extension]) -> List[Any]:
+        import docstrings
+        import pp
 
-            docstrings.insert(
-                str(HSE_PACKAGE / "hse.in.pyx"),
-                str(HSE_PACKAGE / "hse.pyx"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "hse.in.pyi"),
-                str(HSE_PACKAGE / "hse.pyi"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "limits.in.pyx"),
-                str(HSE_PACKAGE / "limits.pyx"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "limits.in.pyi"),
-                str(HSE_PACKAGE / "limits.pyi"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "version.in.pyx"),
-                str(HSE_PACKAGE / "version.pyx"),
-                "docstrings.toml",
-            )
-            docstrings.insert(
-                str(HSE_PACKAGE / "version.in.pyi"),
-                str(HSE_PACKAGE / "version.pyi"),
-                "docstrings.toml",
-            )
+        pp.preprocess(
+            HSE_PACKAGE / "hse.in.pyi",
+            HSE_PACKAGE / "hse.pyi.pp",
+            COMPILE_TIME_ENV["HSE_PYTHON_EXPERIMENTAL"],
+        )
+
+        docstrings.insert(
+            HSE_PACKAGE / "hse.in.pyx",
+            HSE_PACKAGE / "hse.pyx",
+            HERE / "docstrings.toml",
+        )
+        docstrings.insert(
+            HSE_PACKAGE / "hse.pyi.pp",
+            HSE_PACKAGE / "hse.pyi",
+            HERE / "docstrings.toml",
+        )
+        docstrings.insert(
+            HSE_PACKAGE / "limits.in.pyx",
+            HSE_PACKAGE / "limits.pyx",
+            HERE / "docstrings.toml",
+        )
+        docstrings.insert(
+            HSE_PACKAGE / "limits.in.pyi",
+            HSE_PACKAGE / "limits.pyi",
+            HERE / "docstrings.toml",
+        )
+        docstrings.insert(
+            HSE_PACKAGE / "version.in.pyx",
+            HSE_PACKAGE / "version.pyx",
+            HERE / "docstrings.toml",
+        )
+        docstrings.insert(
+            HSE_PACKAGE / "version.in.pyi",
+            HSE_PACKAGE / "version.pyi",
+            HERE / "docstrings.toml",
+        )
 
         return cythonize(
             modules,
-            include_path=["hse"],
+            include_path=["hse2"],
             compiler_directives={
                 "boundscheck": False,
                 "wraparound": False,
@@ -107,13 +114,13 @@ if USE_CYTHON:
             verbose=True,
         )
 
-    extensions = docstring_cythonize(extensions)
+    extensions = precythonize(extensions)
     cmdclass["build_ext"] = build_ext
 
 
 setup(
-    name="hse",
-    version="1.0.0",
+    name="hse2",
+    version="2.0.0",
     maintainer="Micron Technology, Inc.",
     description="Python bindings to HSE's C API. "
     "HSE is an embeddable key-value store designed for SSDs based on NAND "
@@ -130,8 +137,8 @@ setup(
     ext_modules=extensions,
     packages=find_packages(),
     cmdclass=cmdclass,
-    package_data={"hse": ["*.pyi", "py.typed"]},
-    exclude_package_data={"hse": ["*.in.pyi"]},
+    package_data={"hse2": ["*.pyi", "py.typed"]},
+    exclude_package_data={"hse2": ["*.in.pyi", "*.pp"]},
     zip_safe=False,
     keywords=[
         "micron",
@@ -157,6 +164,5 @@ setup(
     ],
     project_urls={
         "HSE": "https://github.com/hse-project/hse",
-        "HSE Wiki": "https://github.com/hse-project/hse/wiki",
     },
 )
