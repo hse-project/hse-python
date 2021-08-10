@@ -1,59 +1,58 @@
 name: Validate Builds
 
 on:
-        push:
-        pull_request:
-                types: [opened, synchronize, reopened, edited]
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
-        build_ubuntu:
-                runs-on: ${{ matrix.os }}
-                strategy:
-                        fail-fast: false
-                        matrix:
-                                os: [ubuntu-18.04]
-                                build_type: [release, debugoptimized]
+  build_ubuntu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+        build_type: [release, debugoptimized]
 
-                steps:
-                - name: Install dependencies
-                  run: |
-                          sudo apt-get update
-                          sudo apt-get install build-essential libblkid-dev libbsd-dev gettext autopoint autoconf bison libtool pkg-config openjdk-8-jdk libmicrohttpd-dev liburcu-dev libyaml-dev liblz4-dev curl python3-setuptools
-                          dpkg -l | grep curl
-                          sudo apt-get install libmongoc-1.0-0 libbson-1.0-0 libssl-dev libsasl2-dev
-                          
-                - uses: actions/checkout@v2
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential libblkid-dev libbsd-dev gettext autopoint autoconf bison libtool pkg-config openjdk-8-jdk libmicrohttpd-dev liburcu-dev libyaml-dev liblz4-dev curl python3-setuptools
+        sudo apt-get install libmongoc-1.0-0 libbson-1.0-0 libssl-dev libsasl2-dev
 
-                - name: Setup python environment to run branch
-                  run: |
-                          python3 -m venv venv
-                          source venv/bin/activate
-                          pip3 install black meson ninja wheel
-                          pip3 install -r requirements.txt
+    - uses: actions/checkout@v2
 
-                - name: Build setup with tests
-                  run: |
-                          source venv/bin/activate
-                          meson builddir -Dtests=true -Dwerror=true
-                
-                - name: Compile with ninja
-                  run: |
-                          source venv/bin/activate
-                          ninja -C builddir
-                
-                - name: Black format check
-                  continue-on-error: true
-                  run: |  
-                          source venv/bin/activate
-                          black --check ./
+    - name: Setup python environment to run branch
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip3 install black wheel
+        pip3 install -r requirements.txt
 
-                - name: Run Unit tests
-                  run: |
-                          source venv/bin/activate
-                          meson test -C builddir --print-errorlogs --no-stdsplit
+    - name: Build setup with tests
+      run: |
+        source venv/bin/activate
+        meson builddir -Dtests=true -Dwerror=true
 
-                - uses: actions/upload-artifact@v2
-                  if: failure()
-                  with:
-                    name: build-artifact-ubuntu-18.04
-                    path: builddir/meson-logs/
+    - name: Compile with ninja
+      run: |
+        source venv/bin/activate
+        ninja -C builddir
+
+    - name: Black format check
+      continue-on-error: true
+      run: |
+        source venv/bin/activate
+        black --check ./
+
+    - name: Run Unit tests
+      run: |
+        source venv/bin/activate
+        meson test -C builddir --print-errorlogs --no-stdsplit
+
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: build-artifact-ubuntu-18.04
+        path: builddir/meson-logs/
