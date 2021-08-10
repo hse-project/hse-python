@@ -6,7 +6,7 @@
 
 #### Verified checks?
 Have the checks completed?
-- [ ] Compile with latest HSE master pass
+- [ ] Compile with latest HSE master
 - [ ] All new and existing unit and functional tests pass
 - [ ] Code format check pass
 - [ ] All Commits are signed off
