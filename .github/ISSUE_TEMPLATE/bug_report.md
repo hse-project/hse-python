@@ -9,11 +9,11 @@ about: Create a bug report to help us improve the project
 
 <!-- A clear and concise description of the bug. Mention details of your test platform -->
 
-### Steps to reproduce
+## Steps to reproduce
 
 <!-- 1. Build and install from master -->
 <!-- 2. Configure your system -->
 <!-- 3. Run some commands -->
 <!-- 4. See error in logs -->
 
-#### Related issues
+## Related issues
