@@ -18,8 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install build-essential libblkid-dev libbsd-dev gettext autopoint autoconf bison libtool pkg-config openjdk-8-jdk libmicrohttpd-dev liburcu-dev libyaml-dev liblz4-dev curl python3-setuptools
-        sudo apt-get install libmongoc-1.0-0 libbson-1.0-0 libssl-dev libsasl2-dev
+        sudo apt-get install build-essential libblkid-dev libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev libcurl4-openssl-dev python3-setuptools
 
     - uses: actions/checkout@v2
 
@@ -27,13 +26,13 @@ jobs:
       run: |
         python3 -m venv venv
         source venv/bin/activate
-        pip3 install black wheel
-        pip3 install -r requirements.txt
+        python3 -m pip install -r requirements.txt
 
     - name: Build setup with tests
       run: |
         source venv/bin/activate
-        meson builddir -Dtests=true -Dwerror=true
+        rm -fr builddir
+        meson builddir -Dwerror=true
 
     - name: Compile with ninja
       run: |

@@ -8,5 +8,5 @@
 Have the checks completed?
 - [ ] Compile with latest HSE master
 - [ ] All new and existing unit and functional tests pass
-- [ ] Code format check pass
+- [ ] Code format check passes
 - [ ] All Commits are signed off
