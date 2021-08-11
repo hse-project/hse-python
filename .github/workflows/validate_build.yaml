@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install build-essential libblkid-dev libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev libcurl4-openssl-dev python3-setuptools
+        sudo apt-get install build-essential libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev libcurl4-openssl-dev python3-setuptools
 
     - uses: actions/checkout@v2
 
@@ -31,7 +31,6 @@ jobs:
     - name: Build setup with tests
       run: |
         source venv/bin/activate
-        rm -fr builddir
         meson builddir -Dwerror=true
 
     - name: Compile with ninja
