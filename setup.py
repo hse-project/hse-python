@@ -121,15 +121,9 @@ if USE_CYTHON:
 setup(
     name="hse2",
     version="2.0.0",
-    maintainer="Micron Technology, Inc.",
-    description="Python bindings to HSE's C API. "
-    "HSE is an embeddable key-value store designed for SSDs based on NAND "
-    "flash or persistent memory. HSE optimizes performance and endurance by "
-    "orchestrating data placement across DRAM and multiple classes of SSDs "
-    "or other solid-state storage. HSE is ideal for powering NoSQL, "
-    "Software-Defined Storage (SDS), High-Performance Computing (HPC), "
-    "Big Data, Internet of Things (IoT), and Artificial Intelligence (AI) "
-    "solutions.",
+    maintainer="Micron HSE",
+    maintainer_email="hse@micron.com",
+    description="HSE is a fast embeddable key-value store designed for SSDs and persistent memory.",
     long_description=(HERE / "README.md").read_text(),
     long_description_content_type="text/markdown",
     license="Apache-2.0",
@@ -145,9 +139,8 @@ setup(
         "hse",
         "key",
         "value",
-        "object",
-        "store",
         "database",
+        "bindings",
         "heterogeneous",
         "memory",
         "storage",
@@ -163,6 +156,7 @@ setup(
         "Typing :: Typed",
     ],
     project_urls={
-        "HSE": "https://github.com/hse-project/hse",
+        "repohome": "https://github.com/hse-project/hse-python",
+        "projecthome": "https://hse-project.github.io",
     },
 )

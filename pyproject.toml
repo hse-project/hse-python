@@ -1,9 +1,10 @@
 [project]
 name = "hse-python" # https://gitlab.com/thiblahute/mesonpep517/-/issues/16
 version = "2.0.0"
-description = "Fast key-value storage for SSDs and persistent memory"
-authors = [{ name = "Micron Technology" }]
-maintainers = [{ name = "Micron Technology" }]
+description = "HSE is a fast embeddable key-value store designed for SSDs and persistent memory."
+maintainers = [
+	{ name = "Micron HSE", email = "hse@micron.com" },
+]
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.6"
@@ -11,8 +12,12 @@ requires-python = ">=3.6"
 # keywords = [
 	# "micron",
 	# "hse",
+	# "key",
+	# "value"
+	# "database"
 	# "bindings",
-	# "heterogeneous-memory",
+	# "heterogeneous",
+	# "memory",
 	# "storage",
 	# "engine",
 # ]
@@ -27,12 +32,17 @@ classifiers = [
 ]
 
 [project.urls]
-HSE = "https://hse-project.github.io/"
-Repository = "https://github.com/hse-project/hse-python"
+repohome = "https://github.com/hse-project/hse-python"
+projecthome = "https://hse-project.github.io/"
 
 [project.optional-dependencies]
-formatting = [
+dev = [
+	"meson >= 0.58.2",
 	"black >= 20.8b1",
+	"ninja >= 1.10.0",
+	"Cython >= 0.29.23",
+	"pytest >= 6.2.4",
+	"pytest-tap >= 3.2",
 ]
 
 [build-system]
