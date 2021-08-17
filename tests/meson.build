@@ -1,25 +1,21 @@
+if get_option('b_sanitize') != 'none'
+    subdir_done()
+endif
+
 pytest = find_program('pytest', required: true)
+test_runner = find_program('test-runner')
 
 env = environment({
     'PYTHONPATH': meson.project_build_root(),
+    'HSE_TEST_RUNNER_RUNNER': 'pytest',
 })
-
-if get_option('tests-dir') == ''
-    tests_dir = meson.project_build_root() / 'hse-python-tests'
-else
-    tests_dir = get_option('tests-dir')
-endif
-
-if not fs.exists(tests_dir)
-    run_command(
-        'mkdir',
-        tests_dir,
-        check: true,
-    )
-endif
 
 add_test_setup(
     'ci',
+    exe_wrapper: [
+        test_runner,
+        '--',
+    ],
     env: env,
     is_default: not meson.is_subproject()
 )
@@ -34,28 +30,18 @@ suites = [
 ]
 
 foreach s : suites
-    home_dir = tests_dir / s
-    if not fs.exists(home_dir)
-        run_command(
-            'mkdir',
-            home_dir,
-            check: true,
-        )
-    endif
-
     test(
         '@0@'.format(s),
         pytest,
         args: [
             '--tap-stream',
-            meson.current_source_dir() / 'test_@0@.py'.format(s),
-            '--home',
-            home_dir,
+            'test_@0@.py'.format(s),
             get_option('experimental') ? ['--experimental'] : [],
         ],
         env: env,
         suite: ['unit'],
         protocol: 'tap',
+        workdir: meson.current_source_dir(),
         depends: [
             extension_modules,
             init_py,
