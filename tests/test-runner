@@ -142,7 +142,7 @@ if __name__ == "__main__":
         def proxy(s: int, frame: Optional[FrameType]):
             proc.send_signal(s)
 
-        for s in set(signal.Signals) - {signal.SIGKILL, signal.SIGSTOP}:
+        for s in set(signal.Signals) - {signal.SIGKILL, signal.SIGSTOP, signal.SIGCHLD}:
             signal.signal(s, proxy)
 
         rc = proc.wait()
