@@ -128,12 +128,6 @@ if __name__ == "__main__":
 
     args = cast(Args, parser.parse_args())
 
-    try:
-        args.dir.resolve().relative_to(tempfile.gettempdir())
-        raise RuntimeError("HSE does not currently support tmpfs.")
-    except ValueError:
-        pass
-
     test = Test.create(args.program, *args.arguments)
 
     with tempfile.TemporaryDirectory(prefix=f"{test.name}-", dir=args.dir) as home:
