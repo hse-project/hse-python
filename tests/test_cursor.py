@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+
 from typing import Generator, Optional
 from hse2 import hse
 import pytest

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+
 from typing import List
 from hse2 import hse, limits
 import sys
