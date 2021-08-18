@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+
 # This script exists because Python/Cython tooling is absolutely horrible. In
 # what world do 2 copies of the same docstring have to be kept in a pyx file
 # and a pyi file for there to be support for __doc__ and language servers, et.
