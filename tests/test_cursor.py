@@ -11,13 +11,13 @@ import errno
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_create("cursor-test", "pfx_len=3")
+        kvdb.kvs_create("cursor-test", "prefix.length=3")
     except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
         else:
             raise e
-    kvs = kvdb.kvs_open("cursor-test", "transactions_enable=0")
+    kvs = kvdb.kvs_open("cursor-test", "transactions.enabled=false")
 
     yield kvs
 
