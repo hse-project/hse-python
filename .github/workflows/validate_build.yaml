@@ -7,12 +7,7 @@ on:
 
 jobs:
   build_ubuntu:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04]
-        build_type: [release, debugoptimized]
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Install dependencies
@@ -42,12 +37,7 @@ jobs:
         path: builddir/meson-logs/
 
   format-check:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04]
-        build_type: [release, debugoptimized]
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -60,3 +50,13 @@ jobs:
       continue-on-error: true
       run: |
         black --check ./
+
+  checkoss:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: check for license
+      run: |
+        scripts/checkoss "${{ runner.temp }}" ./
