@@ -61,8 +61,8 @@ def test_seek_range(kvs: hse.Kvs, filter: Optional[bytes]):
         assert cursor.eof
 
 
-@pytest.mark.parametrize("reverse", [(0), (hse.CursorFlag.REVERSE)])
-def test_update(kvs: hse.Kvs, reverse: hse.CursorFlag):
+@pytest.mark.parametrize("reverse", [(0), (hse.CursorCreateFlag.REV)])
+def test_update(kvs: hse.Kvs, reverse: hse.CursorCreateFlag):
     with kvs.cursor(flags=reverse) as cursor:
         kvs.put(b"key5", b"value5")
 
@@ -81,7 +81,7 @@ def test_update(kvs: hse.Kvs, reverse: hse.CursorFlag):
 
 
 def test_reverse(kvs: hse.Kvs):
-    with kvs.cursor(flags=hse.CursorFlag.REVERSE) as cursor:
+    with kvs.cursor(flags=hse.CursorCreateFlag.REV) as cursor:
         for i in reversed(range(5)):
             assert (
                 cursor.read() == (f"key{i}".encode(), f"value{i}".encode())
