@@ -29,11 +29,11 @@ popd > /dev/null
 
 exit_code=0
 if [ ! -z "${check_bad_words}" ]; then
-    echo -e "Check out for offensive language:\n${check_bad_words}"
+    echo -e "Found the following potentially offensive language:\n${check_bad_words}"
     exit_code=$((exit_code + 1))
 fi
 if [ ! -z "${check_license}" ]; then
-    echo -e "Check out for License/Copyright:\n${check_license}"
+    echo -e "Check following files for License/Copyright:\n${check_license}"
     exit_code=$((exit_code + 1))
 fi
 exit $exit_code
