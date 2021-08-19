@@ -59,10 +59,4 @@ jobs:
 
     - name: check for license
       run: |
-        scripts/checkoss "${{ runner.temp }}" ./
-
-    - uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: checkoss-errors
-        path: "${{ runner.temp }}"
+        scripts/checkoss

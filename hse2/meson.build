@@ -61,7 +61,7 @@ modules = [
 
 pxds = []
 foreach m : modules
-    # HACK: cython needs pxds next to pyxs for whatever reasons and generators are dumb
+    # HACK: cython needs pxds next to pyxs for whatever reason
     pxd = custom_target(
         '@0@-pxd'.format(m),
         input: '@0@.pxd'.format(m),
