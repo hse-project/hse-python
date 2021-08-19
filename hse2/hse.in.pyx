@@ -73,14 +73,14 @@ class HseException(Exception):
 
 
 @unique
-class SyncFlag(IntFlag):
+class KvdbSyncFlag(IntFlag):
     ASYNC = HSE_FLAG_SYNC_ASYNC
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
     @unique
     class KvdbCompactFlag(IntFlag):
-        CANCEL = HSE_FLAG_KVDB_COMPACT_CANCEL
-        SAMP_LWM = HSE_FLAG_KVDB_COMPACT_SAMP_LWM\
+        CANCEL = HSE_KVDB_COMPACT_CANCEL
+        SAMP_LWM = HSE_KVDB_COMPACT_SAMP_LWM
 
 
 cdef class Kvdb:
@@ -196,7 +196,7 @@ cdef class Kvdb:
         """
         return Kvs(self, kvs_name, *params)
 
-    def sync(self, flags: Optional[SyncFlag] = None) -> None:
+    def sync(self, flags: Optional[KvdbSyncFlag] = None) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
@@ -256,14 +256,14 @@ cdef class Kvdb:
 
 
 @unique
-class PutFlag(IntFlag):
-    PRIORITY = HSE_FLAG_PUT_PRIORITY
-    VALUE_COMPRESSION_OFF = HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
+class KvsPutFlag(IntFlag):
+    PRIO = HSE_KVS_PUT_PRIO
+    VCOMP_OFF = HSE_KVS_PUT_VCOMP_OFF
 
 
 @unique
-class CursorFlag(IntFlag):
-    REVERSE = HSE_FLAG_CURSOR_REVERSE
+class CursorCreateFlag(IntFlag):
+    REV = HSE_CURSOR_CREATE_REV
 
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
@@ -310,7 +310,7 @@ cdef class Kvs:
             const unsigned char [:]key,
             const unsigned char [:]value,
             KvdbTransaction txn=None,
-            flags: Optional[PutFlag]=None,
+            flags: Optional[KvsPutFlag]=None,
         ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
@@ -511,7 +511,7 @@ cdef class Kvs:
         self,
         const unsigned char [:]filt=None,
         KvdbTransaction txn=None,
-        flags: CursorFlag=0,
+        flags: Optional[CursorCreateFlag]=None,
     ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
@@ -624,7 +624,7 @@ cdef class KvsCursor:
         Kvs kvs,
         const unsigned char [:]filt=None,
         KvdbTransaction txn=None,
-        flags: Optional[CursorFlag]=None,
+        flags: Optional[CursorCreateFlag]=None,
     ):
         self._eof = False
 
@@ -683,14 +683,11 @@ cdef class KvsCursor:
 
         return _iter()
 
-    def update_view(
-        self,
-        flags: Optional[CursorFlag]=None,
-    ) -> None:
+    def update_view(self) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__
         """
-        cdef unsigned int cflags = int(flags) if flags else 0
+        cdef unsigned int cflags = 0
 
         cdef hse_err_t err = 0
         with nogil:

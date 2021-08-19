@@ -27,7 +27,7 @@ class HseException(Exception):
     returncode: int
     def __init__(self, returncode: int) -> None: ...
 
-class SyncFlag(IntFlag):
+class KvdbSyncFlag(IntFlag):
     ASYNC = ...
 
 class Kvdb:
@@ -77,7 +77,7 @@ class Kvdb:
         @SUB@ hse.Kvdb.kvs_open.__doc__
         """
         ...
-    def sync(self, flags: Optional[SyncFlag] = ...) -> None:
+    def sync(self, flags: Optional[KvdbSyncFlag] = ...) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
         """
@@ -107,12 +107,12 @@ class Kvdb:
         """
         ...
 
-class PutFlag(IntFlag):
-    PRIORITY = ...
-    VALUE_COMPRESSION_OFF = ...
+class KvsPutFlag(IntFlag):
+    PRIO = ...
+    VCOMP_OFF = ...
 
-class CursorFlag(IntFlag):
-    REVERSE = ...
+class CursorCreateFlag(IntFlag):
+    REV = ...
 
 #ifdef HSE_PYTHON_EXPERIMENTAL
 class KvsPfxProbeCnt(Enum):
@@ -136,7 +136,7 @@ class Kvs:
         key: bytes,
         value: Optional[bytes],
         txn: Optional[KvdbTransaction] = ...,
-        flags: Optional[PutFlag] = ...,
+        flags: Optional[KvsPutFlag] = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.put.__doc__
@@ -200,7 +200,7 @@ class Kvs:
         self,
         filt: Optional[bytes] = ...,
         txn: Optional[KvdbTransaction] = ...,
-        flags: Optional[CursorFlag] = ...,
+        flags: Optional[CursorCreateFlag] = ...,
     ) -> KvsCursor:
         """
         @SUB@ hse.Kvs.cursor.__doc__
@@ -272,7 +272,6 @@ class KvsCursor:
     def update_view(
         self,
         txn: Optional[KvdbTransaction] = ...,
-        flags: Optional[CursorFlag] = ...,
     ) -> None:
         """
         @SUB@ hse.KvsCursor.update.__doc__

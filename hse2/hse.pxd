@@ -13,10 +13,14 @@ cdef extern from "Python.h":
 
 
 cdef extern from "hse/flags.h":
-    cdef unsigned int HSE_FLAG_PUT_PRIORITY
-    cdef unsigned int HSE_FLAG_PUT_VALUE_COMPRESSION_OFF
+    cdef unsigned int HSE_KVS_PUT_PRIO
+    cdef unsigned int HSE_KVS_PUT_VCOMP_OFF
 
-    cdef unsigned int HSE_FLAG_CURSOR_REVERSE
+    cdef unsigned int HSE_CURSOR_CREATE_REV
+
+    IF HSE_PYTHON_EXPERIMENTAL == 1:
+        cdef unsigned int HSE_KVDB_COMPACT_CANCEL
+        cdef unsigned int HSE_KVDB_COMPACT_SAMP_LWM
 
 
 cdef extern from "hse/types.h":
@@ -133,9 +137,6 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
     IF HSE_PYTHON_EXPERIMENTAL == 1:
-        cdef int HSE_FLAG_KVDB_COMPACT_CANCEL
-        cdef int HSE_FLAG_KVDB_COMPACT_SAMP_LWM
-
         hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
         hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
 
