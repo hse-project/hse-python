@@ -7,7 +7,7 @@ from enum import Enum, IntFlag
 from types import TracebackType
 from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Union
 
-def init(runtime_home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
+def init(config: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """

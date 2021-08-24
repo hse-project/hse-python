@@ -14,6 +14,7 @@ import pathlib
 
 def pytest_addoption(parser: Parser) -> None:
     parser.addoption("-C", "--home", type=pathlib.Path, default=pathlib.Path.cwd())
+    parser.addoption("--config", type=pathlib.Path)
     parser.addoption("--experimental", action="store_true")
 
 
@@ -32,8 +33,13 @@ def home(pytestconfig: Config) -> Generator[pathlib.Path, None, None]:
 
 
 @pytest.fixture(scope="package")
-def kvdb(home: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
-    hse.init(home)
+def config(pytestconfig: Config) -> Generator[pathlib.Path, None, None]:
+    return pytestconfig.getoption("config") # type: ignore
+
+
+@pytest.fixture(scope="package")
+def kvdb(home: pathlib.Path, config: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
+    hse.init(config)
 
     try:
         hse.Kvdb.create(home)
