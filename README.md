@@ -3,53 +3,49 @@
 [Heterogeneous-Memory Storage Engine](https://github.com/hse-project/hse)
 bindings for Python.
 
-## Dependencies
+## Virtual Environment
 
-Dependencies that are bolded are runtime dependencies. **HSE** is both a
-runtime and build dependency.
+To build `hse-python`, it may be advantageous to use a Python virtual
+environment. Use the following commands to set one up:
 
-* **HSE**, cloned locally and built, or installed on your system including the
-development package
-* [`Cython`](https://pypi.org/project/Cython) (optional unless `USE_CYTHON` is defined)
-* [`toml`](https://pypi.org/project/toml/) (optional unless `USE_CYTHON` is
-defined)
-* [`pytest`](https://pypi.org/project/pytest)
-* [`black`](https://pypi.org/project/black)
+```shell
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt
+```
+
+## Building
+
+`hse-python` is built using the [Meson build system](https://mesonbuild.com/).
+In the event HSE is not visible to the `hse-python` build system, HSE will be
+fetched and built alongside `hse-python`.
+
+```shell
+meson setup build
+meson compile -C build
+```
+
+Check the output of `meson configure build` or
+[`meson_options.txt`](./meson_options.txt) for various build options.
 
 ## Installation
 
 ### From PyPI
 
 ```shell
-# unpublished as of now
-pip install hse
+python3 -m pip install hse2
 ```
 
 ### From Build
 
-```shell
-python setup.py install
-```
-
-## Building
-
-If you need to point the build toward the HSE include directory or the shared
-library, you can use `CFLAGS` and `LDFLAGS` respectively.
-
-In the case you are bootstrapping your build, such as from a fresh clone, you
-will want to define an environment variable called `USE_CYTHON`. What it is
-defined as is unimportant. If you are building from a source distribution, then
-`USE_CYTHON` is unimportant. The Cython generated `.c` files are distributed in
-the source distribution. This is off by default.
-
-If you are interested in more contextual error messages that the C API is
-bubbling up, then you can define the environment variable `HSE_PYTHON_DEBUG`.
-This will provide the C file and line number where the error originated. This is
-off by default.
+The default install directory is `/opt/hse`. This can be overridden by
+configuring the build with either `-Dprefix=$prefix` or `--prefix=$prefix`.
 
 ```shell
-python setup.py build_ext -i
-# or
-CFLAGS="-Ipath/to/include" LDFLAGS="-Lpath/to/search" python setup.py build_ext -i
+meson install -C build
 ```
 
+## Additional References
+
+Information on running test suites and contributing to `hse-python` is located
+in the [`CONTRIBUTING.md`](./CONTRIBUTING.md) file.
