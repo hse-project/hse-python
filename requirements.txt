@@ -4,7 +4,7 @@ build==0.5.1
 Cython==0.29.24
 iniconfig==1.1.1
 meson==0.58.2
-mesonpep517 @ git+https://gitlab.com/thiblahute/mesonpep517@0431b799d8e6d8d3201171edbd83a30f9fa60575
+mesonpep517 @ git+https://gitlab.com/thiblahute/mesonpep517@a11ee772513071198d02d555ac26a3c32e10608f
 ninja==1.10.2
 packaging==21.0
 pep517==0.11.0
