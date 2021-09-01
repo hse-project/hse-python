@@ -609,9 +609,9 @@ cdef class KvdbTransaction:
         """
         @SUB@ hse.KvdbTransaction.state.__doc__
         """
-        cdef hse_kvdb_txn_state = HSE_KVDB_TXN_INVALID
+        cdef hse_kvdb_txn_state state = HSE_KVDB_TXN_INVALID
         with nogil:
-            state = hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            state = hse_kvdb_txn_state_get(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         return KvdbTransactionState(state)
 
 

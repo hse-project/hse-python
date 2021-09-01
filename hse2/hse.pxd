@@ -147,7 +147,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_commit(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
+    hse_kvdb_txn_state hse_kvdb_txn_state_get(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
 
     hse_err_t hse_kvs_cursor_create(
         hse_kvs *kvs,
