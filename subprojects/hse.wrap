@@ -1,6 +1,6 @@
 [wrap-git]
 url = https://github.com/hse-project/hse.git
-revision = r2.0.0-rc1
+revision = r2.0.0-rc2
 
 [provide]
 dependency_names = hse-2
