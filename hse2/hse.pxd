@@ -132,7 +132,7 @@ cdef extern from "hse/hse.h":
             size_t valbuf_sz,
             size_t *val_len) nogil
 
-    cdef unsigned int HSE_FLAG_SYNC_ASYNC
+    cdef unsigned int HSE_KVDB_SYNC_ASYNC
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 

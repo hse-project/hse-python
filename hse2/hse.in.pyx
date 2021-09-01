@@ -74,7 +74,7 @@ class HseException(Exception):
 
 @unique
 class KvdbSyncFlag(IntFlag):
-    ASYNC = HSE_FLAG_SYNC_ASYNC
+    ASYNC = HSE_KVDB_SYNC_ASYNC
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
     @unique
