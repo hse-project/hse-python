@@ -11,7 +11,7 @@ import pytest
 @pytest.fixture(scope="module")
 def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     try:
-        kvdb.kvs_create("kvs-test", "pfx_len=3", "sfx_len=1")
+        kvdb.kvs_create("kvs-test", "prefix.length=3", "suffix.length=1")
     except hse.HseException as e:
         if e.returncode == errno.EEXIST:
             pass
