@@ -87,8 +87,7 @@ not thread safe.
 
 Args:
 
-`home` - KVDB home directory\\n
-`params` - key=value parameters
+`home` - KVDB home directory
 """
 
 [hse.Kvdb.open]

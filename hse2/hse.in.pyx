@@ -128,17 +128,14 @@ cdef class Kvdb:
             raise HseException(err)
 
     @staticmethod
-    def drop(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> None:
+    def drop(home: Optional[Union[str, os.PathLike[str]]]=None) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """
         home_bytes = os.fspath(home).encode() if home else None
         cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
-        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_drop(home_addr, len(params), <const char * const*>paramv)
-        if paramv:
-            free(paramv)
+        cdef hse_err_t err = hse_kvdb_drop(home_addr)
         if err != 0:
             raise HseException(err)
 

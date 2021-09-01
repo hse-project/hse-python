@@ -45,7 +45,7 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def drop(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
+    def drop(home: Optional[Union[str, os.PathLike[str]]] = ...) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """

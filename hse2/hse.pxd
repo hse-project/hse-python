@@ -71,7 +71,7 @@ cdef extern from "hse/hse.h":
     void hse_fini()
 
     hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, const char *const *paramv)
-    hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, const char *const *)
+    hse_err_t hse_kvdb_drop(const char *kvdb_home)
     hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, const char *const *, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
     hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
