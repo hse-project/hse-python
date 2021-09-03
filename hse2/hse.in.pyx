@@ -74,7 +74,7 @@ class HseException(Exception):
 
 @unique
 class KvdbSyncFlag(IntFlag):
-    ASYNC = HSE_FLAG_SYNC_ASYNC
+    ASYNC = HSE_KVDB_SYNC_ASYNC
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
     @unique
@@ -128,17 +128,14 @@ cdef class Kvdb:
             raise HseException(err)
 
     @staticmethod
-    def drop(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> None:
+    def drop(home: Optional[Union[str, os.PathLike[str]]]=None) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """
         home_bytes = os.fspath(home).encode() if home else None
         cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
-        cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_drop(home_addr, len(params), <const char * const*>paramv)
-        if paramv:
-            free(paramv)
+        cdef hse_err_t err = hse_kvdb_drop(home_addr)
         if err != 0:
             raise HseException(err)
 
@@ -612,9 +609,9 @@ cdef class KvdbTransaction:
         """
         @SUB@ hse.KvdbTransaction.state.__doc__
         """
-        cdef hse_kvdb_txn_state = HSE_KVDB_TXN_INVALID
+        cdef hse_kvdb_txn_state state = HSE_KVDB_TXN_INVALID
         with nogil:
-            state = hse_kvdb_txn_get_state(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            state = hse_kvdb_txn_state_get(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
         return KvdbTransactionState(state)
 
 

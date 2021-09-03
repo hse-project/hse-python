@@ -71,7 +71,7 @@ cdef extern from "hse/hse.h":
     void hse_fini()
 
     hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, const char *const *paramv)
-    hse_err_t hse_kvdb_drop(const char *kvdb_home, size_t paramc, const char *const *)
+    hse_err_t hse_kvdb_drop(const char *kvdb_home)
     hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, const char *const *, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
     hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
@@ -132,7 +132,7 @@ cdef extern from "hse/hse.h":
             size_t valbuf_sz,
             size_t *val_len) nogil
 
-    cdef unsigned int HSE_FLAG_SYNC_ASYNC
+    cdef unsigned int HSE_KVDB_SYNC_ASYNC
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
@@ -147,7 +147,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_commit(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
     hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_kvdb_txn_state hse_kvdb_txn_get_state(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
+    hse_kvdb_txn_state hse_kvdb_txn_state_get(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
 
     hse_err_t hse_kvs_cursor_create(
         hse_kvs *kvs,
