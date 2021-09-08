@@ -84,14 +84,14 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
 
 
 cdef class Kvdb:
-    def __cinit__(self, home: Optional[Union[str, os.PathLike[str]]], *params: str):
+    def __cinit__(self, kvdb_home: Union[str, os.PathLike[str]], *params: str):
         self._c_hse_kvdb = NULL
 
-        home_bytes = os.fspath(home).encode() if home else None
-        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
+        cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        err = hse_kvdb_open(home_addr, len(params), <const char * const*>paramv, &self._c_hse_kvdb)
+        err = hse_kvdb_open(kvdb_home_addr, len(params), <const char * const*>paramv, &self._c_hse_kvdb)
         if paramv:
             free(paramv)
         if err != 0:
@@ -113,38 +113,38 @@ cdef class Kvdb:
         self._c_hse_kvdb = NULL
 
     @staticmethod
-    def create(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> None:
+    def create(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
         @SUB@ hse.Kvdb.create.__doc__
         """
-        home_bytes = os.fspath(home).encode() if home else None
-        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
+        cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-        cdef hse_err_t err = hse_kvdb_create(home_addr, len(params), <const char * const*>paramv)
+        cdef hse_err_t err = hse_kvdb_create(kvdb_home_addr, len(params), <const char * const*>paramv)
         if paramv:
             free(paramv)
         if err != 0:
             raise HseException(err)
 
     @staticmethod
-    def drop(home: Optional[Union[str, os.PathLike[str]]]=None) -> None:
+    def drop(kvdb_home: Union[str, os.PathLike[str]]) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """
-        home_bytes = os.fspath(home).encode() if home else None
-        cdef const char *home_addr = <char *>home_bytes if home_bytes else NULL
+        kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
+        cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
 
-        cdef hse_err_t err = hse_kvdb_drop(home_addr)
+        cdef hse_err_t err = hse_kvdb_drop(kvdb_home_addr)
         if err != 0:
             raise HseException(err)
 
     @staticmethod
-    def open(home: Optional[Union[str, os.PathLike[str]]]=None, *params: str) -> Kvdb:
+    def open(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
-        return Kvdb(home, *params)
+        return Kvdb(kvdb_home, *params)
 
     @property
     def kvs_names(self) -> List[str]:
