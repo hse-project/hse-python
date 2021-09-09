@@ -5,7 +5,7 @@
 import os
 from enum import Enum, IntFlag
 from types import TracebackType
-from typing import Iterator, List, Optional, Tuple, Type, Any, Union
+from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Union
 
 def init(runtime_home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
     """
@@ -133,8 +133,8 @@ class Kvs:
         ...
     def put(
         self,
-        key: bytes,
-        value: Optional[bytes],
+        key: Union[bytes, SupportsBytes],
+        value: Optional[Union[bytes, SupportsBytes]],
         txn: Optional[KvdbTransaction] = ...,
         flags: Optional[KvsPutFlag] = ...,
     ) -> None:
@@ -144,7 +144,7 @@ class Kvs:
         ...
     def get(
         self,
-        key: bytes,
+        key: Union[bytes, SupportsBytes],
         txn: Optional[KvdbTransaction] = ...,
         buf: bytearray = ...,
     ) -> Optional[bytes]:
@@ -154,7 +154,7 @@ class Kvs:
         ...
     def get_with_length(
         self,
-        key: bytes,
+        key: Union[bytes, SupportsBytes],
         txn: Optional[KvdbTransaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
@@ -162,7 +162,7 @@ class Kvs:
         @SUB@ hse.Kvs.get_with_length.__doc__
         """
         ...
-    def delete(self, key: bytes, txn: Optional[KvdbTransaction] = ...) -> None:
+    def delete(self, key: Union[bytes, SupportsBytes], txn: Optional[KvdbTransaction] = ...) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """

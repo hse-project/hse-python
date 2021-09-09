@@ -8,7 +8,7 @@ cimport cython
 cimport limits
 from enum import Enum, IntFlag, unique
 from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable
+from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable, SupportsBytes
 from libc.stdlib cimport malloc, free
 
 
@@ -16,6 +16,8 @@ from libc.stdlib cimport malloc, free
 # destruction. Please continue to follow this pattern as the HSE C code does
 # not do this. We use NULL checks to protect against double free
 # issues within the Python bindings.
+
+# bytes(<bytes object>) returns the original bytes object. It is not a copy.
 
 
 def init(runtime_home: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
@@ -304,8 +306,8 @@ cdef class Kvs:
 
     def put(
             self,
-            const unsigned char [:]key,
-            const unsigned char [:]value,
+            key: Union[bytes, SupportsBytes],
+            value: Union[bytes, SupportsBytes],
             KvdbTransaction txn=None,
             flags: Optional[KvsPutFlag]=None,
         ) -> None:
@@ -319,14 +321,17 @@ cdef class Kvs:
         cdef const void *value_addr = NULL
         cdef size_t value_len = 0
 
+        cdef const unsigned char [:]key_view = bytes(key) if key else None
+        cdef const unsigned char [:]value_view = bytes(value) if value else None
+
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
-        if key is not None:
-            key_addr = &key[0]
-            key_len = key.shape[0]
-        if value is not None:
-            value_addr = &value[0]
-            value_len = value.shape[0]
+        if key_view is not None:
+            key_addr = &key_view[0]
+            key_len = key_view.shape[0]
+        if value_view is not None:
+            value_addr = &value_view[0]
+            value_len = value_view.shape[0]
 
         cdef hse_err_t err = 0
         with nogil:
@@ -336,7 +341,7 @@ cdef class Kvs:
 
     def get(
             self,
-            const unsigned char [:]key,
+            key: Union[bytes, SupportsBytes],
             KvdbTransaction txn=None,
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Optional[bytes]:
@@ -348,7 +353,7 @@ cdef class Kvs:
 
     def get_with_length(
             self,
-            const unsigned char [:]key,
+            key: Union[bytes, SupportsBytes],
             KvdbTransaction txn=None,
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
@@ -362,11 +367,13 @@ cdef class Kvs:
         cdef void *buf_addr = NULL
         cdef size_t buf_len = 0
 
+        cdef const unsigned char [:]key_view = bytes(key) if key else None
+
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
-        if key is not None:
-            key_addr = &key[0]
-            key_len = key.shape[0]
+        if key_view is not None:
+            key_addr = &key_view[0]
+            key_len = key_view.shape[0]
         if buf is not None:
             buf_addr = &buf[0]
             buf_len = buf.shape[0]
@@ -390,7 +397,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, const unsigned char [:]key, KvdbTransaction txn=None) -> None:
+    def delete(self, key: Union[bytes, SupportsBytes], KvdbTransaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -399,11 +406,13 @@ cdef class Kvs:
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
 
+        cdef const unsigned char [:]key_view = bytes(key) if key else None
+
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
-        if key is not None:
-            key_addr = &key[0]
-            key_len = key.shape[0]
+        if key_view is not None:
+            key_addr = &key_view[0]
+            key_len = key_view.shape[0]
 
         cdef hse_err_t err = 0
         with nogil:

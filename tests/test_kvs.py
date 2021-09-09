@@ -3,9 +3,17 @@
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 import errno
-from typing import Generator, Optional
+from typing import Generator, Optional, SupportsBytes, Union
 from hse2 import hse, limits
 import pytest
+
+
+class Key(SupportsBytes):
+    def __init__(self, key: str) -> None:
+        self.__key = key
+
+    def __bytes__(self) -> bytes:
+        return self.__key.encode()
 
 
 @pytest.fixture(scope="module")
@@ -25,15 +33,22 @@ def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
     kvdb.kvs_drop("kvs-test")
 
 
-def test_key_operations(kvs: hse.Kvs):
-    kvs.put(b"key1", b"value")
-    assert kvs.get(b"key1") == b"value"
+@pytest.mark.parametrize(
+    "key",
+    [
+        b"key1",
+        Key("key1"),
+    ],
+)
+def test_key_operations(kvs: hse.Kvs, key: Union[bytes, SupportsBytes]):
+    kvs.put(key, b"value")
+    assert kvs.get(key) == b"value"
 
     buf = bytearray(5)
-    assert kvs.get(b"key1", buf=buf) == b"value"
+    assert kvs.get(key, buf=buf) == b"value"
 
-    kvs.delete(b"key1")
-    assert kvs.get(b"key1") == None
+    kvs.delete(key)
+    assert kvs.get(key) == None
 
 
 def test_prefix_delete(kvs: hse.Kvs):
@@ -98,19 +113,19 @@ def test_prefix_probe_with_lengths(
 
 @pytest.mark.xfail(strict=True)
 def test_none_put(kvs: hse.Kvs):
-    kvs.put(None, None) # type: ignore
+    kvs.put(None, None)  # type: ignore
 
 
 @pytest.mark.xfail(strict=True)
 def test_none_get(kvs: hse.Kvs):
-    kvs.get(None) # type: ignore
+    kvs.get(None)  # type: ignore
 
 
 @pytest.mark.xfail(strict=True)
 def test_none_delete(kvs: hse.Kvs):
-    kvs.delete(None) # type: ignore
+    kvs.delete(None)  # type: ignore
 
 
 @pytest.mark.xfail(strict=True)
 def test_none_prefix_delete(kvs: hse.Kvs):
-    kvs.prefix_delete(None) # type: ignore
+    kvs.prefix_delete(None)  # type: ignore
