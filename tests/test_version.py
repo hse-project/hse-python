@@ -6,9 +6,7 @@ from hse2 import version
 
 
 def test_version():
-    assert version.STRING != None
-    assert version.TAG != None
-    assert version.SHA != None
-    assert version.MAJOR != None
-    assert version.MINOR != None
-    assert version.PATCH != None
+    assert version.STRING is not None
+    assert version.MAJOR is not None
+    assert version.MINOR is not None
+    assert version.PATCH is not None

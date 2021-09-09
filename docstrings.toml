@@ -4,26 +4,7 @@
 
 [hse.version.STRING]
 __doc__ = """
-A string representing the HSE KVDB libary version
-
-The version string starts with a numeric sequence (e.g., 1.7.0) and then, depending
-on the type of build may have additional information appended.
-"""
-
-[hse.version.TAG]
-__doc__ = """
-A string representing the HSE KVDB libary version tag
-
-The version tag starts with a sequence (e.g., r1.9.0) and then, depending
-on the type of build may have additional information appended.
-"""
-
-[hse.version.SHA]
-__doc__ = """
-A string representing the HSE KVDB library version commit hash
-
-The version commit hash is a git commit hash
-(e.g., b55fe07774d7cbc1492d7b8a47dc2c194cd3e24a).
+A string representing the HSE libary version
 """
 
 [hse.init]
