@@ -176,6 +176,8 @@ cdef class Kvdb:
         cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise HseException(err)
 
@@ -303,6 +305,8 @@ cdef class Kvs:
 
         cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv, &self._c_hse_kvs)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise HseException(err)
 
