@@ -20,15 +20,15 @@ from libc.stdlib cimport malloc, free
 # bytes(<bytes object>) returns the original bytes object. It is not a copy.
 
 
-def init(runtime_home: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
+def init(config: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
     """
-    runtime_home_bytes = os.fspath(runtime_home).encode() if runtime_home else None
-    cdef const char *runtime_home_addr = <char *>runtime_home_bytes if runtime_home_bytes else NULL
+    config_bytes = os.fspath(config).encode() if config else None
+    cdef const char *config_addr = <char *>config_bytes if config_bytes else NULL
     cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
-    cdef hse_err_t err = hse_init(runtime_home_addr, len(params), <const char * const*>paramv)
+    cdef hse_err_t err = hse_init(config_addr, len(params), <const char * const*>paramv)
 
     if paramv:
         free(paramv)
