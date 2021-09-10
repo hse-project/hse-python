@@ -6,19 +6,9 @@
 STRING:
 
 @SUB@ hse.version.STRING.__doc__
-
-TAG:
-
-@SUB@ hse.version.TAG.__doc__
-
-SHA:
-
-@SUB@ hse.version.SHA.__doc__
 """
 
 STRING: str
-TAG: str
-SHA: str
 
 MAJOR: int
 MINOR: int
