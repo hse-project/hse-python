@@ -184,6 +184,18 @@ Obtain allocated and used space for a specified KVDB. This function is thread
 safe.
 """
 
+[hse.Kvdb.storage_add]
+__doc__ = """
+Add a new media class storage to an existing offline KVDB
+
+This function is not thread safe.
+
+Args:
+
+`kvdb_home` - KVDB home directory\\n
+`params` - key=value parameters
+"""
+
 [hse.Kvdb.transaction]
 __doc__ = """
 Allocate transaction object

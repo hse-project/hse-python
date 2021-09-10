@@ -101,6 +101,11 @@ class Kvdb:
         @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
+    @staticmethod
+    def storage_add(kvdb_home: Union[str, 'os.PathLike[str]'], params: str) -> None:
+        """
+        @SUB@ hse.Kvdb.storage_add.__doc__
+        """
     def transaction(self) -> KvdbTransaction:
         """
         @SUB@ hse.Kvdb.transaction.__doc__

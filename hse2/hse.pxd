@@ -141,6 +141,7 @@ cdef extern from "hse/hse.h":
         hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
 
     hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
+    hse_err_t hse_kvdb_storage_add(const char *kvdb_home, size_t paramc, const char *const *paramv) nogil
 
     hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
     void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil

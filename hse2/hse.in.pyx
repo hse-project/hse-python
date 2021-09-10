@@ -178,6 +178,8 @@ cdef class Kvdb:
         cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise HseException(err)
 
@@ -245,6 +247,25 @@ cdef class Kvdb:
             raise HseException(err)
         return info
 
+    @staticmethod
+    def storage_add(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
+        """
+        @SUB@ hse.Kvdb.storage_add.__doc__
+        """
+        kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
+        cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
+        cdef size_t paramc = len(params)
+        cdef char **paramv = to_paramv(params) if paramc > 0 else NULL
+        cdef hse_err_t err = 0
+
+        with nogil:
+            err = hse_kvdb_storage_add(kvdb_home_addr, paramc, <const char * const*>paramv)
+
+        if paramv:
+            free(paramv)
+        if err != 0:
+            raise HseException(err)
+
     def transaction(self) -> KvdbTransaction:
         """
         @SUB@ hse.Kvdb.transaction.__doc__
@@ -286,6 +307,8 @@ cdef class Kvs:
 
         cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv, &self._c_hse_kvs)
+        if paramv:
+            free(paramv)
         if err != 0:
             raise HseException(err)
 
