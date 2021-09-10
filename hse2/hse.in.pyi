@@ -38,20 +38,20 @@ class Kvdb:
         ...
     @staticmethod
     def create(
-        home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str
+        kvdb_home: Union[str, os.PathLike[str]], *params: str
     ) -> None:
         """
         @SUB@ hse.Kvdb.create.__doc__
         """
         ...
     @staticmethod
-    def drop(home: Optional[Union[str, os.PathLike[str]]] = ...) -> None:
+    def drop(kvdb_home: Union[str, os.PathLike[str]]) -> None:
         """
         @SUB@ hse.Kvdb.drop.__doc__
         """
         ...
     @staticmethod
-    def open(home: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> Kvdb:
+    def open(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
         """
