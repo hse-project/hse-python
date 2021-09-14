@@ -379,7 +379,7 @@ cdef class Kvs:
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get_with_length.__doc__
+        @SUB@ hse.Kvs.get.__doc__
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -477,7 +477,7 @@ cdef class Kvs:
             KvdbTransaction txn=None,
         ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
             """
-            @SUB@ hse.prefix_probe_with_lengths.__doc__
+            @SUB@ hse.prefix_probe.__doc__
             """
             cdef hse_kvdb_txn *txn_addr = NULL
             cdef const void *pfx_addr = NULL
