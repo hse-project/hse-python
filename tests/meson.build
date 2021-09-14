@@ -10,42 +10,40 @@ env = environment({
     'HSE_TEST_RUNNER_RUNNER': 'pytest',
 })
 
+wrapper = [
+    test_runner,
+    '--',
+]
+
 add_test_setup(
-    'ci',
-    exe_wrapper: [
-        test_runner,
-        '--',
-    ],
+    'default',
     env: env,
+    exe_wrapper: wrapper,
     is_default: not meson.is_subproject()
 )
 
-suites = [
-    'cursor',
-    'kvdb',
-    'kvs',
-    'limits',
-    'transaction',
-    'version',
-]
+add_test_setup(
+    'ci',
+    exe_wrapper: wrapper,
+    env: env
+)
 
-foreach s : suites
-    test(
-        '@0@'.format(s),
-        pytest,
-        args: [
-            '--tap-stream',
-            'test_@0@.py'.format(s),
-            get_option('experimental') ? ['--experimental'] : [],
-        ],
-        env: env,
-        suite: ['unit'],
-        protocol: 'tap',
-        workdir: meson.current_source_dir(),
-        depends: [
-            extension_modules,
-            init_py,
-        ],
-        timeout: 60
-    )
-endforeach
+test(
+    'python-bindings',
+    pytest,
+    args: [
+        '--tap-stream',
+        '-s',
+        meson.current_source_dir(),
+        get_option('experimental') ? ['--experimental'] : [],
+    ],
+    suite: ['unit'],
+    protocol: 'tap',
+    workdir: meson.current_source_dir(),
+    env: env,
+    depends: [
+        extension_modules,
+        init_py,
+    ],
+    timeout: 60
+)

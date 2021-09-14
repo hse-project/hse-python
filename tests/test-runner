@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2021 Micron Technology, Inc. All rights reserved.
 
 import abc
 import argparse
@@ -84,7 +84,6 @@ class BashTest(Test):
         return pathlib.Path(self._args[0]).stem
 
     def command_line(self, home: str) -> List[str]:
-        print(" ".join([str(self._program), "-C", str(home), *self._args]))
         return [str(self._program), self._args[0], "-C", str(home), *self._args[1:]]
 
 
@@ -134,7 +133,7 @@ if __name__ == "__main__":
 
     test = Test.create(args.program, *args.arguments)
 
-    with tempfile.TemporaryDirectory(prefix=f"{test.name}-", dir=args.dir) as home:
+    with tempfile.TemporaryDirectory(prefix=f"mtest-{test.name}-", dir=args.dir) as home:
         proc = subprocess.Popen(test.command_line(home))
 
         def proxy(s: int, frame: Optional[FrameType]):
