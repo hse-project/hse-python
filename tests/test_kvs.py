@@ -3,8 +3,8 @@
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 import errno
-from typing import Generator, Optional, SupportsBytes, Union
-from hse2 import hse, limits
+from typing import Generator, SupportsBytes, Union
+from hse2 import hse
 import pytest
 
 
@@ -14,6 +14,14 @@ class Key(SupportsBytes):
 
     def __bytes__(self) -> bytes:
         return self.__key.encode()
+
+
+class Value(SupportsBytes):
+    def __init__(self, value: str) -> None:
+        self.__value = value
+
+    def __bytes__(self) -> bytes:
+        return self.__value.encode()
 
 
 @pytest.fixture(scope="module")
