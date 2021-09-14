@@ -20,6 +20,30 @@ from libc.stdlib cimport malloc, free
 # bytes(<bytes object>) returns the original bytes object. It is not a copy.
 
 
+def to_bytes(obj: Optional[Union[str, bytes, SupportsBytes]]) -> bytes:
+    if obj is None:
+        return None
+
+    if isinstance(obj, str):
+        return obj.encode()
+
+    return bytes(obj)
+
+
+cdef char **to_paramv(tuple params) except NULL:
+    cdef char **paramv = <char **>malloc(len(params) * sizeof(char *))
+    if not paramv:
+        raise MemoryError()
+    else:
+        for i, param in enumerate(params):
+            assert isinstance(param, str)
+            paramv[i] = <char *>PyUnicode_AsUTF8(param)
+            if not paramv[i]:
+                return NULL
+
+    return paramv
+
+
 def init(config: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
     """
     @SUB@ hse.init.__doc__
@@ -41,20 +65,6 @@ def fini() -> None:
     @SUB@ hse.fini.__doc__
     """
     hse_fini()
-
-
-cdef char **to_paramv(tuple params) except NULL:
-    cdef char **paramv = <char **>malloc(len(params) * sizeof(char *))
-    if not paramv:
-        raise MemoryError()
-    else:
-        for i, param in enumerate(params):
-            assert isinstance(param, str)
-            paramv[i] = <char *>PyUnicode_AsUTF8(param)
-            if not paramv[i]:
-                return NULL
-
-    return paramv
 
 
 class HseException(Exception):
@@ -329,8 +339,8 @@ cdef class Kvs:
 
     def put(
             self,
-            key: Union[bytes, SupportsBytes],
-            value: Union[bytes, SupportsBytes],
+            key: Union[str, bytes, SupportsBytes],
+            value: Optional[Union[str, bytes, SupportsBytes]],
             KvdbTransaction txn=None,
             flags: Optional[KvsPutFlag]=None,
         ) -> None:
@@ -344,8 +354,8 @@ cdef class Kvs:
         cdef const void *value_addr = NULL
         cdef size_t value_len = 0
 
-        cdef const unsigned char [:]key_view = bytes(key) if key else None
-        cdef const unsigned char [:]value_view = bytes(value) if value else None
+        cdef const unsigned char [:]key_view = to_bytes(key)
+        cdef const unsigned char [:]value_view = to_bytes(value)
 
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
@@ -364,24 +374,12 @@ cdef class Kvs:
 
     def get(
             self,
-            key: Union[bytes, SupportsBytes],
-            KvdbTransaction txn=None,
-            unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
-        ) -> Optional[bytes]:
-        """
-        @SUB@ hse.Kvs.get.__doc__
-        """
-        value, _ = self.get_with_length(key, txn=txn, buf=buf)
-        return value
-
-    def get_with_length(
-            self,
-            key: Union[bytes, SupportsBytes],
+            key: Union[str, bytes, SupportsBytes],
             KvdbTransaction txn=None,
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get_with_length.__doc__
+        @SUB@ hse.Kvs.get.__doc__
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -390,7 +388,7 @@ cdef class Kvs:
         cdef void *buf_addr = NULL
         cdef size_t buf_len = 0
 
-        cdef const unsigned char [:]key_view = bytes(key) if key else None
+        cdef const unsigned char [:]key_view = to_bytes(key)
 
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
@@ -420,7 +418,7 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, key: Union[bytes, SupportsBytes], KvdbTransaction txn=None) -> None:
+    def delete(self, key: Union[str, bytes, SupportsBytes], KvdbTransaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
@@ -429,7 +427,7 @@ cdef class Kvs:
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
 
-        cdef const unsigned char [:]key_view = bytes(key) if key else None
+        cdef const unsigned char [:]key_view = to_bytes(key)
 
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
@@ -443,26 +441,28 @@ cdef class Kvs:
         if err != 0:
             raise HseException(err)
 
-    def prefix_delete(self, const unsigned char [:]filt, txn: KvdbTransaction=None) -> int:
+    def prefix_delete(self, pfx: Union[str, bytes], txn: KvdbTransaction=None) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
-        cdef const void *filt_addr = NULL
-        cdef size_t filt_len = 0
+        cdef const void *pfx_addr = NULL
+        cdef size_t pfx_len = 0
+
+        cdef const unsigned char[:] pfx_view = to_bytes(pfx)
 
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
-        if filt is not None:
-            filt_addr = &filt[0]
-            filt_len = filt.shape[0]
+        if pfx_view is not None:
+            pfx_addr = &pfx_view[0]
+            pfx_len = pfx_view.shape[0]
 
         cdef hse_err_t err = 0
         cdef size_t kvs_pfx_len = 0
         with nogil:
-            err = hse_kvs_prefix_delete(self._c_hse_kvs, cflags, txn_addr, filt_addr,
-                filt_len, &kvs_pfx_len)
+            err = hse_kvs_prefix_delete(self._c_hse_kvs, cflags, txn_addr, pfx_addr,
+                pfx_len, &kvs_pfx_len)
         if err != 0:
             raise HseException(err)
 
@@ -471,30 +471,13 @@ cdef class Kvs:
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         def prefix_probe(
             self,
-            const unsigned char [:]pfx,
-            unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
-            unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
-            KvdbTransaction txn=None,
-        ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
-            """
-            @SUB@ hse.prefix_probe.__doc__
-            """
-            cnt, key, _, value, _ = self.prefix_probe_with_lengths(pfx, key_buf, value_buf, txn=txn)
-            return (
-                cnt,
-                key,
-                value
-            )
-
-        def prefix_probe_with_lengths(
-            self,
-            const unsigned char [:]pfx,
+            pfx: Union[str, bytes],
             unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
             unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
             KvdbTransaction txn=None,
         ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
             """
-            @SUB@ hse.prefix_probe_with_lengths.__doc__
+            @SUB@ hse.prefix_probe.__doc__
             """
             cdef hse_kvdb_txn *txn_addr = NULL
             cdef const void *pfx_addr = NULL
@@ -506,9 +489,12 @@ cdef class Kvs:
             cdef void *value_buf_addr = NULL
             cdef size_t value_buf_len = 0
             cdef size_t value_len = 0
-            if pfx is not None and len(pfx) > 0:
-                pfx_addr = &pfx[0]
-                pfx_len = len(pfx)
+
+            cdef const unsigned char[:] pfx_view = to_bytes(pfx)
+
+            if pfx_view is not None:
+                pfx_addr = &pfx_view[0]
+                pfx_len = pfx_view.shape[0]
             if key_buf is not None and len(key_buf) > 0:
                 key_buf_addr = &key_buf[0]
                 key_buf_len = len(key_buf)
@@ -538,7 +524,7 @@ cdef class Kvs:
 
     def cursor(
         self,
-        const unsigned char [:]filt=None,
+        filt: Optional[Union[str, bytes]]=None,
         KvdbTransaction txn=None,
         flags: Optional[CursorCreateFlag]=None,
     ) -> KvsCursor:
@@ -651,7 +637,7 @@ cdef class KvsCursor:
     def __cinit__(
         self,
         Kvs kvs,
-        const unsigned char [:]filt=None,
+        filt: Optional[Union[str, bytes]]=None,
         KvdbTransaction txn=None,
         flags: Optional[CursorCreateFlag]=None,
     ):
@@ -662,11 +648,13 @@ cdef class KvsCursor:
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
 
+        cdef const unsigned char[:] filt_view = to_bytes(filt)
+
         if txn:
             txn_addr = txn._c_hse_kvdb_txn
-        if filt is not None:
-            filt_addr = &filt[0]
-            filt_len = filt.shape[0]
+        if filt_view is not None:
+            filt_addr = &filt_view[0]
+            filt_len = filt_view.shape[0]
 
         with nogil:
             err = hse_kvs_cursor_create(
@@ -724,16 +712,19 @@ cdef class KvsCursor:
         if err != 0:
             raise HseException(err)
 
-    def seek(self, const unsigned char [:]key) -> Optional[bytes]:
+    def seek(self, key: Union[str, bytes, SupportsBytes]) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek.__doc__
         """
         cdef unsigned int cflags = 0
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
-        if key is not None:
-            key_addr = &key[0]
-            key_len = key.shape[0]
+
+        cdef const unsigned char [:]key_view = to_bytes(key)
+
+        if key_view is not None:
+            key_addr = &key_view[0]
+            key_len = key_view.shape[0]
 
         cdef const void *found = NULL
         cdef size_t found_len = 0
@@ -755,7 +746,7 @@ cdef class KvsCursor:
 
         return (<char *>found)[:found_len]
 
-    def seek_range(self, const unsigned char [:]filt_min, const unsigned char [:]filt_max) -> Optional[bytes]:
+    def seek_range(self, filt_min: Optional[Union[str, bytes, SupportsBytes]], filt_max: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek_range.__doc__
         """
@@ -764,12 +755,16 @@ cdef class KvsCursor:
         cdef size_t filt_min_len = 0
         cdef const void *filt_max_addr = NULL
         cdef size_t filt_max_len = 0
-        if filt_min is not None:
-            filt_min_addr = &filt_min[0]
-            filt_min_len = filt_min.shape[0]
-        if filt_max is not None:
-            filt_max_addr = &filt_max[0]
-            filt_max_len = filt_max.shape[0]
+
+        cdef const unsigned char[:] filt_min_view = to_bytes(filt_min)
+        cdef const unsigned char[:] filt_max_view = to_bytes(filt_max)
+
+        if filt_min_view is not None:
+            filt_min_addr = &filt_min_view[0]
+            filt_min_len = filt_min_view.shape[0]
+        if filt_max_view is not None:
+            filt_max_addr = &filt_max_view[0]
+            filt_max_len = filt_max_view.shape[0]
 
         cdef const void *found = NULL
         cdef size_t found_len = 0

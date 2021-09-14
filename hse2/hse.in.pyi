@@ -37,9 +37,7 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def create(
-        kvdb_home: Union[str, os.PathLike[str]], *params: str
-    ) -> None:
+    def create(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
         @SUB@ hse.Kvdb.create.__doc__
         """
@@ -102,7 +100,7 @@ class Kvdb:
         """
         ...
     @staticmethod
-    def storage_add(kvdb_home: Union[str, 'os.PathLike[str]'], params: str) -> None:
+    def storage_add(kvdb_home: Union[str, "os.PathLike[str]"], params: str) -> None:
         """
         @SUB@ hse.Kvdb.storage_add.__doc__
         """
@@ -138,8 +136,8 @@ class Kvs:
         ...
     def put(
         self,
-        key: Union[bytes, SupportsBytes],
-        value: Optional[Union[bytes, SupportsBytes]],
+        key: Union[str, bytes, SupportsBytes],
+        value: Optional[Union[str, bytes, SupportsBytes]],
         txn: Optional[KvdbTransaction] = ...,
         flags: Optional[KvsPutFlag] = ...,
     ) -> None:
@@ -149,30 +147,26 @@ class Kvs:
         ...
     def get(
         self,
-        key: Union[bytes, SupportsBytes],
-        txn: Optional[KvdbTransaction] = ...,
-        buf: bytearray = ...,
-    ) -> Optional[bytes]:
-        """
-        @SUB@ hse.Kvs.get.__doc__
-        """
-        ...
-    def get_with_length(
-        self,
-        key: Union[bytes, SupportsBytes],
+        key: Union[str, bytes, SupportsBytes],
         txn: Optional[KvdbTransaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get_with_length.__doc__
+        @SUB@ hse.Kvs.get.__doc__
         """
         ...
-    def delete(self, key: Union[bytes, SupportsBytes], txn: Optional[KvdbTransaction] = ...) -> None:
+    def delete(
+        self,
+        key: Union[str, bytes, SupportsBytes],
+        txn: Optional[KvdbTransaction] = ...,
+    ) -> None:
         """
         @SUB@ hse.Kvs.delete.__doc__
         """
         ...
-    def prefix_delete(self, filt: bytes, txn: Optional[KvdbTransaction] = ...) -> int:
+    def prefix_delete(
+        self, pfx: Union[str, bytes], txn: Optional[KvdbTransaction] = ...
+    ) -> int:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -180,30 +174,19 @@ class Kvs:
 #ifdef HSE_PYTHON_EXPERIMENTAL
     def prefix_probe(
         self,
-        pfx: bytes,
-        key_buf: bytearray = ...,
-        value_buf: bytearray = ...,
-        txn: Optional[KvdbTransaction] = ...,
-    ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], Optional[bytes]]:
-        """
-        @SUB@ hse.prefix_probe.__doc__
-        """
-        ...
-    def prefix_probe_with_lengths(
-        self,
-        pfx: bytes,
+        pfx: Union[str, bytes],
         key_buf: bytearray = ...,
         value_buf: Optional[bytearray] = ...,
         txn: Optional[KvdbTransaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
         """
-        @SUB@ hse.prefix_probe_with_lengths.__doc__
+        @SUB@ hse.prefix_probe.__doc__
         """
         ...
 #endif
     def cursor(
         self,
-        filt: Optional[bytes] = ...,
+        filt: Optional[Union[str, bytes]] = ...,
         txn: Optional[KvdbTransaction] = ...,
         flags: Optional[CursorCreateFlag] = ...,
     ) -> KvsCursor:
@@ -282,13 +265,15 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.update.__doc__
         """
         ...
-    def seek(self, key: Optional[bytes]) -> Optional[bytes]:
+    def seek(self, key: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek.__doc__
         """
         ...
     def seek_range(
-        self, filt_min: Optional[bytes], filt_max: Optional[bytes]
+        self,
+        filt_min: Optional[Union[str, bytes, SupportsBytes]],
+        filt_max: Optional[Union[str, bytes, SupportsBytes]],
     ) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek_range.__doc__

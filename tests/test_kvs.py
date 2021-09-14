@@ -3,8 +3,8 @@
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 import errno
-from typing import Generator, Optional, SupportsBytes, Union
-from hse2 import hse, limits
+from typing import Generator, SupportsBytes, Union
+from hse2 import hse
 import pytest
 
 
@@ -14,6 +14,14 @@ class Key(SupportsBytes):
 
     def __bytes__(self) -> bytes:
         return self.__key.encode()
+
+
+class Value(SupportsBytes):
+    def __init__(self, value: str) -> None:
+        self.__value = value
+
+    def __bytes__(self) -> bytes:
+        return self.__value.encode()
 
 
 @pytest.fixture(scope="module")
@@ -34,79 +42,64 @@ def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
 
 
 @pytest.mark.parametrize(
-    "key",
+    "key,value",
     [
-        b"key1",
-        Key("key1"),
+        ("key1", "value"),
+        (b"key1", b"value"),
+        (Key("key1"), Value("value")),
     ],
 )
-def test_key_operations(kvs: hse.Kvs, key: Union[bytes, SupportsBytes]):
-    kvs.put(key, b"value")
-    assert kvs.get(key) == b"value"
+def test_key_operations(kvs: hse.Kvs, key: Union[str, bytes, SupportsBytes], value: Union[str, bytes, SupportsBytes]):
+    kvs.put(key, value)
+    assert kvs.get(key)[0] == b"value"
 
     buf = bytearray(5)
-    assert kvs.get(key, buf=buf) == b"value"
+    assert kvs.get(key, buf=buf)[0] == b"value"
 
     kvs.delete(key)
-    assert kvs.get(key) == None
+    assert kvs.get(key)[0] == None
 
 
-def test_prefix_delete(kvs: hse.Kvs):
+@pytest.mark.parametrize(
+    "pfx",
+    ["key", b"key"],
+)
+def test_prefix_delete(kvs: hse.Kvs, pfx: Union[str, bytes]):
     for i in range(5):
-        kvs.put(f"key{i}".encode(), f"value{i}".encode())
+        kvs.put(f"key{i}", f"value{i}")
 
-    assert kvs.prefix_delete(b"key") == 3
+    assert kvs.prefix_delete(pfx) == 3
 
     for i in range(5):
-        assert kvs.get(f"key{i}".encode()) == None
+        assert kvs.get(f"key{i}")[0] == None
 
 
 def test_get_with_length(kvs: hse.Kvs):
     kvs.put(b"key1", b"value")
-    assert kvs.get_with_length(b"key1") == (b"value", 5)
-    assert kvs.get_with_length(b"key1", buf=None) == (None, 5)
+    assert kvs.get(b"key1") == (b"value", 5)
+    assert kvs.get(b"key1", buf=None) == (None, 5)
     kvs.delete(b"key1")
 
 
 @pytest.mark.experimental
-def test_prefix_probe(kvs: hse.Kvs):
+@pytest.mark.parametrize("pfx1,pfx2", [("key", "abc"), (b"key", b"abc")])
+def test_prefix_probe(kvs: hse.Kvs, pfx1: Union[str, bytes], pfx2: Union[str, bytes]):
     kvs.put(b"key1", b"value1")
     kvs.put(b"abc1", b"value1")
     kvs.put(b"abc2", b"value2")
 
-    cnt, *kv = kvs.prefix_probe(b"key")
+    cnt, k, _, v, _ = kvs.prefix_probe(pfx1)
     assert cnt == hse.KvsPfxProbeCnt.ONE
-    assert kv == [b"key1", b"value1"]
+    assert (k, v) == (b"key1", b"value1")
 
-    cnt, *kv = kvs.prefix_probe(b"abc")
+    cnt, k, kl, v, vl = kvs.prefix_probe(pfx2)
     assert cnt == hse.KvsPfxProbeCnt.MUL
-    assert kv == [b"abc1", b"value1"]
+    assert (k, v) == (b"abc1", b"value1")
+    assert kl == 4
+    assert vl == 6
 
-    cnt, *_ = kvs.prefix_probe(b"xyz")
+    cnt, *_ = kvs.prefix_probe("xyz")
     assert cnt == hse.KvsPfxProbeCnt.ZERO
-
-    kvs.prefix_delete(b"key")
-
-
-@pytest.mark.experimental
-@pytest.mark.parametrize(
-    "key_buf,value_buf",
-    [
-        (bytearray(limits.KVS_KEY_LEN_MAX), bytearray(256)),
-        (bytearray(limits.KVS_KEY_LEN_MAX), None),
-    ],
-)
-def test_prefix_probe_with_lengths(
-    kvs: hse.Kvs, key_buf: bytearray, value_buf: Optional[bytearray]
-):
-    kvs.put(b"key1", b"value1")
-
-    cnt, _, key_len, _, value_len = kvs.prefix_probe_with_lengths(
-        b"key", key_buf=key_buf, value_buf=value_buf
-    )
-    assert cnt == hse.KvsPfxProbeCnt.ONE
-    assert key_len == 4
-    assert value_len == 6
 
     kvs.prefix_delete(b"key")
 

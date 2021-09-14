@@ -162,8 +162,6 @@ Args:
 
 `cancel` - To cancel an ongoing compaction request for a KVDB\\n
 `samp_lwm` - To perform compaction to its fullest extent
-
-THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.compact_status]
@@ -172,8 +170,6 @@ Get status of an ongoing compaction activity
 
 The caller can examine the properties of the `KvdbCompactStatus` class to determine
 the current state of maintenance compaction. This function is thread safe.
-
-THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.Kvdb.storage_info]
@@ -245,21 +241,6 @@ Retrieve the value for a given key from KVS
 If the key exists in the KVS then the return value is not None. See the section
 on transactions for information on how gets within transactions are handled. This
 function is thread safe.
-
-Args:
-
-`key` - Key to get from KVS\\n
-`txn` - Transaction context\\n
-`buf` - Buffer to store the value in, defaults to `hse.KVS_VALUE_LEN_MAX`
-"""
-
-[hse.Kvs.get_with_length]
-__doc__ = """
-Retrieve the value and length for a given key from KVS
-
-If the key exists in the KVS then the first value of the return tuple is not None.
-See the section on transactions for information on how gets within transactions are
-handled. This function is thread safe.
 
 Args:
 
@@ -614,8 +595,6 @@ Max KVS name lengths
 [hse.KvsPfxProbeCnt]
 __doc__ = """
 Enum representing how many results were found in the probe operation.
-
-THIS CLASS IS EXPERIMENTAL. USE AT OWN RISK.
 """
 
 [hse.prefix_probe]
@@ -623,26 +602,6 @@ __doc__ = """
 Probe for prefix
 
 Outputs how many matches were encountered - zero, one or multiple.
-
-THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
-
-Args:
-
-`kvs` - Kvs instance\\n
-`pfx` - Prefix to be probed\\n
-`key_buf` - Buffer which will be populated with contents of first seen key\\n
-`val_buf` - Buffer which will be populated with value for `key_buf`\\n
-`txn` - Transaction context
-"""
-
-[hse.prefix_probe_with_lengths]
-__doc__ = """
-Probe for prefix
-
-Outputs how many matches were encountered - zero, one or multiple. Returns
-lengths of key and value in addition to the `bytes` objects.
-
-THIS FUNCTION IS EXPERIMENTAL. USE AT OWN RISK.
 
 Args:
 
