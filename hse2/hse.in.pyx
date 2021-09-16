@@ -441,7 +441,7 @@ cdef class Kvs:
         if err != 0:
             raise HseException(err)
 
-    def prefix_delete(self, pfx: Union[str, bytes], txn: KvdbTransaction=None) -> int:
+    def prefix_delete(self, pfx: Union[str, bytes], txn: KvdbTransaction=None) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
@@ -459,14 +459,10 @@ cdef class Kvs:
             pfx_len = pfx_view.shape[0]
 
         cdef hse_err_t err = 0
-        cdef size_t kvs_pfx_len = 0
         with nogil:
-            err = hse_kvs_prefix_delete(self._c_hse_kvs, cflags, txn_addr, pfx_addr,
-                pfx_len, &kvs_pfx_len)
+            err = hse_kvs_prefix_delete(self._c_hse_kvs, cflags, txn_addr, pfx_addr, pfx_len)
         if err != 0:
             raise HseException(err)
-
-        return kvs_pfx_len
 
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         def prefix_probe(
