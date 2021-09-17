@@ -166,7 +166,7 @@ class Kvs:
         ...
     def prefix_delete(
         self, pfx: Union[str, bytes], txn: Optional[KvdbTransaction] = ...
-    ) -> int:
+    ) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """

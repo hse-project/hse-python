@@ -114,9 +114,8 @@ cdef extern from "hse/hse.h":
         hse_kvs *kvs,
         unsigned int flags,
         hse_kvdb_txn *txn,
-        const void *filt,
-        size_t filt_len,
-        size_t *kvs_pfx_len) nogil
+        const void *pfx,
+        size_t pfx_len) nogil
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         hse_err_t hse_kvs_prefix_probe(
             hse_kvs *kvs,
