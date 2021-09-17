@@ -68,7 +68,7 @@ def test_prefix_delete(kvs: hse.Kvs, pfx: Union[str, bytes]):
     for i in range(5):
         kvs.put(f"key{i}", f"value{i}")
 
-    assert kvs.prefix_delete(pfx) == 3
+    kvs.prefix_delete(pfx)
 
     for i in range(5):
         assert kvs.get(f"key{i}")[0] == None
