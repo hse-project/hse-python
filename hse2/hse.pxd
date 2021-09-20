@@ -139,7 +139,7 @@ cdef extern from "hse/hse.h":
         hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
         hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
 
-    hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
+        hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
     hse_err_t hse_kvdb_storage_add(const char *kvdb_home, size_t paramc, const char *const *paramv) nogil
 
     hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
@@ -207,5 +207,6 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
     cdef class KvdbCompactStatus:
         cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
 
-cdef class KvdbStorageInfo:
-    cdef hse_kvdb_storage_info _c_hse_kvdb_storage_info
+IF HSE_PYTHON_EXPERIMENTAL == 1:
+    cdef class KvdbStorageInfo:
+        cdef hse_kvdb_storage_info _c_hse_kvdb_storage_info
