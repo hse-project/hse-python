@@ -92,13 +92,13 @@ class Kvdb:
         @SUB@ hse.Kvdb.compact_status.__doc__
         """
         ...
-#endif
     @property
     def storage_info(self) -> KvdbStorageInfo:
         """
         @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
+#endif
     @staticmethod
     def storage_add(kvdb_home: Union[str, "os.PathLike[str]"], params: str) -> None:
         """

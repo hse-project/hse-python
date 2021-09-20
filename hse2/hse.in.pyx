@@ -244,18 +244,19 @@ cdef class Kvdb:
                 raise HseException(err)
             return status
 
-    @property
-    def storage_info(self) -> KvdbStorageInfo:
-        """
-        @SUB@ hse.Kvdb.storage_info.__doc__
-        """
-        info: KvdbStorageInfo = KvdbStorageInfo()
-        cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvdb_storage_info_get(self._c_hse_kvdb, &info._c_hse_kvdb_storage_info)
-        if err != 0:
-            raise HseException(err)
-        return info
+    IF HSE_PYTHON_EXPERIMENTAL == 1:
+        @property
+        def storage_info(self) -> KvdbStorageInfo:
+            """
+            @SUB@ hse.Kvdb.storage_info.__doc__
+            """
+            info: KvdbStorageInfo = KvdbStorageInfo()
+            cdef hse_err_t err = 0
+            with nogil:
+                err = hse_kvdb_storage_info_get(self._c_hse_kvdb, &info._c_hse_kvdb_storage_info)
+            if err != 0:
+                raise HseException(err)
+            return info
 
     @staticmethod
     def storage_add(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
@@ -860,34 +861,35 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
             return self._c_hse_kvdb_compact_status.kvcs_canceled
 
 
-cdef class KvdbStorageInfo:
-    """
-    @SUB@ hse.KvdbStorageInfo.__doc__
-    """
-    @property
-    def total_bytes(self) -> int:
+IF HSE_PYTHON_EXPERIMENTAL == 1:
+    cdef class KvdbStorageInfo:
         """
-        @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
+        @SUB@ hse.KvdbStorageInfo.__doc__
         """
-        return self._c_hse_kvdb_storage_info.total_bytes
+        @property
+        def total_bytes(self) -> int:
+            """
+            @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
+            """
+            return self._c_hse_kvdb_storage_info.total_bytes
 
-    @property
-    def available_bytes(self) -> int:
-        """
-        @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
-        """
-        return self._c_hse_kvdb_storage_info.available_bytes
+        @property
+        def available_bytes(self) -> int:
+            """
+            @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
+            """
+            return self._c_hse_kvdb_storage_info.available_bytes
 
-    @property
-    def allocated_bytes(self) -> int:
-        """
-        @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
-        """
-        return self._c_hse_kvdb_storage_info.allocated_bytes
+        @property
+        def allocated_bytes(self) -> int:
+            """
+            @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
+            """
+            return self._c_hse_kvdb_storage_info.allocated_bytes
 
-    @property
-    def used_bytes(self) -> int:
-        """
-        @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
-        """
-        return self._c_hse_kvdb_storage_info.used_bytes
+        @property
+        def used_bytes(self) -> int:
+            """
+            @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
+            """
+            return self._c_hse_kvdb_storage_info.used_bytes
