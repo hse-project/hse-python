@@ -64,7 +64,7 @@ def put_files_as_kv(kvs: hse.Kvs, keys: List[str]) -> None:
                 kvs.put(f"{key}|{i:08x}".encode(), chunk)
 
 
-def main() -> int:
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("home", help="kvdb home to operate on")
     parser.add_argument("kvs", help="kvs to operate in")
@@ -87,12 +87,10 @@ def main() -> int:
     kvs.close()
     kvdb.close()
 
-    return 0
-
 
 if __name__ == "__main__":
     hse.init()
     try:
-        main()
+        sys.exit(main())
     finally:
         hse.fini()
