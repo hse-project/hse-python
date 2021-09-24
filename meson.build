@@ -6,6 +6,9 @@ project(
         'prefix=/opt/hse',
         'buildtype=debugoptimized',
         'warning_level=2',
+		# Meson for whatever reason chooses not to respect HSE's default
+		# options :).
+		'force_fallback_for=xxhash,lz4,cjson',
     ],
     meson_version: '>=0.57',
 )
