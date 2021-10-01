@@ -86,6 +86,9 @@ class HseException(Exception):
 
 @unique
 class KvdbSyncFlag(IntFlag):
+    """
+    @SUB@ hse.KvdbSyncFlag.__doc__
+    """
     ASYNC = HSE_KVDB_SYNC_ASYNC
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
@@ -288,12 +291,18 @@ cdef class Kvdb:
 
 @unique
 class KvsPutFlag(IntFlag):
+    """
+    @SUB@ hse.KvsPutFlag.__doc__
+    """
     PRIO = HSE_KVS_PUT_PRIO
     VCOMP_OFF = HSE_KVS_PUT_VCOMP_OFF
 
 
 @unique
 class CursorCreateFlag(IntFlag):
+    """
+    @SUB@ hse.CursorCreateFlag.__doc__
+    """
     REV = HSE_CURSOR_CREATE_REV
 
 
@@ -474,7 +483,7 @@ cdef class Kvs:
             KvdbTransaction txn=None,
         ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
             """
-            @SUB@ hse.prefix_probe.__doc__
+            @SUB@ hse.Kvs.prefix_probe.__doc__
             """
             cdef hse_kvdb_txn *txn_addr = NULL
             cdef const void *pfx_addr = NULL
@@ -699,7 +708,7 @@ cdef class KvsCursor:
 
     def update_view(self) -> None:
         """
-        @SUB@ hse.KvsCursor.update.__doc__
+        @SUB@ hse.KvsCursor.update_view.__doc__
         """
         cdef unsigned int cflags = 0
 
@@ -817,6 +826,9 @@ cdef class KvsCursor:
 
     @property
     def eof(self) -> bool:
+        """
+        @SUB@ hse.KvsCursor.eof.__doc__
+        """
         return self._eof
 
 

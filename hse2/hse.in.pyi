@@ -28,6 +28,10 @@ class HseException(Exception):
     def __init__(self, returncode: int) -> None: ...
 
 class KvdbSyncFlag(IntFlag):
+    """
+    @SUB@ hse.KvdbSyncFlag.__doc__
+    """
+
     ASYNC = ...
 
 class Kvdb:
@@ -80,7 +84,7 @@ class Kvdb:
         @SUB@ hse.Kvdb.sync.__doc__
         """
         ...
-#ifdef HSE_PYTHON_EXPERIMENTAL
+    # ifdef HSE_PYTHON_EXPERIMENTAL
     def compact(self, cancel: bool = ..., samp_lwm: bool = ...) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
@@ -98,7 +102,7 @@ class Kvdb:
         @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
-#endif
+    # endif
     @staticmethod
     def storage_add(kvdb_home: Union[str, "os.PathLike[str]"], params: str) -> None:
         """
@@ -111,13 +115,21 @@ class Kvdb:
         ...
 
 class KvsPutFlag(IntFlag):
+    """
+    @SUB@ hse.KvsPutFlag.__doc__
+    """
+
     PRIO = ...
     VCOMP_OFF = ...
 
 class CursorCreateFlag(IntFlag):
+    """
+    @SUB@ hse.CursorCreateFlag.__doc__
+    """
+
     REV = ...
 
-#ifdef HSE_PYTHON_EXPERIMENTAL
+# ifdef HSE_PYTHON_EXPERIMENTAL
 class KvsPfxProbeCnt(Enum):
     """
     @SUB@ hse.KvsPfxProbeCnt.__doc__
@@ -126,7 +138,8 @@ class KvsPfxProbeCnt(Enum):
     ZERO = ...
     ONE = ...
     MUL = ...
-#endif
+
+# endif
 
 class Kvs:
     def close(self) -> None:
@@ -171,7 +184,7 @@ class Kvs:
         @SUB@ hse.Kvs.prefix_delete.__doc__
         """
         ...
-#ifdef HSE_PYTHON_EXPERIMENTAL
+    # ifdef HSE_PYTHON_EXPERIMENTAL
     def prefix_probe(
         self,
         pfx: Union[str, bytes],
@@ -180,10 +193,10 @@ class Kvs:
         txn: Optional[KvdbTransaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
         """
-        @SUB@ hse.prefix_probe.__doc__
+        @SUB@ hse.Kvs.prefix_probe.__doc__
         """
         ...
-#endif
+    # endif
     def cursor(
         self,
         filt: Optional[Union[str, bytes]] = ...,
@@ -247,6 +260,12 @@ class KvsCursor:
         exc_val: Optional[Any],
         exc_tb: Optional[TracebackType],
     ) -> None: ...
+    @property
+    def eof(self) -> bool:
+        """
+        @SUB@ hse.KvsCursor.eof.__doc__
+        """
+        ...
     def destroy(self) -> None:
         """
         @SUB@ hse.KvsCursor.destroy.__doc__
@@ -257,12 +276,17 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.items.__doc__
         """
         ...
+    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
+        """
+        @SUB@ hse.KvsCursor.read.__doc__
+        """
+        ...
     def update_view(
         self,
         txn: Optional[KvdbTransaction] = ...,
     ) -> None:
         """
-        @SUB@ hse.KvsCursor.update.__doc__
+        @SUB@ hse.KvsCursor.update_view.__doc__
         """
         ...
     def seek(self, key: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
@@ -279,19 +303,8 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.seek_range.__doc__
         """
         ...
-    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
-        """
-        @SUB@ hse.KvsCursor.read.__doc__
-        """
-        ...
-    @property
-    def eof(self) -> bool:
-        """
-        @SUB@ hse.KvsCursor.eof.__doc__
-        """
-        ...
 
-#ifdef HSE_PYTHON_EXPERIMENTAL
+# ifdef HSE_PYTHON_EXPERIMENTAL
 class KvdbCompactStatus:
     """
     @SUB@ hse.KvdbCompactStatus.__doc__
@@ -327,7 +340,8 @@ class KvdbCompactStatus:
         @SUB@ hse.KvdbCompactStatus.canceled.__doc__
         """
         ...
-#endif
+
+# endif
 
 class KvdbStorageInfo:
     """
