@@ -6,7 +6,12 @@
 
 import argparse
 import pathlib
+import re
 import sys
+
+
+IFDEF_RE = re.compile(r"#\W+ifdef\W+HSE_PYTHON_EXPERIMENTAL")
+ENDIF_RE = re.compile(r"#\W+endif")
 
 
 def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool = False):
@@ -14,9 +19,9 @@ def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool = Fa
     with open(output, "w") as out:
         while lines:
             line = lines.pop(0)
-            if line.strip() == "#ifdef HSE_PYTHON_EXPERIMENTAL":
+            if IFDEF_RE.match(line.strip()):
                 line = lines.pop(0)
-                while line.strip() != "#endif":
+                while ENDIF_RE.match(line.strip()):
                     if experimental:
                         out.write(line)
                     else:
