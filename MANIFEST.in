@@ -1,4 +1,4 @@
-include hse/py.typed
+include hse2/py.typed
 # Remove the following line when we support only platforms with setuptools >= 42.0.0 by default
 include LICENSE
 # Remove the following line when we support only platforms with setuptools >= 43.0.0 by default

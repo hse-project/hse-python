@@ -6,11 +6,10 @@ import os
 import pathlib
 from typing import Any, Dict, List, Type
 from setuptools import Command, find_packages, setup, Extension
-from setuptools.extension import Library
 
 
 HERE = pathlib.Path(__file__).parent
-HSE_PACKAGE = HERE / "hse2"
+HSE_PACKAGE = pathlib.Path("hse2")
 
 
 # Distribute the generated C source files so that consumers don't necessarily
@@ -23,7 +22,6 @@ COMPILE_TIME_ENV = {
     "HSE_PYTHON_DEBUG": bool(os.environ.get("HSE_PYTHON_DEBUG", 0)),
     "HSE_PYTHON_EXPERIMENTAL": bool(os.environ.get("HSE_PYTHON_EXPERIMENTAL", 0)),
 }
-
 
 extensions: List[Extension] = [
     Extension(
@@ -136,6 +134,7 @@ setup(
     packages=find_packages(),
     cmdclass=cmdclass,
     package_data={"hse2": ["*.pyi", "py.typed"]},
+    include_package_data=True,
     exclude_package_data={"hse2": ["*.in.pyi", "*.pp"]},
     zip_safe=False,
     keywords=[

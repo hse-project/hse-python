@@ -73,7 +73,7 @@ hse_dep = dependency(
     default_options: [
         'cli=false',
         'tests=false',
-        'tools=false',
+        'tools=disabled',
         'samples=false',
         'bindings=none',
         'db_bench=false',
