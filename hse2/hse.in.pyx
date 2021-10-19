@@ -112,9 +112,6 @@ cdef class Kvdb:
         if err != 0:
             raise HseException(err)
 
-    def __dealloc__(self):
-        self.close()
-
     def close(self) -> None:
         """
         @SUB@ hse.Kvdb.close.__doc__
@@ -331,9 +328,6 @@ cdef class Kvs:
             free(paramv)
         if err != 0:
             raise HseException(err)
-
-    def __dealloc__(self):
-        self.close()
 
     def close(self) -> None:
         """
@@ -675,7 +669,10 @@ cdef class KvsCursor:
             raise HseException(err)
 
     def __dealloc__(self):
-        self.destroy()
+        if self._c_hse_kvs_cursor:
+            with nogil:
+                hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
+            self._c_hse_kvs_cursor = NULL
 
     def __enter__(self):
         return self
