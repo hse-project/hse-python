@@ -1,7 +1,7 @@
 # Do not use this until mesonpep517 improves
 [project]
 name = "hse-python" # https://gitlab.com/thiblahute/mesonpep517/-/issues/16
-version = "2.0.0"
+version = "2.0.1"
 description = "HSE is a fast embeddable key-value store designed for SSDs and persistent memory."
 maintainers = [
 	{ name = "Micron HSE", email = "hse@micron.com" },
