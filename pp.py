@@ -21,11 +21,9 @@ def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool = Fa
             line = lines.pop(0)
             if IFDEF_RE.match(line.strip()):
                 line = lines.pop(0)
-                while ENDIF_RE.match(line.strip()):
+                while not ENDIF_RE.match(line.strip()):
                     if experimental:
                         out.write(line)
-                    else:
-                        pass
                     line = lines.pop(0)
             else:
                 out.write(line)
