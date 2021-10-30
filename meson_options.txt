@@ -1,4 +1,4 @@
-option('experimental', type: 'boolean', value: true,
+option('experimental', type: 'boolean', value: true, yield: true,
     description: 'Enable support for the experimental API')
-option('tests', type: 'boolean', value: true,
+option('tests', type: 'boolean', value: true, yield: true,
     description: 'Build tests')
