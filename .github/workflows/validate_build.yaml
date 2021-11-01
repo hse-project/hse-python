@@ -28,7 +28,7 @@ jobs:
         source venv/bin/activate
         meson builddir -Dwerror=true
         ninja -C builddir
-        meson test -C builddir --print-errorlogs --no-stdsplit
+        meson test -C builddir --print-errorlogs --no-stdsplit --suite hse-python
 
     - uses: actions/upload-artifact@v2
       if: failure()

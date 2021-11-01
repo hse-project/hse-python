@@ -6,9 +6,9 @@ project(
         'prefix=/opt/hse',
         'buildtype=debugoptimized',
         'warning_level=2',
-		# Meson for whatever reason chooses not to respect HSE's default
-		# options :).
-		'force_fallback_for=xxhash,lz4,cjson',
+        # Meson for whatever reason chooses not to respect HSE's default
+        # options :).
+        'force_fallback_for=xxhash,lz4,cjson',
     ],
     meson_version: '>=0.57',
 )
@@ -72,12 +72,10 @@ hse_dep = dependency(
     fallback: ['hse', 'hse_dep'],
     default_options: [
         'cli=false',
-        'tests=false',
         'tools=disabled',
         'samples=false',
         'bindings=none',
         'db_bench=false',
-        'experimental=@0@'.format(get_option('experimental')),
     ],
 )
 
