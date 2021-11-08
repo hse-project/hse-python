@@ -35,6 +35,28 @@ python = pymod.find_installation(
     ],
 )
 
+black = find_program('black')
+if black.found()
+    black_command = [
+        black,
+        meson.project_source_root(),
+    ]
+
+    run_target(
+        'format',
+        command: black_command
+    )
+
+    run_target(
+        'format-check',
+        command: [
+            black_command,
+            '--check',
+            '--diff',
+        ]
+    )
+endif
+
 # Exported for usage in hse.
 project_build_root = meson.project_build_root()
 
