@@ -35,33 +35,6 @@ python = pymod.find_installation(
     ],
 )
 
-build_number_result = run_command(
-    'sh',
-    '-c',
-    '[ -n "$BUILD_NUMBER" ]'
-)
-in_ci = build_number_result.returncode() == 0
-
-black = find_program('black', required: in_ci)
-if black.found()
-    black_command = [
-        black,
-        meson.project_source_root(),
-    ]
-
-    if in_ci
-        black_command += [
-            '--check',
-            '--diff',
-        ]
-    endif
-
-    run_target(
-        'black',
-        command: black_command,
-    )
-endif
-
 # Exported for usage in hse.
 project_build_root = meson.project_build_root()
 
