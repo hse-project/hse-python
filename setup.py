@@ -122,7 +122,7 @@ if USE_CYTHON:
 
 setup(
     name="hse2",
-    version="2.0.1",
+    version="2.0.2",
     maintainer="Micron HSE",
     maintainer_email="hse@micron.com",
     description="HSE is a fast embeddable key-value store designed for SSDs and persistent memory.",
