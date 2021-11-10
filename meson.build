@@ -72,6 +72,7 @@ hse_dep = dependency(
     fallback: ['hse', 'hse_dep'],
     default_options: [
         'cli=false',
+        'tests=false',
         'tools=disabled',
         'samples=false',
         'bindings=none',
