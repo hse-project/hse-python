@@ -40,14 +40,31 @@ cdef extern from "hse/types.h":
         HSE_KVDB_TXN_COMMITTED,
         HSE_KVDB_TXN_ABORTED
 
-    IF HSE_PYTHON_EXPERIMENTAL == 1:
-        cdef struct hse_kvdb_compact_status:
-            unsigned int kvcs_samp_lwm
-            unsigned int kvcs_samp_hwm
-            unsigned int kvcs_samp_curr
-            unsigned int kvcs_active
-            unsigned int kvcs_canceled
 
+cdef extern from "hse/experimental.h":
+    hse_err_t hse_kvs_prefix_probe(
+        hse_kvs *kvs,
+        unsigned int flags,
+        hse_kvdb_txn *txn,
+        const void *pfx,
+        size_t pfx_len,
+        hse_kvs_pfx_probe_cnt *found,
+        void *keybuf,
+        size_t keybuf_sz,
+        size_t *key_len,
+        void *valbuf,
+        size_t valbuf_sz,
+        size_t *val_len) nogil
+    cdef struct hse_kvdb_compact_status:
+        unsigned int kvcs_samp_lwm
+        unsigned int kvcs_samp_hwm
+        unsigned int kvcs_samp_curr
+        unsigned int kvcs_active
+        unsigned int kvcs_canceled
+    cdef enum hse_kvs_pfx_probe_cnt:
+        HSE_KVS_PFX_FOUND_ZERO,
+        HSE_KVS_PFX_FOUND_ONE,
+        HSE_KVS_PFX_FOUND_MUL
     cdef struct hse_kvdb_storage_info:
         uint64_t total_bytes
         uint64_t available_bytes
@@ -55,13 +72,9 @@ cdef extern from "hse/types.h":
         uint64_t used_bytes
         char capacity_path[4096]
         char staging_path[4096]
-
-    IF HSE_PYTHON_EXPERIMENTAL == 1:
-        cdef enum hse_kvs_pfx_probe_cnt:
-            HSE_KVS_PFX_FOUND_ZERO,
-            HSE_KVS_PFX_FOUND_ONE,
-            HSE_KVS_PFX_FOUND_MUL
-
+    hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
+    hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
+    hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
 
 cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
@@ -116,30 +129,11 @@ cdef extern from "hse/hse.h":
         hse_kvdb_txn *txn,
         const void *pfx,
         size_t pfx_len) nogil
-    IF HSE_PYTHON_EXPERIMENTAL == 1:
-        hse_err_t hse_kvs_prefix_probe(
-            hse_kvs *kvs,
-            unsigned int flags,
-            hse_kvdb_txn *txn,
-            const void *pfx,
-            size_t pfx_len,
-            hse_kvs_pfx_probe_cnt *found,
-            void *keybuf,
-            size_t keybuf_sz,
-            size_t *key_len,
-            void *valbuf,
-            size_t valbuf_sz,
-            size_t *val_len) nogil
 
     cdef unsigned int HSE_KVDB_SYNC_ASYNC
 
     hse_err_t hse_kvdb_sync(hse_kvdb *kvdb, unsigned int flags) nogil
 
-    IF HSE_PYTHON_EXPERIMENTAL == 1:
-        hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
-        hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
-
-        hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
     hse_err_t hse_kvdb_storage_add(const char *kvdb_home, size_t paramc, const char *const *paramv) nogil
 
     hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil

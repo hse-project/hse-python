@@ -59,11 +59,6 @@ modules = [
     'version',
 ]
 
-module_c_args = []
-if get_option('experimental')
-    module_c_args += '-DHSE_EXPERIMENTAL'
-endif
-
 pxds = []
 foreach m : modules
     # HACK: cython needs pxds next to pyxs for whatever reason
@@ -162,7 +157,6 @@ foreach m : modules
     extension_module = python.extension_module(
         '@0@'.format(m),
         [c, init_py, py_typed, pyi],
-        c_args: module_c_args,
         dependencies: [
             hse_dep,
             python.dependency(),
