@@ -49,7 +49,11 @@ def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
         (Key("key1"), Value("value")),
     ],
 )
-def test_key_operations(kvs: hse.Kvs, key: Union[str, bytes, SupportsBytes], value: Union[str, bytes, SupportsBytes]):
+def test_key_operations(
+    kvs: hse.Kvs,
+    key: Union[str, bytes, SupportsBytes],
+    value: Union[str, bytes, SupportsBytes],
+):
     kvs.put(key, value)
     assert kvs.get(key)[0] == b"value"
 
@@ -122,3 +126,16 @@ def test_none_delete(kvs: hse.Kvs):
 @pytest.mark.xfail(strict=True)
 def test_none_prefix_delete(kvs: hse.Kvs):
     kvs.prefix_delete(None)  # type: ignore
+
+
+def test_param(kvs: hse.Kvs):
+    assert kvs.param("transactions.enabled") == "false"
+
+
+@pytest.mark.xfail(strict=True)
+def test_bad_param(kvs: hse.Kvs):
+    kvs.param("this-does-not-exist")
+
+
+def test_name(kvs: hse.Kvs):
+    assert kvs.name == "kvs-test"

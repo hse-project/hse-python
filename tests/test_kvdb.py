@@ -2,10 +2,11 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-from hse2 import hse
-import pytest
-from typing import Generator
 import errno
+import pathlib
+import pytest
+from hse2 import hse
+from typing import Generator
 
 
 @pytest.fixture(scope="module")
@@ -29,6 +30,31 @@ def test_sync(kvdb: hse.Kvdb):
     kvdb.sync()
 
 
+def test_param(kvdb: hse.Kvdb):
+    assert kvdb.param("throttling.init_policy") == '"default"'
+
+
+@pytest.mark.xfail(strict=True)
+def test_bad_param(kvdb: hse.Kvdb):
+    kvdb.param("this-does-not-exist")
+
+
+def test_home(kvdb: hse.Kvdb, home: pathlib.Path):
+    assert kvdb.home == home
+
+
+def test_mclass_info(kvdb: hse.Kvdb):
+    for mclass in hse.Mclass:
+        if mclass is hse.Mclass.CAPACITY:
+            kvdb.mclass_info(mclass)
+        else:
+            try:
+                kvdb.mclass_info(mclass)
+                assert False
+            except hse.HseException as e:
+                assert e.returncode == errno.ENOENT
+
+
 @pytest.mark.skip(reason="Hard to control when compaction occurs")
 def test_compact(kvdb: hse.Kvdb, kvs: hse.Kvs):
     for i in range(1000):
@@ -36,6 +62,12 @@ def test_compact(kvdb: hse.Kvdb, kvs: hse.Kvs):
     kvdb.compact()
     status = kvdb.compact_status
     assert status.active
-    kvdb.compact(cancel=True)
+    kvdb.compact(flags=hse.KvdbCompactFlag.CANCEL)
     status = kvdb.compact_status
     assert status.canceled
+
+
+def test_mclass():
+    assert str(hse.Mclass.CAPACITY) == "capacity"
+    assert str(hse.Mclass.STAGING) == "staging"
+    assert str(hse.Mclass.PMEM) == "pmem"

@@ -3,7 +3,8 @@
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 import os
-from enum import Enum, IntFlag
+import pathlib
+from enum import Enum, IntFlag, unique
 from types import TracebackType
 from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Union
 
@@ -19,6 +20,12 @@ def fini() -> None:
     """
     ...
 
+def param(param: str) -> str:
+    """
+    @SUB@ hse.param.__doc__
+    """
+    ...
+
 class HseException(Exception):
     """
     @SUB@ hse.HseException.__doc__
@@ -27,12 +34,34 @@ class HseException(Exception):
     returncode: int
     def __init__(self, returncode: int) -> None: ...
 
+@unique
 class KvdbSyncFlag(IntFlag):
     """
     @SUB@ hse.KvdbSyncFlag.__doc__
     """
 
     ASYNC = ...
+
+# ifdef HSE_PYTHON_EXPERIMENTAL
+@unique
+class KvdbCompactFlag(IntFlag):
+    """
+    @SUB@ hse.KvdbCompactFlag.__doc__
+    """
+
+    CANCEL = ...
+    SAMP_LWM = ...
+
+# endif
+@unique
+class Mclass(Enum):
+    """
+    @SUB@ hse.Mclass.__doc__
+    """
+
+    CAPACITY = ...
+    STAGING = ...
+    PMEM = ...
 
 class Kvdb:
     def close(self) -> None:
@@ -56,6 +85,17 @@ class Kvdb:
     def open(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> Kvdb:
         """
         @SUB@ hse.Kvdb.open.__doc__
+        """
+        ...
+    @property
+    def home(self) -> pathlib.Path:
+        """
+        @SUB@ hse.Kvdb.home.__doc__
+        """
+        ...
+    def param(self, param: str) -> str:
+        """
+        @SUB@ hse.Kvdb.param.__doc__
         """
         ...
     @property
@@ -84,8 +124,13 @@ class Kvdb:
         @SUB@ hse.Kvdb.sync.__doc__
         """
         ...
+    def mclass_info(self, mclass: Mclass) -> MclassInfo:
+        """
+        @SUB@ hse.Kvdb.mclass_info.__doc__
+        """
+        ...
     # ifdef HSE_PYTHON_EXPERIMENTAL
-    def compact(self, cancel: bool = ..., samp_lwm: bool = ...) -> None:
+    def compact(self, flags: Optional[KvdbCompactFlag] = ...) -> None:
         """
         @SUB@ hse.Kvdb.compact.__doc__
         """
@@ -94,12 +139,6 @@ class Kvdb:
     def compact_status(self) -> KvdbCompactStatus:
         """
         @SUB@ hse.Kvdb.compact_status.__doc__
-        """
-        ...
-    @property
-    def storage_info(self) -> KvdbStorageInfo:
-        """
-        @SUB@ hse.Kvdb.storage_info.__doc__
         """
         ...
     # endif
@@ -142,6 +181,17 @@ class KvsPfxProbeCnt(Enum):
 # endif
 
 class Kvs:
+    @property
+    def name(self) -> str:
+        """
+        @SUB@ hse.Kvs.name.__doc__
+        """
+        ...
+    def param(self, param: str) -> str:
+        """
+        @SUB@ hse.Kvs.param.__doc__
+        """
+        ...
     def close(self) -> None:
         """
         @SUB@ hse.Kvs.close.__doc__
@@ -343,32 +393,25 @@ class KvdbCompactStatus:
 
 # endif
 
-class KvdbStorageInfo:
+class MclassInfo:
     """
-    @SUB@ hse.KvdbStorageInfo.__doc__
+    @SUB@ hse.MclassInfo.__doc__
     """
 
     @property
-    def total_bytes(self) -> int:
-        """
-        @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
-        """
-        ...
-    @property
-    def available_bytes(self) -> int:
-        """
-        @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
-        """
-        ...
-    @property
     def allocated_bytes(self) -> int:
         """
-        @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
+        @SUB@ hse.MclassInfo.allocated_bytes.__doc__
         """
         ...
     @property
     def used_bytes(self) -> int:
         """
-        @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
+        @SUB@ hse.MclassInfo.used_bytes.__doc__
         """
         ...
+    @property
+    def path(self) -> pathlib.Path:
+        """
+        @SUB@ hse.MclassInfo.path.__doc__
+        """

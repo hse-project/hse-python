@@ -4,6 +4,7 @@
 
 import errno
 import os
+import pathlib
 cimport cython
 cimport limits
 from enum import Enum, IntFlag, unique
@@ -67,6 +68,33 @@ def fini() -> None:
     hse_fini()
 
 
+def param(str param) -> str:
+    """
+    @SUB@ hse.param.__doc__
+    """
+    param_bytes = param.encode() if param else None
+    cdef const char *param_addr = <char *>param_bytes
+    cdef char *buf = NULL
+    cdef size_t needed_sz = 0
+
+    cdef hse_err_t err = 0
+    with nogil:
+        err = hse_param_get(param_addr, NULL, 0, &needed_sz)
+        if err == 0:
+            buf = <char *>malloc(needed_sz + 1)
+            if not buf:
+                raise MemoryError()
+            err = hse_param_get(param_addr, buf, needed_sz + 1, NULL)
+
+    try:
+        if err != 0:
+            raise HseException(err)
+
+        return buf.decode()
+    finally:
+        free(buf)
+
+
 class HseException(Exception):
     """
     @SUB@ hse.HseException.__doc__
@@ -98,6 +126,19 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
         SAMP_LWM = HSE_KVDB_COMPACT_SAMP_LWM
 
 
+@unique
+class Mclass(Enum):
+    """
+    @SUB@ hse.Mclass.__doc__
+    """
+    CAPACITY = HSE_MCLASS_CAPACITY
+    STAGING = HSE_MCLASS_STAGING
+    PMEM = HSE_MCLASS_PMEM
+
+    def __str__(self) -> str:
+        return hse_mclass_name_get(self.value).decode()
+
+
 cdef class Kvdb:
     def __cinit__(self, kvdb_home: Union[str, os.PathLike[str]], *params: str):
         self._c_hse_kvdb = NULL
@@ -107,10 +148,16 @@ cdef class Kvdb:
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
         err = hse_kvdb_open(kvdb_home_addr, len(params), <const char * const*>paramv, &self._c_hse_kvdb)
-        if paramv:
-            free(paramv)
+        free(paramv)
         if err != 0:
             raise HseException(err)
+
+    @property
+    def home(self) -> pathlib.Path:
+        """
+        @SUB@ hse.Kvdb.home.__doc__
+        """
+        return pathlib.Path(hse_kvdb_home_get(self._c_hse_kvdb).decode())
 
     def close(self) -> None:
         """
@@ -134,8 +181,7 @@ cdef class Kvdb:
         cdef char **paramv = to_paramv(params) if len(params) > 0 else NULL
 
         cdef hse_err_t err = hse_kvdb_create(kvdb_home_addr, len(params), <const char * const*>paramv)
-        if paramv:
-            free(paramv)
+        free(paramv)
         if err != 0:
             raise HseException(err)
 
@@ -161,7 +207,7 @@ cdef class Kvdb:
     @property
     def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb._kvs_names.__doc__
+        @SUB@ hse.Kvdb.kvs_names.__doc__
         """
         cdef size_t namec = 0
         cdef char **namev = NULL
@@ -188,8 +234,7 @@ cdef class Kvdb:
         cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv)
-        if paramv:
-            free(paramv)
+        free(paramv)
         if err != 0:
             raise HseException(err)
 
@@ -207,6 +252,32 @@ cdef class Kvdb:
         """
         return Kvs(self, kvs_name, *params)
 
+    def param(self, str param) -> str:
+        """
+        @SUB@ hse.Kvdb.param.__doc__
+        """
+        param_bytes = param.encode() if param else None
+        cdef const char *param_addr = <char *>param_bytes
+        cdef char *buf = NULL
+        cdef size_t needed_sz = 0
+
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvdb_param_get(self._c_hse_kvdb, param_addr, NULL, 0, &needed_sz)
+            if err == 0:
+                buf = <char *>malloc(needed_sz + 1)
+                if not buf:
+                    raise MemoryError()
+                err = hse_kvdb_param_get(self._c_hse_kvdb, param_addr, buf, needed_sz + 1, NULL)
+
+        try:
+            if err != 0:
+                raise HseException(err)
+
+            return buf.decode()
+        finally:
+            free(buf)
+
     def sync(self, flags: Optional[KvdbSyncFlag] = None) -> None:
         """
         @SUB@ hse.Kvdb.sync.__doc__
@@ -217,6 +288,21 @@ cdef class Kvdb:
             err = hse_kvdb_sync(self._c_hse_kvdb, cflags)
         if err != 0:
             raise HseException(err)
+
+    def mclass_info(self, mclass: Mclass) -> MclassInfo:
+        """
+        @SUB@ hse.Kvdb.mclass_info.__doc__
+        """
+        info = MclassInfo()
+        cdef hse_err_t err = 0
+        cdef hse_mclass value = mclass.value
+        with nogil:
+            err = hse_kvdb_mclass_info_get(
+                self._c_hse_kvdb, value, &info._c_hse_mclass_info)
+        if err != 0:
+            raise HseException(err)
+
+        return info
 
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         def compact(self, flags: Optional[KvdbCompactFlag] = None) -> None:
@@ -244,20 +330,6 @@ cdef class Kvdb:
                 raise HseException(err)
             return status
 
-    IF HSE_PYTHON_EXPERIMENTAL == 1:
-        @property
-        def storage_info(self) -> KvdbStorageInfo:
-            """
-            @SUB@ hse.Kvdb.storage_info.__doc__
-            """
-            info: KvdbStorageInfo = KvdbStorageInfo()
-            cdef hse_err_t err = 0
-            with nogil:
-                err = hse_kvdb_storage_info_get(self._c_hse_kvdb, &info._c_hse_kvdb_storage_info)
-            if err != 0:
-                raise HseException(err)
-            return info
-
     @staticmethod
     def storage_add(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
@@ -272,8 +344,7 @@ cdef class Kvdb:
         with nogil:
             err = hse_kvdb_storage_add(kvdb_home_addr, paramc, <const char * const*>paramv)
 
-        if paramv:
-            free(paramv)
+        free(paramv)
         if err != 0:
             raise HseException(err)
 
@@ -324,10 +395,16 @@ cdef class Kvs:
 
         cdef hse_err_t err = hse_kvdb_kvs_open(kvdb._c_hse_kvdb, name_addr, len(params),
             <const char * const*>paramv, &self._c_hse_kvs)
-        if paramv:
-            free(paramv)
+        free(paramv)
         if err != 0:
             raise HseException(err)
+
+    @property
+    def name(self) -> str:
+        """
+        @SUB@ hse.Kvs.name.__doc__
+        """
+        return hse_kvs_name_get(self._c_hse_kvs).decode()
 
     def close(self) -> None:
         """
@@ -340,6 +417,32 @@ cdef class Kvs:
         if err != 0:
             raise HseException(err)
         self._c_hse_kvs = NULL
+
+    def param(self, str param) -> str:
+        """
+        @SUB@ hse.Kvs.param.__doc__
+        """
+        param_bytes = param.encode() if param else None
+        cdef const char *param_addr = <char *>param_bytes
+        cdef char *buf = NULL
+        cdef size_t needed_sz = 0
+
+        cdef hse_err_t err = 0
+        with nogil:
+            err = hse_kvs_param_get(self._c_hse_kvs, param_addr, NULL, 0, &needed_sz)
+            if err == 0:
+                buf = <char *>malloc(needed_sz + 1)
+                if not buf:
+                    raise MemoryError()
+                err = hse_kvs_param_get(self._c_hse_kvs, param_addr, buf, needed_sz + 1, NULL)
+
+        try:
+            if err != 0:
+                raise HseException(err)
+
+            return buf.decode()
+        finally:
+            free(buf)
 
     def put(
             self,
@@ -868,37 +971,3 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
             @SUB@ hse.KvdbCompactStatus.canceled.__doc__
             """
             return self._c_hse_kvdb_compact_status.kvcs_canceled
-
-
-IF HSE_PYTHON_EXPERIMENTAL == 1:
-    cdef class KvdbStorageInfo:
-        """
-        @SUB@ hse.KvdbStorageInfo.__doc__
-        """
-        @property
-        def total_bytes(self) -> int:
-            """
-            @SUB@ hse.KvdbStorageInfo.total_bytes.__doc__
-            """
-            return self._c_hse_kvdb_storage_info.total_bytes
-
-        @property
-        def available_bytes(self) -> int:
-            """
-            @SUB@ hse.KvdbStorageInfo.available_bytes.__doc__
-            """
-            return self._c_hse_kvdb_storage_info.available_bytes
-
-        @property
-        def allocated_bytes(self) -> int:
-            """
-            @SUB@ hse.KvdbStorageInfo.allocated_bytes.__doc__
-            """
-            return self._c_hse_kvdb_storage_info.allocated_bytes
-
-        @property
-        def used_bytes(self) -> int:
-            """
-            @SUB@ hse.KvdbStorageInfo.used_bytes.__doc__
-            """
-            return self._c_hse_kvdb_storage_info.used_bytes
