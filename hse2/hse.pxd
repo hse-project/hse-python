@@ -25,12 +25,31 @@ cdef extern from "hse/flags.h":
 
 cdef extern from "hse/types.h":
     ctypedef uint64_t hse_err_t
+
     cdef struct hse_kvdb:
         pass
+
+    cdef enum hse_mclass:
+        HSE_MCLASS_CAPACITY
+        HSE_MCLASS_STAGING
+        HSE_MCLASS_PMEM
+
+    cdef const char *HSE_MCLASS_CAPACITY_NAME
+    cdef const char *HSE_MCLASS_STAGING_NAME
+    cdef const char *HSE_MCLASS_PMEM_NAME
+
+    cdef struct hse_mclass_info:
+        uint64_t mi_allocated_bytes;
+        uint64_t mi_used_bytes
+        uint64_t mi_reserved[8]
+        char mi_path[PATH_MAX]
+
     cdef struct hse_kvs:
         pass
+
     cdef struct hse_kvs_cursor:
         pass
+
     cdef struct hse_kvdb_txn:
         pass
 
@@ -66,16 +85,8 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
             HSE_KVS_PFX_FOUND_ZERO,
             HSE_KVS_PFX_FOUND_ONE,
             HSE_KVS_PFX_FOUND_MUL
-        cdef struct hse_kvdb_storage_info:
-            uint64_t total_bytes
-            uint64_t available_bytes
-            uint64_t allocated_bytes
-            uint64_t used_bytes
-            char capacity_path[4096]
-            char staging_path[4096]
         hse_err_t hse_kvdb_compact(hse_kvdb *kvdb, int flags) nogil
         hse_err_t hse_kvdb_compact_status_get(hse_kvdb *kvdb, hse_kvdb_compact_status *status) nogil
-        hse_err_t hse_kvdb_storage_info_get(hse_kvdb *kvdb, hse_kvdb_storage_info *info) nogil
 
 cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
@@ -83,13 +94,22 @@ cdef extern from "hse/hse.h":
 
     hse_err_t hse_init(const char *config, size_t paramc, const char *const *paramv)
     void hse_fini()
+    hse_err_t hse_param_get(const char *param, char *buf, size_t buf_sz, size_t *needed_sz) nogil
 
     hse_err_t hse_kvdb_create(const char *kvdb_home, size_t paramc, const char *const *paramv)
     hse_err_t hse_kvdb_drop(const char *kvdb_home)
     hse_err_t hse_kvdb_open(const char *kvdb_home, size_t paramc, const char *const *, hse_kvdb **kvdb)
     hse_err_t hse_kvdb_close(hse_kvdb *kvdb)
+    const char *hse_kvdb_home_get(hse_kvdb *kvdb) nogil
+    hse_err_t hse_kvdb_param_get(
+        hse_kvdb *kvdb,
+        const char *param,
+        char *buf,
+        size_t buf_sz,
+        size_t *needed_sz) nogil
     hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
     void hse_kvdb_kvs_names_free(hse_kvdb *kvdb, char **namev) nogil
+    hse_err_t hse_kvdb_mclass_info_get(hse_kvdb *kvdb, hse_mclass mclass, hse_mclass_info *info) nogil
     hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, const char *const *)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(
@@ -99,7 +119,15 @@ cdef extern from "hse/hse.h":
         const char *const *,
         hse_kvs **kvs_out)
     hse_err_t hse_kvdb_kvs_close(hse_kvs *kvs)
+    const char *hse_mclass_name_get(hse_mclass mclass) nogil
 
+    const char *hse_kvs_name_get(hse_kvs *kvs) nogil
+    hse_err_t hse_kvs_param_get(
+        hse_kvs *kvs,
+        const char *param,
+        char *buf,
+        size_t buf_sz,
+        size_t *needed_sz) nogil
     hse_err_t hse_kvs_put(
         hse_kvs *kvs,
         unsigned int flags,
@@ -198,10 +226,11 @@ cdef class KvsCursor:
     cdef hse_kvs_cursor *_c_hse_kvs_cursor
     cdef cbool _eof
 
+
+cdef class MclassInfo:
+    cdef hse_mclass_info _c_hse_mclass_info
+
+
 IF HSE_PYTHON_EXPERIMENTAL == 1:
     cdef class KvdbCompactStatus:
         cdef hse_kvdb_compact_status _c_hse_kvdb_compact_status
-
-IF HSE_PYTHON_EXPERIMENTAL == 1:
-    cdef class KvdbStorageInfo:
-        cdef hse_kvdb_storage_info _c_hse_kvdb_storage_info

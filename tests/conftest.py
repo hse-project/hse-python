@@ -19,27 +19,27 @@ def pytest_addoption(parser: Parser) -> None:
 
 
 def pytest_collection_modifyitems(config: Config, items: List[Function]):
-    if config.getoption("--experimental"): # type: ignore
+    if config.getoption("--experimental"):  # type: ignore
         return
     experimental = pytest.mark.skip(reason="need --experimental option to run")
     for item in items:
-        if "experimental" in item.keywords: # type: ignore
+        if "experimental" in item.keywords:  # type: ignore
             item.add_marker(experimental)
 
 
 @pytest.fixture(scope="package")
 def home(pytestconfig: Config) -> Generator[pathlib.Path, None, None]:
-    return pytestconfig.getoption("home") # type: ignore
+    return pytestconfig.getoption("home")  # type: ignore
 
 
 @pytest.fixture(scope="package")
 def config(pytestconfig: Config) -> Generator[pathlib.Path, None, None]:
-    return pytestconfig.getoption("config") # type: ignore
+    return pytestconfig.getoption("config")  # type: ignore
 
 
 @pytest.fixture(scope="package")
 def kvdb(home: pathlib.Path, config: pathlib.Path) -> Generator[hse.Kvdb, None, None]:
-    hse.init(config)
+    hse.init(config, "socket.enabled=false")
 
     try:
         hse.Kvdb.create(home)

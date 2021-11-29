@@ -30,6 +30,24 @@ result in undefined behavior unless HSE is re-initialized.
 This function is not thread safe.
 """
 
+[hse.param]
+__doc__ = """
+Get HSE global parameter.
+
+Puts the stringified bersion of the parameter value into the buffer.
+
+This function is thread safe.
+
+Args:
+    param: Parameter name.
+
+Returns:
+    str: Stringified version of the parameter value.
+
+Raises:
+    HseException: Underlying C function returned a non-zero value.
+"""
+
 [hse.HseException]
 __doc__ = """
 Raised when HSE encounters an error. Wrapper around ``hse_err_t``.
@@ -119,6 +137,16 @@ Raises:
     HseException: Underlying C function returned a non-zero value.
 """
 
+[hse.Kvdb.home]
+__doc__ = """
+Get the KVDB home.
+
+This function is thread safe.
+
+Returns:
+    pathlib.Path: KVDB home.
+"""
+
 [hse.Kvdb.kvs_names]
 __doc__ = """
 Get the names of the KVSs within the given KVDB.
@@ -126,8 +154,26 @@ Get the names of the KVSs within the given KVDB.
 Key-value stores (KVSs) are opened by name. This function allocates a vector
 of allocated strings.
 
+This function is thread safe.
+
 Returns:
     List[str]: List of KVS names.
+
+Raises:
+    HseException: Underlying C function returned a non-zero value.
+"""
+
+[hse.Kvdb.mclass_info]
+__doc__ = """
+Get media class information from a KVDB.
+
+This function is thread safe.
+
+Args:
+    mclass: Media class to query for.
+
+Returns:
+    MclassInfo: Media class information.
 
 Raises:
     HseException: Underlying C function returned a non-zero value.
@@ -150,6 +196,24 @@ Raises:
     HseException: Underlying C function returned a non-zero value.
 """
 
+[hse.Kvdb.param]
+__doc__ = """
+Get KVDB parameter.
+
+Puts the stringified bersion of the parameter value into the buffer.
+
+This function is thread safe.
+
+Args:
+    param: Parameter name.
+
+Returns:
+    str: Stringified version of the parameter value.
+
+Raises:
+    HseException: Underlying C function returned a non-zero value.
+"""
+
 [hse.Kvdb.storage_add]
 __doc__ = """
 Add a new media class storage to an existing offline KVDB.
@@ -159,21 +223,6 @@ This function is not thread safe.
 Args:
     kvdb_home: KVDB home directory.
     params: List of parameters in key=value format.
-
-Raises:
-    HseException: Underlying C function returned a non-zero value.
-"""
-
-[hse.Kvdb.storage_info]
-__doc__ = """
-Get KVDB storage stats.
-
-Obtain the space usage statistics for a specified kvdb.
-
-This function is thread safe.
-
-Returns:
-    KvdbStorageInfo: KVDB storage config and stats.
 
 Raises:
     HseException: Underlying C function returned a non-zero value.
@@ -290,6 +339,34 @@ Args:
 
 Returns:
     tuple: Value and length of the value.
+
+Raises:
+    HseException: Underlying C function returned a non-zero value.
+"""
+
+[hse.Kvs.name]
+__doc__ = """
+Get the name of a KVS.
+
+This function is thread safe.
+
+Returns:
+    str: Name of the KVS.
+"""
+
+[hse.Kvs.param]
+__doc__ = """
+Get KVS parameter.
+
+Puts the stringified bersion of the parameter value into the buffer.
+
+This function is thread safe.
+
+Args:
+    param: Parameter name.
+
+Returns:
+    str: Stringified version of the parameter value.
 
 Raises:
     HseException: Underlying C function returned a non-zero value.
@@ -743,29 +820,34 @@ __doc__ = """
 was an externally requested compaction canceled.
 """
 
-[hse.KvdbStorageInfo]
+[hse.Mclass]
 __doc__ = """
-Storage information for a KVDB.
+Media class types.
+
+Attributes:
+    CAPACITY: Capacity media class.
+    STAGING: Staging media class.
+    PMEM: PMEM media class.
 """
 
-[hse.KvdbStorageInfo.total_bytes]
+[hse.MclassInfo]
 __doc__ = """
-total space in the file-system containing this kvdb.
+Media class information.
 """
 
-[hse.KvdbStorageInfo.available_bytes]
+[hse.MclassInfo.allocated_bytes]
 __doc__ = """
-available space in the file-system containing this kvdb.
+Allocated storage space for a media class.
 """
 
-[hse.KvdbStorageInfo.allocated_bytes]
+[hse.MclassInfo.used_bytes]
 __doc__ = """
-allocated storage space for a kvdb.
+Used storage space for a media class.
 """
 
-[hse.KvdbStorageInfo.used_bytes]
+[hse.MclassInfo.path]
 __doc__ = """
-used storage space for a kvdb.
+Path to the media class.
 """
 
 [hse.KvsPfxProbeCnt]
@@ -798,4 +880,11 @@ Minor version of HSE.
 [hse.version.PATCH]
 __doc__ = """
 Patch version of HSE.
+"""
+
+# hse/experimental.h
+
+[hse.KvdbCompactFlag]
+__doc__ = """
+Kvdb.compact() flags.
 """

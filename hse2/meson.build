@@ -18,7 +18,8 @@ compiler_directives = [
 
 compile_time_env = [
     'HSE_PYTHON_DEBUG=@0@'.format(get_option('buildtype').startswith('debug').to_int()),
-    'HSE_PYTHON_EXPERIMENTAL=@0@'.format(get_option('experimental').to_int())
+    'HSE_PYTHON_EXPERIMENTAL=@0@'.format(get_option('experimental').to_int()),
+    'PATH_MAX=@0@'.format(cc.get_define('PATH_MAX', prefix: '#include <limits.h>')),
 ]
 
 extra_cython_args = []
