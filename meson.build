@@ -13,6 +13,10 @@ project(
     meson_version: '>=0.57',
 )
 
+sh = find_program('sh')
+
+ci = run_command(sh, '-c', '[ ${CI+x} ]').returncode() == 0
+
 version_components = meson.project_version().split('.')
 
 hse_python_major_version = version_components[0]
@@ -37,7 +41,7 @@ python = pymod.find_installation(
     ],
 )
 
-black = find_program('black')
+black = find_program('black', required: ci)
 if black.found()
     black_command = [
         black,
