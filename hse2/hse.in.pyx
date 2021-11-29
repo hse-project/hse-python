@@ -101,12 +101,12 @@ class HseException(Exception):
     """
     def __init__(self, hse_err_t returncode):
         self.returncode = hse_err_to_errno(returncode)
-        IF HSE_PYTHON_DEBUG != 0:
-            cdef char buf[256]
-            hse_strerror(returncode, buf, sizeof(buf))
-            self.message = buf.decode()
-        ELSE:
-            self.message = os.strerror(self.returncode)
+        cdef size_t needed_sz = 0
+        needed_sz = hse_strerror(returncode, NULL, 0)
+        cdef char *buf = <char *>malloc(needed_sz + 1)
+        hse_strerror(returncode, buf, needed_sz + 1)
+        self.message = buf.decode()
+        free(buf)
 
     def __str__(self):
         return self.message

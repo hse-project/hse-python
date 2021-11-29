@@ -19,7 +19,6 @@ HSE_PACKAGE = pathlib.Path("hse2")
 USE_CYTHON = bool(os.environ.get("USE_CYTHON", 0))
 SOURCE_EXTENSION = "pyx" if USE_CYTHON else "c"
 COMPILE_TIME_ENV = {
-    "HSE_PYTHON_DEBUG": bool(os.environ.get("HSE_PYTHON_DEBUG", 0)),
     "HSE_PYTHON_EXPERIMENTAL": bool(os.environ.get("HSE_PYTHON_EXPERIMENTAL", 0)),
 }
 
