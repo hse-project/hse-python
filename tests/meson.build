@@ -8,6 +8,7 @@ test_runner = find_program('test-runner')
 env = environment({
     'PYTHONPATH': meson.project_build_root(),
     'HSE_TEST_RUNNER_RUNNER': 'pytest',
+    'MESON_BUILD_ROOT': meson.project_build_root(),
 })
 
 wrapper = [
@@ -45,5 +46,5 @@ test(
         extension_modules,
         init_py,
     ],
-    timeout: 60
+    timeout: 120
 )
