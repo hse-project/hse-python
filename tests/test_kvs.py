@@ -2,10 +2,12 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-import errno
-from typing import Generator, SupportsBytes, Union
+import unittest
+
+from typing import SupportsBytes
+
+from common import ARGS, UNKNOWN, HseTestCase, kvdb_fixture, kvs_fixture
 from hse2 import hse
-import pytest
 
 
 class Key(SupportsBytes):
@@ -24,118 +26,107 @@ class Value(SupportsBytes):
         return self.__value.encode()
 
 
-@pytest.fixture(scope="module")
-def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
-    try:
-        kvdb.kvs_create("kvs-test", "prefix.length=3", "suffix.length=1")
-    except hse.HseException as e:
-        if e.returncode == errno.EEXIST:
-            pass
-        else:
-            raise e
-    kvs = kvdb.kvs_open("kvs-test")
+class KvsTests(HseTestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
 
-    yield kvs
+        cls.kvdb = kvdb_fixture()
+        cls.kvs = kvs_fixture(
+            cls.kvdb, "kvs", cparams=("prefix.length=3", "suffix.length=1")
+        )
 
-    kvs.close()
-    kvdb.kvs_drop("kvs-test")
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.kvs.close()
+        cls.kvdb.kvs_drop("kvs")
 
+        cls.kvdb.close()
+        hse.Kvdb.drop(ARGS.home)
 
-@pytest.mark.parametrize(
-    "key,value",
-    [
-        ("key1", "value"),
-        (b"key1", b"value"),
-        (Key("key1"), Value("value")),
-    ],
-)
-def test_key_operations(
-    kvs: hse.Kvs,
-    key: Union[str, bytes, SupportsBytes],
-    value: Union[str, bytes, SupportsBytes],
-):
-    kvs.put(key, value)
-    assert kvs.get(key)[0] == b"value"
+        return super().tearDownClass()
 
-    buf = bytearray(5)
-    assert kvs.get(key, buf=buf)[0] == b"value"
+    def test_basic_operations(self):
+        for key, value in (
+            ("key1", "value"),
+            (b"key1", b"value"),
+            (Key("key1"), Value("value")),
+        ):
+            with self.subTest(type=(type(key), type(value))):
+                self.kvs.put(key, value)
+                self.assertTupleEqual(self.kvs.get(key), (b"value", 5))
 
-    kvs.delete(key)
-    assert kvs.get(key)[0] == None
+                buf = bytearray(5)
+                self.assertTupleEqual(self.kvs.get(key, buf=buf), (b"value", 5))
 
+                self.kvs.delete(key)
+                self.assertTupleEqual(self.kvs.get(key), (None, 0))
 
-@pytest.mark.parametrize(
-    "pfx",
-    ["key", b"key"],
-)
-def test_prefix_delete(kvs: hse.Kvs, pfx: Union[str, bytes]):
-    for i in range(5):
-        kvs.put(f"key{i}", f"value{i}")
+    def test_prefix_delete(self):
+        for pfx in ("key", b"key"):
+            with self.subTest(type=type(pfx)):
+                for i in range(5):
+                    self.kvs.put(f"key{i}", f"value{i}")
 
-    kvs.prefix_delete(pfx)
+                self.kvs.prefix_delete(pfx)
 
-    for i in range(5):
-        assert kvs.get(f"key{i}")[0] == None
+                for i in range(5):
+                    self.assertIsNone(self.kvs.get(f"key{i}")[0])
 
+    @unittest.skipUnless(ARGS.experimental, "Kvs.prefix_probe() is experimental")
+    def test_prefix_probe(self):
+        for pfx1, pfx2 in (("key", "abc"), (b"key", b"abc")):
+            with self.subTest(type=type(pfx1)):
+                self.kvs.put(b"key1", b"value1")
+                self.kvs.put(b"abc1", b"value1")
+                self.kvs.put(b"abc2", b"value2")
 
-def test_get_with_length(kvs: hse.Kvs):
-    kvs.put(b"key1", b"value")
-    assert kvs.get(b"key1") == (b"value", 5)
-    assert kvs.get(b"key1", buf=None) == (None, 5)
-    kvs.delete(b"key1")
+                cnt, k, _, v, _ = self.kvs.prefix_probe(pfx1)
+                self.assertEqual(cnt, hse.KvsPfxProbeCnt.ONE)
+                self.assertTupleEqual((k, v), (b"key1", b"value1"))
 
+                cnt, k, kl, v, vl = self.kvs.prefix_probe(pfx2)
+                self.assertEqual(cnt, hse.KvsPfxProbeCnt.MUL)
+                self.assertTupleEqual((k, v), (b"abc1", b"value1"))
+                self.assertEqual(kl, 4)
+                self.assertEqual(vl, 6)
 
-@pytest.mark.experimental
-@pytest.mark.parametrize("pfx1,pfx2", [("key", "abc"), (b"key", b"abc")])
-def test_prefix_probe(kvs: hse.Kvs, pfx1: Union[str, bytes], pfx2: Union[str, bytes]):
-    kvs.put(b"key1", b"value1")
-    kvs.put(b"abc1", b"value1")
-    kvs.put(b"abc2", b"value2")
+                cnt, *_ = self.kvs.prefix_probe("xyz")
+                self.assertEqual(cnt, hse.KvsPfxProbeCnt.ZERO)
 
-    cnt, k, _, v, _ = kvs.prefix_probe(pfx1)
-    assert cnt == hse.KvsPfxProbeCnt.ONE
-    assert (k, v) == (b"key1", b"value1")
+                self.kvs.prefix_delete(b"key")
 
-    cnt, k, kl, v, vl = kvs.prefix_probe(pfx2)
-    assert cnt == hse.KvsPfxProbeCnt.MUL
-    assert (k, v) == (b"abc1", b"value1")
-    assert kl == 4
-    assert vl == 6
+    def test_none_put(self):
+        with self.assertRaises(hse.HseException):
+            self.kvs.put(None, None)  # type: ignore
 
-    cnt, *_ = kvs.prefix_probe("xyz")
-    assert cnt == hse.KvsPfxProbeCnt.ZERO
+    def test_none_get(self):
+        with self.assertRaises(hse.HseException):
+            self.kvs.get(None)  # type: ignore
 
-    kvs.prefix_delete(b"key")
+    def test_none_delete(self):
+        with self.assertRaises(hse.HseException):
+            self.kvs.delete(None)  # type: ignore
 
+    def test_none_prefix_delete(self):
+        with self.assertRaises(hse.HseException):
+            self.kvs.prefix_delete(None)  # type: ignore
 
-@pytest.mark.xfail(strict=True)
-def test_none_put(kvs: hse.Kvs):
-    kvs.put(None, None)  # type: ignore
+    def test_param(self):
+        for args in (
+            ("transactions.enabled", 'false'),
+            ("this-does-not-exist", None),
+        ):
+            with self.subTest(param=args[0], value=args[1]):
+                if args[1]:
+                    self.assertEqual(self.kvs.param(args[0]), args[1])
+                else:
+                    with self.assertRaises(hse.HseException):
+                        self.kvs.param(args[0])
 
-
-@pytest.mark.xfail(strict=True)
-def test_none_get(kvs: hse.Kvs):
-    kvs.get(None)  # type: ignore
-
-
-@pytest.mark.xfail(strict=True)
-def test_none_delete(kvs: hse.Kvs):
-    kvs.delete(None)  # type: ignore
-
-
-@pytest.mark.xfail(strict=True)
-def test_none_prefix_delete(kvs: hse.Kvs):
-    kvs.prefix_delete(None)  # type: ignore
+    def test_name(self):
+        assert self.kvs.name == "kvs"
 
 
-def test_param(kvs: hse.Kvs):
-    assert kvs.param("transactions.enabled") == "false"
-
-
-@pytest.mark.xfail(strict=True)
-def test_bad_param(kvs: hse.Kvs):
-    kvs.param("this-does-not-exist")
-
-
-def test_name(kvs: hse.Kvs):
-    assert kvs.name == "kvs-test"
+if __name__ == "__main__":
+    unittest.main(argv=UNKNOWN)

@@ -30,37 +30,33 @@ cc = meson.get_compiler('c')
 fs = import('fs')
 pymod = import('python')
 
-docstrings = find_program('docstrings.py', required: true)
-pp = find_program('pp.py', required: true)
-cython = find_program('cython', required: true)
-python = pymod.find_installation(
-    'python3',
-    required: true,
-    modules: [
-        'toml',
-    ],
-)
+docstrings = find_program('docstrings.py')
+pp = find_program('pp.py')
+cython = find_program('cython')
+python = pymod.find_installation('python3')
 
-black = find_program('black', required: ci)
-if black.found()
-    black_command = [
-        black,
-        meson.project_source_root(),
-    ]
-
-    run_target(
-        'format',
-        command: black_command
-    )
-
-    run_target(
-        'format-check',
-        command: [
-            black_command,
-            '--check',
-            '--diff',
+if not meson.is_subproject()
+    black = find_program('black', required: ci)
+    if black.found()
+        black_command = [
+            black,
+            meson.project_source_root(),
         ]
-    )
+
+        run_target(
+            'format',
+            command: black_command
+        )
+
+        run_target(
+            'format-check',
+            command: [
+                black_command,
+                '--check',
+                '--diff',
+            ]
+        )
+    endif
 endif
 
 # Exported for usage in hse.
@@ -68,7 +64,7 @@ project_build_root = meson.project_build_root()
 
 hse_dep = dependency(
     'hse-2',
-    version: '>=2.0.0',
+    version: '>=2.1.0',
     required: true,
     fallback: ['hse', 'hse_dep'],
     default_options: [

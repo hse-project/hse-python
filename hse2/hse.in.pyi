@@ -10,25 +10,25 @@ from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Un
 
 def init(config: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
     """
-    @SUB@ hse.init.__doc__
+    @SUB@ hse.init
     """
     ...
 
 def fini() -> None:
     """
-    @SUB@ hse.fini.__doc__
+    @SUB@ hse.fini
     """
     ...
 
 def param(param: str) -> str:
     """
-    @SUB@ hse.param.__doc__
+    @SUB@ hse.param
     """
     ...
 
 class HseException(Exception):
     """
-    @SUB@ hse.HseException.__doc__
+    @SUB@ hse.HseException
     """
 
     returncode: int
@@ -37,7 +37,7 @@ class HseException(Exception):
 @unique
 class KvdbSyncFlag(IntFlag):
     """
-    @SUB@ hse.KvdbSyncFlag.__doc__
+    @SUB@ hse.KvdbSyncFlag
     """
 
     ASYNC = ...
@@ -46,7 +46,7 @@ class KvdbSyncFlag(IntFlag):
 @unique
 class KvdbCompactFlag(IntFlag):
     """
-    @SUB@ hse.KvdbCompactFlag.__doc__
+    @SUB@ hse.KvdbCompactFlag
     """
 
     CANCEL = ...
@@ -56,7 +56,7 @@ class KvdbCompactFlag(IntFlag):
 @unique
 class Mclass(Enum):
     """
-    @SUB@ hse.Mclass.__doc__
+    @SUB@ hse.Mclass
     """
 
     CAPACITY = ...
@@ -66,96 +66,96 @@ class Mclass(Enum):
 class Kvdb:
     def close(self) -> None:
         """
-        @SUB@ hse.Kvdb.close.__doc__
+        @SUB@ hse.Kvdb.close
         """
         ...
     @staticmethod
     def create(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.create.__doc__
+        @SUB@ hse.Kvdb.create
         """
         ...
     @staticmethod
     def drop(kvdb_home: Union[str, os.PathLike[str]]) -> None:
         """
-        @SUB@ hse.Kvdb.drop.__doc__
+        @SUB@ hse.Kvdb.drop
         """
         ...
     @staticmethod
     def open(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> Kvdb:
         """
-        @SUB@ hse.Kvdb.open.__doc__
+        @SUB@ hse.Kvdb.open
         """
         ...
     @property
     def home(self) -> pathlib.Path:
         """
-        @SUB@ hse.Kvdb.home.__doc__
+        @SUB@ hse.Kvdb.home
         """
         ...
     def param(self, param: str) -> str:
         """
-        @SUB@ hse.Kvdb.param.__doc__
+        @SUB@ hse.Kvdb.param
         """
         ...
     @property
     def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.kvs_names.__doc__
+        @SUB@ hse.Kvdb.kvs_names
         """
         ...
     def kvs_create(self, name: str, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_create.__doc__
+        @SUB@ hse.Kvdb.kvs_create
         """
         ...
     def kvs_drop(self, name: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_drop.__doc__
+        @SUB@ hse.Kvdb.kvs_drop
         """
         ...
     def kvs_open(self, name: str, *params: str) -> Kvs:
         """
-        @SUB@ hse.Kvdb.kvs_open.__doc__
+        @SUB@ hse.Kvdb.kvs_open
         """
         ...
     def sync(self, flags: Optional[KvdbSyncFlag] = ...) -> None:
         """
-        @SUB@ hse.Kvdb.sync.__doc__
+        @SUB@ hse.Kvdb.sync
         """
         ...
     def mclass_info(self, mclass: Mclass) -> MclassInfo:
         """
-        @SUB@ hse.Kvdb.mclass_info.__doc__
+        @SUB@ hse.Kvdb.mclass_info
         """
         ...
     # ifdef HSE_PYTHON_EXPERIMENTAL
     def compact(self, flags: Optional[KvdbCompactFlag] = ...) -> None:
         """
-        @SUB@ hse.Kvdb.compact.__doc__
+        @SUB@ hse.Kvdb.compact
         """
         ...
     @property
     def compact_status(self) -> KvdbCompactStatus:
         """
-        @SUB@ hse.Kvdb.compact_status.__doc__
+        @SUB@ hse.Kvdb.compact_status
         """
         ...
     # endif
     @staticmethod
     def storage_add(kvdb_home: Union[str, "os.PathLike[str]"], params: str) -> None:
         """
-        @SUB@ hse.Kvdb.storage_add.__doc__
+        @SUB@ hse.Kvdb.storage_add
         """
     def transaction(self) -> KvdbTransaction:
         """
-        @SUB@ hse.Kvdb.transaction.__doc__
+        @SUB@ hse.Kvdb.transaction
         """
         ...
 
 class KvsPutFlag(IntFlag):
     """
-    @SUB@ hse.KvsPutFlag.__doc__
+    @SUB@ hse.KvsPutFlag
     """
 
     PRIO = ...
@@ -163,7 +163,7 @@ class KvsPutFlag(IntFlag):
 
 class CursorCreateFlag(IntFlag):
     """
-    @SUB@ hse.CursorCreateFlag.__doc__
+    @SUB@ hse.CursorCreateFlag
     """
 
     REV = ...
@@ -171,7 +171,7 @@ class CursorCreateFlag(IntFlag):
 # ifdef HSE_PYTHON_EXPERIMENTAL
 class KvsPfxProbeCnt(Enum):
     """
-    @SUB@ hse.KvsPfxProbeCnt.__doc__
+    @SUB@ hse.KvsPfxProbeCnt
     """
 
     ZERO = ...
@@ -184,17 +184,17 @@ class Kvs:
     @property
     def name(self) -> str:
         """
-        @SUB@ hse.Kvs.name.__doc__
+        @SUB@ hse.Kvs.name
         """
         ...
     def param(self, param: str) -> str:
         """
-        @SUB@ hse.Kvs.param.__doc__
+        @SUB@ hse.Kvs.param
         """
         ...
     def close(self) -> None:
         """
-        @SUB@ hse.Kvs.close.__doc__
+        @SUB@ hse.Kvs.close
         """
         ...
     def put(
@@ -205,7 +205,7 @@ class Kvs:
         flags: Optional[KvsPutFlag] = ...,
     ) -> None:
         """
-        @SUB@ hse.Kvs.put.__doc__
+        @SUB@ hse.Kvs.put
         """
         ...
     def get(
@@ -215,7 +215,7 @@ class Kvs:
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get.__doc__
+        @SUB@ hse.Kvs.get
         """
         ...
     def delete(
@@ -224,14 +224,14 @@ class Kvs:
         txn: Optional[KvdbTransaction] = ...,
     ) -> None:
         """
-        @SUB@ hse.Kvs.delete.__doc__
+        @SUB@ hse.Kvs.delete
         """
         ...
     def prefix_delete(
         self, pfx: Union[str, bytes], txn: Optional[KvdbTransaction] = ...
     ) -> None:
         """
-        @SUB@ hse.Kvs.prefix_delete.__doc__
+        @SUB@ hse.Kvs.prefix_delete
         """
         ...
     # ifdef HSE_PYTHON_EXPERIMENTAL
@@ -243,7 +243,7 @@ class Kvs:
         txn: Optional[KvdbTransaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.prefix_probe.__doc__
+        @SUB@ hse.Kvs.prefix_probe
         """
         ...
     # endif
@@ -254,13 +254,13 @@ class Kvs:
         flags: Optional[CursorCreateFlag] = ...,
     ) -> KvsCursor:
         """
-        @SUB@ hse.Kvs.cursor.__doc__
+        @SUB@ hse.Kvs.cursor
         """
         ...
 
 class KvdbTransactionState(Enum):
     """
-    @SUB@ hse.KvdbTransactionState.__doc__
+    @SUB@ hse.KvdbTransactionState
     """
 
     INVALID: int
@@ -270,7 +270,7 @@ class KvdbTransactionState(Enum):
 
 class KvdbTransaction:
     """
-    @SUB@ hse.KvdbTransaction.__doc__
+    @SUB@ hse.KvdbTransaction
     """
 
     def __enter__(self) -> KvdbTransaction: ...
@@ -282,23 +282,23 @@ class KvdbTransaction:
     ) -> None: ...
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.begin.__doc__
+        @SUB@ hse.KvdbTransaction.begin
         """
         ...
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.commit.__doc__
+        @SUB@ hse.KvdbTransaction.commit
         """
         ...
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.abort.__doc__
+        @SUB@ hse.KvdbTransaction.abort
         """
         ...
     @property
     def state(self) -> KvdbTransactionState:
         """
-        @SUB@ hse.KvdbTransaction.state.__doc__
+        @SUB@ hse.KvdbTransaction.state
         """
         ...
 
@@ -313,22 +313,22 @@ class KvsCursor:
     @property
     def eof(self) -> bool:
         """
-        @SUB@ hse.KvsCursor.eof.__doc__
+        @SUB@ hse.KvsCursor.eof
         """
         ...
     def destroy(self) -> None:
         """
-        @SUB@ hse.KvsCursor.destroy.__doc__
+        @SUB@ hse.KvsCursor.destroy
         """
         ...
     def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
-        @SUB@ hse.KvsCursor.items.__doc__
+        @SUB@ hse.KvsCursor.items
         """
         ...
     def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
-        @SUB@ hse.KvsCursor.read.__doc__
+        @SUB@ hse.KvsCursor.read
         """
         ...
     def update_view(
@@ -336,12 +336,12 @@ class KvsCursor:
         txn: Optional[KvdbTransaction] = ...,
     ) -> None:
         """
-        @SUB@ hse.KvsCursor.update_view.__doc__
+        @SUB@ hse.KvsCursor.update_view
         """
         ...
     def seek(self, key: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek.__doc__
+        @SUB@ hse.KvsCursor.seek
         """
         ...
     def seek_range(
@@ -350,44 +350,44 @@ class KvsCursor:
         filt_max: Optional[Union[str, bytes, SupportsBytes]],
     ) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek_range.__doc__
+        @SUB@ hse.KvsCursor.seek_range
         """
         ...
 
 # ifdef HSE_PYTHON_EXPERIMENTAL
 class KvdbCompactStatus:
     """
-    @SUB@ hse.KvdbCompactStatus.__doc__
+    @SUB@ hse.KvdbCompactStatus
     """
 
     @property
     def samp_lwm(self) -> int:
         """
-        @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+        @SUB@ hse.KvdbCompactStatus.samp_lwm
         """
         ...
     @property
     def samp_hwm(self) -> int:
         """
-        @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
+        @SUB@ hse.KvdbCompactStatus.samp_hwm
         """
         ...
     @property
     def samp_curr(self) -> int:
         """
-        @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
+        @SUB@ hse.KvdbCompactStatus.samp_curr
         """
         ...
     @property
     def active(self) -> int:
         """
-        @SUB@ hse.KvdbCompactStatus.active.__doc__
+        @SUB@ hse.KvdbCompactStatus.active
         """
         ...
     @property
     def canceled(self) -> int:
         """
-        @SUB@ hse.KvdbCompactStatus.canceled.__doc__
+        @SUB@ hse.KvdbCompactStatus.canceled
         """
         ...
 
@@ -395,23 +395,23 @@ class KvdbCompactStatus:
 
 class MclassInfo:
     """
-    @SUB@ hse.MclassInfo.__doc__
+    @SUB@ hse.MclassInfo
     """
 
     @property
     def allocated_bytes(self) -> int:
         """
-        @SUB@ hse.MclassInfo.allocated_bytes.__doc__
+        @SUB@ hse.MclassInfo.allocated_bytes
         """
         ...
     @property
     def used_bytes(self) -> int:
         """
-        @SUB@ hse.MclassInfo.used_bytes.__doc__
+        @SUB@ hse.MclassInfo.used_bytes
         """
         ...
     @property
     def path(self) -> pathlib.Path:
         """
-        @SUB@ hse.MclassInfo.path.__doc__
+        @SUB@ hse.MclassInfo.path
         """

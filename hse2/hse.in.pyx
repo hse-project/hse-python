@@ -47,7 +47,7 @@ cdef char **to_paramv(tuple params) except NULL:
 
 def init(config: Optional[Union[str, os.PathLike[str]]] = None, *params: str) -> None:
     """
-    @SUB@ hse.init.__doc__
+    @SUB@ hse.init
     """
     config_bytes = os.fspath(config).encode() if config else None
     cdef const char *config_addr = <char *>config_bytes if config_bytes else NULL
@@ -63,14 +63,14 @@ def init(config: Optional[Union[str, os.PathLike[str]]] = None, *params: str) ->
 
 def fini() -> None:
     """
-    @SUB@ hse.fini.__doc__
+    @SUB@ hse.fini
     """
     hse_fini()
 
 
 def param(str param) -> str:
     """
-    @SUB@ hse.param.__doc__
+    @SUB@ hse.param
     """
     param_bytes = param.encode() if param else None
     cdef const char *param_addr = <char *>param_bytes
@@ -97,7 +97,7 @@ def param(str param) -> str:
 
 class HseException(Exception):
     """
-    @SUB@ hse.HseException.__doc__
+    @SUB@ hse.HseException
     """
     def __init__(self, hse_err_t returncode):
         self.returncode = hse_err_to_errno(returncode)
@@ -115,7 +115,7 @@ class HseException(Exception):
 @unique
 class KvdbSyncFlag(IntFlag):
     """
-    @SUB@ hse.KvdbSyncFlag.__doc__
+    @SUB@ hse.KvdbSyncFlag
     """
     ASYNC = HSE_KVDB_SYNC_ASYNC
 
@@ -129,7 +129,7 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
 @unique
 class Mclass(Enum):
     """
-    @SUB@ hse.Mclass.__doc__
+    @SUB@ hse.Mclass
     """
     CAPACITY = HSE_MCLASS_CAPACITY
     STAGING = HSE_MCLASS_STAGING
@@ -137,6 +137,33 @@ class Mclass(Enum):
 
     def __str__(self) -> str:
         return hse_mclass_name_get(self.value).decode()
+
+
+cdef class MclassInfo:
+    """
+    @SUB@ hse.MclassInfo
+    """
+
+    @property
+    def allocated_bytes(self) -> int:
+        """
+        @SUB@ hse.MclassInfo.allocated_bytes
+        """
+        return self._c_hse_mclass_info.mi_allocated_bytes
+
+    @property
+    def used_bytes(self) -> int:
+        """
+        @SUB@ hse.MclassInfo.used_bytes
+        """
+        return self._c_hse_mclass_info.mi_used_bytes
+
+    @property
+    def path(self) -> pathlib.Path:
+        """
+        @SUB@ hse.MclassInfo.path
+        """
+        return pathlib.Path(self._c_hse_mclass_info.mi_path.decode())
 
 
 cdef class Kvdb:
@@ -155,13 +182,13 @@ cdef class Kvdb:
     @property
     def home(self) -> pathlib.Path:
         """
-        @SUB@ hse.Kvdb.home.__doc__
+        @SUB@ hse.Kvdb.home
         """
         return pathlib.Path(hse_kvdb_home_get(self._c_hse_kvdb).decode())
 
     def close(self) -> None:
         """
-        @SUB@ hse.Kvdb.close.__doc__
+        @SUB@ hse.Kvdb.close
         """
         if not self._c_hse_kvdb:
             return
@@ -174,7 +201,7 @@ cdef class Kvdb:
     @staticmethod
     def create(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.create.__doc__
+        @SUB@ hse.Kvdb.create
         """
         kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
         cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
@@ -188,7 +215,7 @@ cdef class Kvdb:
     @staticmethod
     def drop(kvdb_home: Union[str, os.PathLike[str]]) -> None:
         """
-        @SUB@ hse.Kvdb.drop.__doc__
+        @SUB@ hse.Kvdb.drop
         """
         kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
         cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
@@ -200,14 +227,14 @@ cdef class Kvdb:
     @staticmethod
     def open(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> Kvdb:
         """
-        @SUB@ hse.Kvdb.open.__doc__
+        @SUB@ hse.Kvdb.open
         """
         return Kvdb(kvdb_home, *params)
 
     @property
     def kvs_names(self) -> List[str]:
         """
-        @SUB@ hse.Kvdb.kvs_names.__doc__
+        @SUB@ hse.Kvdb.kvs_names
         """
         cdef size_t namec = 0
         cdef char **namev = NULL
@@ -225,7 +252,7 @@ cdef class Kvdb:
 
     def kvs_create(self, str name, *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_create.__doc__
+        @SUB@ hse.Kvdb.kvs_create
         """
         name_bytes = name.encode() if name else None
         cdef const char *name_addr = <char *>name_bytes if name_bytes else NULL
@@ -233,14 +260,14 @@ cdef class Kvdb:
 
         cdef hse_err_t err = hse_kvdb_kvs_create(
             self._c_hse_kvdb, name_addr, len(params),
-            <const char * const*>paramv)
+            <const char *const *>paramv)
         free(paramv)
         if err != 0:
             raise HseException(err)
 
     def kvs_drop(self, str kvs_name) -> None:
         """
-        @SUB@ hse.Kvdb.kvs_drop.__doc__
+        @SUB@ hse.Kvdb.kvs_drop
         """
         cdef hse_err_t err = hse_kvdb_kvs_drop(self._c_hse_kvdb, kvs_name.encode())
         if err != 0:
@@ -248,13 +275,13 @@ cdef class Kvdb:
 
     def kvs_open(self, str kvs_name, *params: str) -> Kvs:
         """
-        @SUB@ hse.Kvdb.kvs_open.__doc__
+        @SUB@ hse.Kvdb.kvs_open
         """
         return Kvs(self, kvs_name, *params)
 
     def param(self, str param) -> str:
         """
-        @SUB@ hse.Kvdb.param.__doc__
+        @SUB@ hse.Kvdb.param
         """
         param_bytes = param.encode() if param else None
         cdef const char *param_addr = <char *>param_bytes
@@ -280,7 +307,7 @@ cdef class Kvdb:
 
     def sync(self, flags: Optional[KvdbSyncFlag] = None) -> None:
         """
-        @SUB@ hse.Kvdb.sync.__doc__
+        @SUB@ hse.Kvdb.sync
         """
         cdef unsigned int cflags = int(flags) if flags else 0
         cdef hse_err_t err = 0
@@ -291,7 +318,7 @@ cdef class Kvdb:
 
     def mclass_info(self, mclass: Mclass) -> MclassInfo:
         """
-        @SUB@ hse.Kvdb.mclass_info.__doc__
+        @SUB@ hse.Kvdb.mclass_info
         """
         info = MclassInfo()
         cdef hse_err_t err = 0
@@ -307,7 +334,7 @@ cdef class Kvdb:
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         def compact(self, flags: Optional[KvdbCompactFlag] = None) -> None:
             """
-            @SUB@ hse.Kvdb.compact.__doc__
+            @SUB@ hse.Kvdb.compact
             """
             cdef unsigned int cflags = int(flags) if flags else 0
 
@@ -320,7 +347,7 @@ cdef class Kvdb:
         @property
         def compact_status(self) -> KvdbCompactStatus:
             """
-            @SUB@ hse.Kvdb.compact_status.__doc__
+            @SUB@ hse.Kvdb.compact_status
             """
             status: KvdbCompactStatus = KvdbCompactStatus()
             cdef hse_err_t err = 0
@@ -333,7 +360,7 @@ cdef class Kvdb:
     @staticmethod
     def storage_add(kvdb_home: Union[str, os.PathLike[str]], *params: str) -> None:
         """
-        @SUB@ hse.Kvdb.storage_add.__doc__
+        @SUB@ hse.Kvdb.storage_add
         """
         kvdb_home_bytes = os.fspath(kvdb_home).encode() if kvdb_home else None
         cdef const char *kvdb_home_addr = <char *>kvdb_home_bytes if kvdb_home_bytes else NULL
@@ -350,7 +377,7 @@ cdef class Kvdb:
 
     def transaction(self) -> KvdbTransaction:
         """
-        @SUB@ hse.Kvdb.transaction.__doc__
+        @SUB@ hse.Kvdb.transaction
         """
         txn = KvdbTransaction(self)
 
@@ -360,7 +387,7 @@ cdef class Kvdb:
 @unique
 class KvsPutFlag(IntFlag):
     """
-    @SUB@ hse.KvsPutFlag.__doc__
+    @SUB@ hse.KvsPutFlag
     """
     PRIO = HSE_KVS_PUT_PRIO
     VCOMP_OFF = HSE_KVS_PUT_VCOMP_OFF
@@ -369,7 +396,7 @@ class KvsPutFlag(IntFlag):
 @unique
 class CursorCreateFlag(IntFlag):
     """
-    @SUB@ hse.CursorCreateFlag.__doc__
+    @SUB@ hse.CursorCreateFlag
     """
     REV = HSE_CURSOR_CREATE_REV
 
@@ -378,7 +405,7 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
     @unique
     class KvsPfxProbeCnt(Enum):
         """
-        @SUB@ hse.KvsPfxProbeCnt.__doc__
+        @SUB@ hse.KvsPfxProbeCnt
         """
         ZERO = HSE_KVS_PFX_FOUND_ZERO
         ONE = HSE_KVS_PFX_FOUND_ONE
@@ -402,13 +429,13 @@ cdef class Kvs:
     @property
     def name(self) -> str:
         """
-        @SUB@ hse.Kvs.name.__doc__
+        @SUB@ hse.Kvs.name
         """
         return hse_kvs_name_get(self._c_hse_kvs).decode()
 
     def close(self) -> None:
         """
-        @SUB@ hse.Kvs.close.__doc__
+        @SUB@ hse.Kvs.close
         """
         if not self._c_hse_kvs:
             return
@@ -420,7 +447,7 @@ cdef class Kvs:
 
     def param(self, str param) -> str:
         """
-        @SUB@ hse.Kvs.param.__doc__
+        @SUB@ hse.Kvs.param
         """
         param_bytes = param.encode() if param else None
         cdef const char *param_addr = <char *>param_bytes
@@ -452,7 +479,7 @@ cdef class Kvs:
             flags: Optional[KvsPutFlag]=None,
         ) -> None:
         """
-        @SUB@ hse.Kvs.put.__doc__
+        @SUB@ hse.Kvs.put
         """
         cdef unsigned int cflags = int(flags) if flags else 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -486,7 +513,7 @@ cdef class Kvs:
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
         """
-        @SUB@ hse.Kvs.get.__doc__
+        @SUB@ hse.Kvs.get
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -527,7 +554,7 @@ cdef class Kvs:
 
     def delete(self, key: Union[str, bytes, SupportsBytes], KvdbTransaction txn=None) -> None:
         """
-        @SUB@ hse.Kvs.delete.__doc__
+        @SUB@ hse.Kvs.delete
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -550,7 +577,7 @@ cdef class Kvs:
 
     def prefix_delete(self, pfx: Union[str, bytes], txn: KvdbTransaction=None) -> None:
         """
-        @SUB@ hse.Kvs.prefix_delete.__doc__
+        @SUB@ hse.Kvs.prefix_delete
         """
         cdef unsigned int cflags = 0
         cdef hse_kvdb_txn *txn_addr = NULL
@@ -580,7 +607,7 @@ cdef class Kvs:
             KvdbTransaction txn=None,
         ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
             """
-            @SUB@ hse.Kvs.prefix_probe.__doc__
+            @SUB@ hse.Kvs.prefix_probe
             """
             cdef hse_kvdb_txn *txn_addr = NULL
             cdef const void *pfx_addr = NULL
@@ -632,7 +659,7 @@ cdef class Kvs:
         flags: Optional[CursorCreateFlag]=None,
     ) -> KvsCursor:
         """
-        @SUB@ hse.Kvs.cursor.__doc__
+        @SUB@ hse.Kvs.cursor
         """
         cursor: KvsCursor = KvsCursor(
             self,
@@ -647,7 +674,7 @@ cdef class Kvs:
 @unique
 class KvdbTransactionState(Enum):
     """
-    @SUB@ hse.KvdbTransactionState.__doc__
+    @SUB@ hse.KvdbTransactionState
     """
     INVALID = HSE_KVDB_TXN_INVALID
     ACTIVE = HSE_KVDB_TXN_ACTIVE
@@ -658,7 +685,7 @@ class KvdbTransactionState(Enum):
 @cython.no_gc_clear
 cdef class KvdbTransaction:
     """
-    @SUB@ hse.KvdbTransaction.__doc__
+    @SUB@ hse.KvdbTransaction
     """
     def __cinit__(self, Kvdb kvdb):
         self.kvdb = kvdb
@@ -697,7 +724,7 @@ cdef class KvdbTransaction:
 
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.begin.__doc__
+        @SUB@ hse.KvdbTransaction.begin
         """
         cdef hse_err_t err = 0
         with nogil:
@@ -707,7 +734,7 @@ cdef class KvdbTransaction:
 
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.commit.__doc__
+        @SUB@ hse.KvdbTransaction.commit
         """
         cdef hse_err_t err = 0
         with nogil:
@@ -717,7 +744,7 @@ cdef class KvdbTransaction:
 
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.abort.__doc__
+        @SUB@ hse.KvdbTransaction.abort
         """
         cdef hse_err_t err = 0
         with nogil:
@@ -728,7 +755,7 @@ cdef class KvdbTransaction:
     @property
     def state(self) -> KvdbTransactionState:
         """
-        @SUB@ hse.KvdbTransaction.state.__doc__
+        @SUB@ hse.KvdbTransaction.state
         """
         cdef hse_kvdb_txn_state state = HSE_KVDB_TXN_INVALID
         with nogil:
@@ -785,7 +812,7 @@ cdef class KvsCursor:
 
     def destroy(self):
         """
-        @SUB@ hse.KvsCursor.destroy.__doc__
+        @SUB@ hse.KvsCursor.destroy
         """
         if self._c_hse_kvs_cursor:
             with nogil:
@@ -794,7 +821,7 @@ cdef class KvsCursor:
 
     def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
         """
-        @SUB@ hse.KvsCursor.items.__doc__
+        @SUB@ hse.KvsCursor.items
         """
         def _iter():
             while True:
@@ -808,7 +835,7 @@ cdef class KvsCursor:
 
     def update_view(self) -> None:
         """
-        @SUB@ hse.KvsCursor.update_view.__doc__
+        @SUB@ hse.KvsCursor.update_view
         """
         cdef unsigned int cflags = 0
 
@@ -820,7 +847,7 @@ cdef class KvsCursor:
 
     def seek(self, key: Union[str, bytes, SupportsBytes]) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek.__doc__
+        @SUB@ hse.KvsCursor.seek
         """
         cdef unsigned int cflags = 0
         cdef const void *key_addr = NULL
@@ -854,7 +881,7 @@ cdef class KvsCursor:
 
     def seek_range(self, filt_min: Optional[Union[str, bytes, SupportsBytes]], filt_max: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
         """
-        @SUB@ hse.KvsCursor.seek_range.__doc__
+        @SUB@ hse.KvsCursor.seek_range
         """
         cdef unsigned int cflags = 0
         cdef const void *filt_min_addr = NULL
@@ -896,7 +923,7 @@ cdef class KvsCursor:
 
     def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
-        @SUB@ hse.KvsCursor.read.__doc__
+        @SUB@ hse.KvsCursor.read
         """
         cdef unsigned int cflags = 0
         cdef const void *key = NULL
@@ -927,7 +954,7 @@ cdef class KvsCursor:
     @property
     def eof(self) -> bool:
         """
-        @SUB@ hse.KvsCursor.eof.__doc__
+        @SUB@ hse.KvsCursor.eof
         """
         return self._eof
 
@@ -935,39 +962,39 @@ cdef class KvsCursor:
 IF HSE_PYTHON_EXPERIMENTAL == 1:
     cdef class KvdbCompactStatus:
         """
-        @SUB@ hse.KvdbCompactStatus.__doc__
+        @SUB@ hse.KvdbCompactStatus
         """
         @property
         def samp_lwm(self) -> int:
             """
-            @SUB@ hse.KvdbCompactStatus.samp_lwm.__doc__
+            @SUB@ hse.KvdbCompactStatus.samp_lwm
             """
             return self._c_hse_kvdb_compact_status.kvcs_samp_lwm
 
         @property
         def samp_hwm(self) -> int:
             """
-            @SUB@ hse.KvdbCompactStatus.samp_hwm.__doc__
+            @SUB@ hse.KvdbCompactStatus.samp_hwm
             """
             return self._c_hse_kvdb_compact_status.kvcs_samp_hwm
 
         @property
         def samp_curr(self) -> int:
             """
-            @SUB@ hse.KvdbCompactStatus.samp_curr.__doc__
+            @SUB@ hse.KvdbCompactStatus.samp_curr
             """
             return self._c_hse_kvdb_compact_status.kvcs_samp_curr
 
         @property
         def active(self) -> int:
             """
-            @SUB@ hse.KvdbCompactStatus.active.__doc__
+            @SUB@ hse.KvdbCompactStatus.active
             """
             return self._c_hse_kvdb_compact_status.kvcs_active
 
         @property
         def canceled(self) -> int:
             """
-            @SUB@ hse.KvdbCompactStatus.canceled.__doc__
+            @SUB@ hse.KvdbCompactStatus.canceled
             """
             return self._c_hse_kvdb_compact_status.kvcs_canceled
