@@ -5,7 +5,19 @@
 """
 STRING:
 
-@SUB@ hse.version.STRING.__doc__
+@SUB@ hse.version.STRING
+
+MAJOR:
+
+@SUB@ hse.version.MAJOR
+
+MINOR:
+
+@SUB@ hse.version.MINOR
+
+PATCH:
+
+@SUB@ hse.version.PATCH
 """
 
 STRING: str

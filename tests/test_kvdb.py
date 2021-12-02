@@ -2,72 +2,77 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
-import errno
+import unittest
 import pathlib
-import pytest
+
+from common import ARGS, UNKNOWN, kvdb_fixture, kvs_fixture, HseTestCase
 from hse2 import hse
-from typing import Generator
 
 
-@pytest.fixture(scope="module")
-def kvs(kvdb: hse.Kvdb) -> Generator[hse.Kvs, None, None]:
-    try:
-        kvdb.kvs_create("kvdb-test", "prefix.length=3")
-    except hse.HseException as e:
-        if e.returncode == errno.EEXIST:
-            pass
-        else:
-            raise e
-    kvs = kvdb.kvs_open("kvdb-test")
+class KvdbTests(HseTestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
 
-    yield kvs
+        cls.kvdb = kvdb_fixture()
+        cls.kvs = kvs_fixture(cls.kvdb, "kvs", cparams=("prefix.length=3",))
 
-    kvs.close()
-    kvdb.kvs_drop("kvdb-test")
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.kvs.close()
+        cls.kvdb.kvs_drop("kvs")
+
+        cls.kvdb.close()
+        hse.Kvdb.drop(ARGS.home)
+
+        return super().tearDownClass()
+
+    def test_sync(self):
+        self.kvdb.sync()
+
+    def test_param(self):
+        for args in (
+            ("throttling.init_policy", '"default"'),
+            ("this-does-not-exist", None),
+        ):
+            with self.subTest(param=args[0], value=args[1]):
+                if args[1]:
+                    self.assertEqual(self.kvdb.param(args[0]), args[1])
+                else:
+                    with self.assertRaises(hse.HseException):
+                        self.kvdb.param(args[0])
+
+    def test_home(self):
+        self.assertEqual(self.kvdb.home, ARGS.home)
+
+    def test_mclass_info(self):
+        for mclass in hse.Mclass:
+            with self.subTest(mclass=mclass):
+                if mclass is hse.Mclass.CAPACITY:
+                    self.assertEqual(
+                        self.kvdb.mclass_info(mclass).path, ARGS.home / "capacity"
+                    )
+                else:
+                    with self.assertRaises(hse.HseException):
+                        self.kvdb.mclass_info(mclass)
+
+    @unittest.skip("Hard to control when compaction occurs")
+    @unittest.skipUnless(ARGS.experimental, "KVDB compaction is experimental")
+    def test_compact(self):
+        for i in range(1000):
+            self.kvs.put(f"key{i}".encode(), f"value{i}".encode())
+        self.kvdb.compact()
+        status = self.kvdb.compact_status
+        assert status.active
+        self.kvdb.compact(flags=hse.KvdbCompactFlag.CANCEL)
+        status = self.kvdb.compact_status
+        assert status.canceled
+
+    def test_mclass(self):
+        self.assertEqual(str(hse.Mclass.CAPACITY), "capacity")
+        self.assertEqual(str(hse.Mclass.STAGING), "staging")
+        self.assertEqual(str(hse.Mclass.PMEM), "pmem")
 
 
-def test_sync(kvdb: hse.Kvdb):
-    kvdb.sync()
-
-
-def test_param(kvdb: hse.Kvdb):
-    assert kvdb.param("throttling.init_policy") == '"default"'
-
-
-@pytest.mark.xfail(strict=True)
-def test_bad_param(kvdb: hse.Kvdb):
-    kvdb.param("this-does-not-exist")
-
-
-def test_home(kvdb: hse.Kvdb, home: pathlib.Path):
-    assert kvdb.home == home
-
-
-def test_mclass_info(kvdb: hse.Kvdb):
-    for mclass in hse.Mclass:
-        if mclass is hse.Mclass.CAPACITY:
-            kvdb.mclass_info(mclass)
-        else:
-            try:
-                kvdb.mclass_info(mclass)
-                assert False
-            except hse.HseException as e:
-                assert e.returncode == errno.ENOENT
-
-
-@pytest.mark.skip(reason="Hard to control when compaction occurs")
-def test_compact(kvdb: hse.Kvdb, kvs: hse.Kvs):
-    for i in range(1000):
-        kvs.put(f"key{i}".encode(), f"value{i}".encode())
-    kvdb.compact()
-    status = kvdb.compact_status
-    assert status.active
-    kvdb.compact(flags=hse.KvdbCompactFlag.CANCEL)
-    status = kvdb.compact_status
-    assert status.canceled
-
-
-def test_mclass():
-    assert str(hse.Mclass.CAPACITY) == "capacity"
-    assert str(hse.Mclass.STAGING) == "staging"
-    assert str(hse.Mclass.PMEM) == "pmem"
+if __name__ == "__main__":
+    unittest.main(argv=UNKNOWN)

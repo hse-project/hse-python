@@ -13,19 +13,13 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install build-essential libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev libcurl4-openssl-dev python3-setuptools
+        sudo apt-get install build-essential ninja-build libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev libcurl4-openssl-dev
+        sudo python3 -m pip install meson Cython black
 
     - uses: actions/checkout@v2
 
-    - name: Setup python environment to run branch
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        python3 -m pip install -r requirements.txt
-
     - name: Build, Compile and run Unit tests
       run: |
-        source venv/bin/activate
         meson builddir -Dwerror=true
         ninja -C builddir
         meson test -C builddir --print-errorlogs --no-stdsplit

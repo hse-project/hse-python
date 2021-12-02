@@ -2,15 +2,37 @@
 #
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
+import unittest
+
+from common import ARGS, UNKNOWN, HseTestCase, kvdb_fixture
 from hse2 import hse
 
-def test_state_transitions(kvdb: hse.Kvdb):
-    txn = kvdb.transaction()
-    assert txn.state == hse.KvdbTransactionState.INVALID
-    txn.begin()
-    assert txn.state == hse.KvdbTransactionState.ACTIVE
-    txn.abort()
-    assert txn.state == hse.KvdbTransactionState.ABORTED
-    txn.begin()
-    txn.commit()
-    assert txn.state == hse.KvdbTransactionState.COMMITTED
+
+class TransactionsTests(HseTestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+
+        cls.kvdb = kvdb_fixture()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.kvdb.close()
+        hse.Kvdb.drop(ARGS.home)
+
+        return super().tearDownClass()
+
+    def test_state_transitions(self):
+        txn = self.kvdb.transaction()
+        self.assertEqual(txn.state, hse.KvdbTransactionState.INVALID)
+        txn.begin()
+        self.assertEqual(txn.state, hse.KvdbTransactionState.ACTIVE)
+        txn.abort()
+        self.assertEqual(txn.state, hse.KvdbTransactionState.ABORTED)
+        txn.begin()
+        txn.commit()
+        self.assertEqual(txn.state, hse.KvdbTransactionState.COMMITTED)
+
+
+if __name__ == "__main__":
+    unittest.main(argv=UNKNOWN)

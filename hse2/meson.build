@@ -101,12 +101,9 @@ foreach m : modules
             '@INPUT@',
             '--output',
             '@OUTPUT@',
-            '--docstrings',
-            meson.project_source_root() / 'docstrings.toml',
         ],
         depend_files: [
             docstrings.full_path(),
-            meson.project_source_root() / 'docstrings.toml',
         ],
         output: '@0@.pyi'.format(m),
         install: true,
@@ -122,12 +119,9 @@ foreach m : modules
             '@INPUT@',
             '--output',
             '@OUTPUT@',
-            '--docstrings',
-            meson.project_source_root() / 'docstrings.toml',
         ],
         depend_files: [
             docstrings.full_path(),
-            meson.project_source_root() / 'docstrings.toml',
         ],
         output: '@0@.pyx'.format(m),
     )

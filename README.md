@@ -3,18 +3,13 @@
 [Heterogeneous-Memory Storage Engine](https://github.com/hse-project/hse)
 bindings for Python.
 
-## Virtual Environment
-
-To build `hse-python`, it may be advantageous to use a Python virtual
-environment. Use the following commands to set one up:
-
-```shell
-python3 -m venv venv
-source venv/bin/activate
-python3 -m pip install -r requirements.txt
-```
-
 ## Building
+
+### Dependencies
+
+- `Cython >= 0.29.21` (install from system repositories or PyPI)
+
+---
 
 `hse-python` is built using the [Meson build system](https://mesonbuild.com/).
 In the event HSE is not visible to the `hse-python` build system, HSE will be
@@ -35,6 +30,10 @@ Check the output of `meson configure build` or
 ```shell
 python3 -m pip install hse2
 ```
+
+In this case, you may need to properly set `CFLAGS` and `LDFLAGS` according to
+your environment, since hse-python will have to be compiled from source behind
+the scenes.
 
 ### From Build
 
