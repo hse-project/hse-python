@@ -180,6 +180,15 @@ Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
 
+    "hse.Kvdb.mclass_is_configured": """
+Check if a media class is configured for a KVDB.
+
+This function is thread safe.
+
+Returns:
+    bool: Whether or not mclass is configured.
+""",
+
     "hse.Kvdb.open": """
 Open a KVDB.
 

@@ -129,6 +129,11 @@ class Kvdb:
         @SUB@ hse.Kvdb.mclass_info
         """
         ...
+    def mclass_is_configured(self, mclass: Mclass) -> bool:
+        """
+        @SUB@ hse.Kvdb.mclass_is_configured
+        """
+        ...
     # ifdef HSE_PYTHON_EXPERIMENTAL
     def compact(self, flags: Optional[KvdbCompactFlag] = ...) -> None:
         """
