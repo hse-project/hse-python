@@ -32,7 +32,7 @@ class KvdbTests(HseTestCase):
 
     def test_param(self):
         for args in (
-            ("throttling.init_policy", '"default"'),
+            ("durability.interval_ms", '100'),
             ("this-does-not-exist", None),
         ):
             with self.subTest(param=args[0], value=args[1]):
