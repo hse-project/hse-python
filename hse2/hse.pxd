@@ -110,6 +110,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvdb_kvs_names_get(hse_kvdb *kvdb, size_t *namec, char ***namev) nogil
     void hse_kvdb_kvs_names_free(hse_kvdb *kvdb, char **namev) nogil
     hse_err_t hse_kvdb_mclass_info_get(hse_kvdb *kvdb, hse_mclass mclass, hse_mclass_info *info) nogil
+    hse_err_t hse_kvdb_mclass_is_configured(hse_kvdb *kvdb, hse_mclass mclass) nogil
     hse_err_t hse_kvdb_kvs_create(hse_kvdb *kvdb, const char *kvs_name, size_t paramc, const char *const *)
     hse_err_t hse_kvdb_kvs_drop(hse_kvdb *kvdb, const char *kvs_name)
     hse_err_t hse_kvdb_kvs_open(

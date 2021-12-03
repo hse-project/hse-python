@@ -56,6 +56,14 @@ class KvdbTests(HseTestCase):
                     with self.assertRaises(hse.HseException):
                         self.kvdb.mclass_info(mclass)
 
+    def test_mclass_is_configured(self):
+        for mclass in hse.Mclass:
+            with self.subTest(mclass=mclass):
+                self.assertEqual(
+                    mclass == hse.Mclass.CAPACITY,
+                    self.kvdb.mclass_is_configured(mclass),
+                )
+
     @unittest.skip("Hard to control when compaction occurs")
     @unittest.skipUnless(ARGS.experimental, "KVDB compaction is experimental")
     def test_compact(self):

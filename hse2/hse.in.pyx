@@ -331,6 +331,17 @@ cdef class Kvdb:
 
         return info
 
+    def mclass_is_configured(self, mclass: Mclass) -> bool:
+        """
+        @SUB@ hse.Kvdb.mclass_is_configured
+        """
+        cdef cbool configured = 0
+        cdef hse_mclass value = mclass.value
+        with nogil:
+            configured = hse_kvdb_mclass_is_configured(self._c_hse_kvdb, value)
+
+        return configured
+
     IF HSE_PYTHON_EXPERIMENTAL == 1:
         def compact(self, flags: Optional[KvdbCompactFlag] = None) -> None:
             """
