@@ -179,12 +179,14 @@ cdef class Kvdb:
         if err != 0:
             raise HseException(err)
 
+        self.__home = pathlib.Path(hse_kvdb_home_get(self._c_hse_kvdb).decode())
+
     @property
     def home(self) -> pathlib.Path:
         """
         @SUB@ hse.Kvdb.home
         """
-        return pathlib.Path(hse_kvdb_home_get(self._c_hse_kvdb).decode())
+        return self.__home
 
     def close(self) -> None:
         """
@@ -437,12 +439,14 @@ cdef class Kvs:
         if err != 0:
             raise HseException(err)
 
+        self.__name = hse_kvs_name_get(self._c_hse_kvs).decode()
+
     @property
     def name(self) -> str:
         """
         @SUB@ hse.Kvs.name
         """
-        return hse_kvs_name_get(self._c_hse_kvs).decode()
+        return self.__name
 
     def close(self) -> None:
         """
