@@ -26,6 +26,9 @@ cdef extern from "hse/flags.h":
 cdef extern from "hse/types.h":
     ctypedef uint64_t hse_err_t
 
+    cdef enum hse_err_ctx:
+        HSE_ERR_CTX_NONE
+
     cdef struct hse_kvdb:
         pass
 
@@ -90,6 +93,7 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
 
 cdef extern from "hse/hse.h":
     cdef int hse_err_to_errno(hse_err_t err)
+    cdef hse_err_ctx hse_err_to_ctx(hse_err_t err)
     cdef size_t hse_strerror(hse_err_t err, char *buf, size_t buf_len)
 
     hse_err_t hse_init(const char *config, size_t paramc, const char *const *paramv)

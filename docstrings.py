@@ -58,11 +58,20 @@ Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
 
+    "hse.ErrCtx": """
+Error context. Wrapper around ``hse_err_ctx``.
+""",
+
     "hse.HseException": """
 Raised when HSE encounters an error. Wrapper around ``hse_err_t``.
+""",
 
-Attributes:
-    returncode: Errno value returned by HSE.
+    "hse.HseException.returncode": """
+Errno value returned by HSE.
+""",
+
+    "hse.HseException.ctx": """
+Error context.
 """,
 
     "hse.Kvdb.close": """

@@ -7,7 +7,7 @@ import os
 import pathlib
 cimport cython
 cimport limits
-from enum import Enum, IntFlag, unique
+from enum import Enum, IntFlag, unique, IntEnum
 from types import TracebackType
 from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable, SupportsBytes
 from libc.stdlib cimport malloc, free
@@ -95,12 +95,21 @@ def param(str param) -> str:
         free(buf)
 
 
+@unique
+class ErrCtx(IntEnum):
+    """
+    @SUB@ hse.ErrCtx
+    """
+    NONE = HSE_ERR_CTX_NONE
+
+
 class HseException(Exception):
     """
     @SUB@ hse.HseException
     """
     def __init__(self, hse_err_t returncode):
-        self.returncode = hse_err_to_errno(returncode)
+        self.__returncode = hse_err_to_errno(returncode)
+        self.__ctx = ErrCtx(hse_err_to_ctx(returncode))
         cdef size_t needed_sz = 0
         needed_sz = hse_strerror(returncode, NULL, 0)
         cdef char *buf = <char *>malloc(needed_sz + 1)
@@ -110,6 +119,20 @@ class HseException(Exception):
 
     def __str__(self):
         return self.message
+
+    @property
+    def returncode(self) -> int:
+        """
+        @SUB@ hse.HseException.returncode
+        """
+        return self.__returncode
+
+    @property
+    def ctx(self) -> ErrCtx:
+        """
+        @SUB@ hse.HseException.ctx
+        """
+        return self.__ctx
 
 
 @unique
