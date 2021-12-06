@@ -345,12 +345,18 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.destroy
         """
         ...
-    def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
+    def items(
+        self,
+        key_buf: Optional[bytearray] = ...,
+        value_buf: Optional[bytearray] = ...,
+    ) -> Iterator[Tuple[Optional[bytes], Optional[bytes]]]:
         """
         @SUB@ hse.KvsCursor.items
         """
         ...
-    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
+    def read(
+        self, key_buf: Optional[bytearray] = ..., value_buf: Optional[bytearray] = ...
+    ) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
         @SUB@ hse.KvsCursor.read
         """

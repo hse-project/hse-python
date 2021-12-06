@@ -8,7 +8,7 @@ from common import UNKNOWN, HseTestCase, ARGS, kvdb_fixture, kvs_fixture
 from hse2 import hse
 
 
-class KvsTests(HseTestCase):
+class CursorTests(HseTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -29,13 +29,54 @@ class KvsTests(HseTestCase):
         return super().tearDownClass()
 
     def setUp(self) -> None:
+        super().setUp()
         for i in range(5):
             self.kvs.put(f"key{i}", f"value{i}")
-        return super().setUp()
 
     def tearDown(self) -> None:
         self.kvs.prefix_delete("key")
         return super().tearDown()
+
+    def test_read(self):
+        for key_buf, value_buf in ((None, None), (bytearray(10), bytearray(10))):
+            with self.subTest(key_buf=key_buf, value_buf=value_buf):
+                with self.kvs.cursor() as cursor:
+                    kv = cursor.read(key_buf=key_buf, value_buf=value_buf)
+                    self.assertTupleEqual(kv, (b"key0", b"value0"))
+                    if key_buf and value_buf:
+                        # following asserts satisfy type checker
+                        assert kv[0]
+                        assert kv[1]
+                        self.assertTupleEqual(
+                            kv,
+                            (
+                                bytes(key_buf)[: len(kv[0])],
+                                bytes(value_buf)[: len(kv[1])],
+                            ),
+                        )
+
+    def test_items(self):
+        for key_buf, value_buf in ((None, None), (bytearray(10), bytearray(10))):
+            with self.subTest(key_buf=key_buf, value_buf=value_buf):
+                with self.kvs.cursor() as cursor:
+                    for i, kv in enumerate(
+                        cursor.items(key_buf=key_buf, value_buf=value_buf)
+                    ):
+
+                        self.assertTupleEqual(
+                            kv, (f"key{i}".encode(), f"value{i}".encode())
+                        )
+                        if key_buf and value_buf:
+                            # following asserts satisfy type checker
+                            assert kv[0]
+                            assert kv[1]
+                            self.assertTupleEqual(
+                                kv,
+                                (
+                                    bytes(key_buf)[: len(kv[0])],
+                                    bytes(value_buf)[: len(kv[1])],
+                                ),
+                            )
 
     def test_seek(self):
         for filter, key in ((None, b"key3"), ("key", "key3"), (b"key", b"key3")):

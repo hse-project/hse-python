@@ -211,6 +211,16 @@ cdef extern from "hse/hse.h":
         const void **val,
         size_t *val_len,
         cbool *eof) nogil
+    hse_err_t hse_kvs_cursor_read_copy(
+        hse_kvs_cursor *cursor,
+        unsigned int flags,
+        void *keybuf,
+        size_t keybuf_sz,
+        size_t *key_len,
+        void *valbuf,
+        size_t valbuf_sz,
+        size_t *val_len,
+        cbool *eof) nogil
     hse_err_t hse_kvs_cursor_destroy(hse_kvs_cursor *cursor) nogil
 
 

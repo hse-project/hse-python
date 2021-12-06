@@ -642,7 +642,8 @@ Convenience function to return an iterator over key-value pairs in a cursor's
 view.
 
 Args:
-    max_count: Limit for the number of results.
+    key_buf: Buffer into which keys will be copied.
+    value_buf: Buffer into which values will be copied.
 
 Returns:
     Iterator of key-value pairs.
@@ -661,6 +662,10 @@ If the cursor is at EOF, attempts to read from it will not change the
 state of the cursor.
 
 This function is thread safe across disparate cursors.
+
+Args:
+    key_buf: Buffer into which the next key will be copied.
+    value_buf: Buffer into which the next value will be copied.
 
 Returns:
     tuple: Key-value pair.
