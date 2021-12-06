@@ -4,7 +4,7 @@
 
 import os
 import pathlib
-from enum import Enum, IntFlag, unique
+from enum import Enum, IntEnum, IntFlag, unique
 from types import TracebackType
 from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Union
 
@@ -26,13 +26,32 @@ def param(param: str) -> str:
     """
     ...
 
+@unique
+class ErrCtx(IntEnum):
+    """
+    @SUB@ hse.ErrCtx
+    """
+
+    NONE = ...
+
 class HseException(Exception):
     """
     @SUB@ hse.HseException
     """
 
-    returncode: int
     def __init__(self, returncode: int) -> None: ...
+    @property
+    def returncode(self) -> int:
+        """
+        @SUB@ hse.HseException.returncode
+        """
+        ...
+    @property
+    def ctx(self) -> ErrCtx:
+        """
+        @SUB@ hse.HseException.ctx
+        """
+        ...
 
 @unique
 class KvdbSyncFlag(IntFlag):
