@@ -853,19 +853,19 @@ cdef class KvsCursor:
                 hse_kvs_cursor_destroy(self._c_hse_kvs_cursor)
             self._c_hse_kvs_cursor = NULL
 
-    def items(self) -> Iterator[Tuple[bytes, Optional[bytes]]]:
+    def items(self, unsigned char [:]key_buf=None, unsigned char [:]value_buf=None) -> Iterator[Tuple[Optional[bytes], Optional[bytes]]]:
         """
         @SUB@ hse.KvsCursor.items
         """
-        def _iter():
+        def _iter(unsigned char [:]key_buf=None, unsigned char [:]value_buf=None):
             while True:
-                key, val = self.read()
+                key, val = self.read(key_buf=key_buf, value_buf=value_buf)
                 if not self._eof:
                     yield key, val
                 else:
                     return
 
-        return _iter()
+        return _iter(key_buf=key_buf, value_buf=value_buf)
 
     def update_view(self) -> None:
         """
@@ -955,27 +955,57 @@ cdef class KvsCursor:
 
         return (<char *>found)[:found_len]
 
-    def read(self) -> Tuple[Optional[bytes], Optional[bytes]]:
+    def read(self, unsigned char [:]key_buf=None, unsigned char [:]value_buf=None) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
         @SUB@ hse.KvsCursor.read
         """
         cdef unsigned int cflags = 0
-        cdef const void *key = NULL
-        cdef const void *value = NULL
         cdef size_t key_len = 0
         cdef size_t value_len = 0
         cdef cbool eof = False
         cdef hse_err_t err = 0
-        with nogil:
-            err = hse_kvs_cursor_read(
-                self._c_hse_kvs_cursor,
-                cflags,
-                &key,
-                &key_len,
-                &value,
-                &value_len,
-                &eof
-            )
+
+        cdef void *key_buf_addr = NULL
+        cdef size_t key_buf_sz = 0
+        cdef void *value_buf_addr = NULL
+        cdef size_t value_buf_sz = 0
+
+        cdef const void *key = NULL
+        cdef const void *value = NULL
+
+        copy = key_buf is not None or value_buf is not None
+
+        if copy:
+            if key_buf is not None and len(key_buf) > 0:
+                key_buf_addr = &key_buf[0]
+                key_buf_sz = key_buf.shape[0]
+            if value_buf is not None and len(value_buf) > 0:
+                value_buf_addr = &value_buf[0]
+                value_buf_sz = value_buf.shape[0]
+
+            with nogil:
+                err = hse_kvs_cursor_read_copy(
+                    self._c_hse_kvs_cursor,
+                    cflags,
+                    key_buf_addr,
+                    key_buf_sz,
+                    &key_len,
+                    value_buf_addr,
+                    value_buf_sz,
+                    &value_len,
+                    &eof
+                )
+        else:
+            with nogil:
+                err = hse_kvs_cursor_read(
+                    self._c_hse_kvs_cursor,
+                    cflags,
+                    &key,
+                    &key_len,
+                    &value,
+                    &value_len,
+                    &eof
+                )
         if err != 0:
             raise HseException(err)
 
@@ -983,7 +1013,11 @@ cdef class KvsCursor:
         if eof:
             return None, None
         else:
-            return (<char *>key)[:key_len], (<char *>value)[:value_len] if value else None
+            if copy:
+                return bytes(key_buf)[:key_len] if key_buf is not None else None, bytes(value_buf)[:value_len] if value_buf is not None else None
+            else:
+                return (<char *>key)[:key_len] if key else None, (<char *>value)[:value_len] if value else None
+
 
     @property
     def eof(self) -> bool:
