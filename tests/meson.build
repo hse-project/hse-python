@@ -6,7 +6,7 @@ test_runner = find_program('test-runner')
 
 env = environment({
     'PYTHONPATH': meson.project_build_root(),
-    'HSE_TEST_RUNNER_RUNNER': 'pytest',
+    'HSE_TEST_RUNNER_RUNNER': 'python',
 })
 
 wrapper = [
