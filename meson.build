@@ -15,7 +15,7 @@ project(
 
 sh = find_program('sh')
 
-ci = run_command(sh, '-c', '[ ${CI+x} ]').returncode() == 0
+ci = run_command(sh, '-c', '[ ${CI+x} ]', check: false).returncode() == 0
 
 version_components = meson.project_version().split('.')
 
