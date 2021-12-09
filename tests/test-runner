@@ -37,12 +37,10 @@ class Test(abc.ABC):
 
         if runner is None:
             return PlainTest(program, *args)
-        elif runner == "bash":
-            return BashTest(program, *args)
+        elif runner == "shell":
+            return ShellTest(program, *args)
         elif runner == "python":
             return PythonTest(program, *args)
-        elif runner == "pytest":
-            return PytestTest(program, *args)
         else:
             raise NotImplementedError()
 
@@ -73,7 +71,7 @@ class PythonTest(Test):
         return [str(self._program), self._args[0], "-C", str(home), *self._args[1:]]
 
 
-class BashTest(Test):
+class ShellTest(Test):
     def __init__(self, program: pathlib.Path, *args: str) -> None:
         super().__init__(program, *args)
 
@@ -85,21 +83,6 @@ class BashTest(Test):
 
     def command_line(self, home: str) -> List[str]:
         return [str(self._program), self._args[0], "-C", str(home), *self._args[1:]]
-
-
-class PytestTest(Test):
-    def __init__(self, program: pathlib.Path, *args: str) -> None:
-        super().__init__(program, *args)
-
-        assert len(self._args) >= 1
-
-    @property
-    def name(self) -> str:
-        # Parsing the pytest command lines is brittle, so just skip it.
-        return "pytest"
-
-    def command_line(self, home: str) -> List[str]:
-        return [str(self._program), *self._args, "-C", str(home)]
 
 
 class Args(argparse.Namespace):
