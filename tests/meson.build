@@ -10,6 +10,7 @@ env = environment({
 })
 
 wrapper = [
+    python,
     test_runner,
     '--',
 ]
