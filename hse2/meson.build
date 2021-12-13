@@ -161,13 +161,3 @@ foreach m : modules
 
     extension_modules += extension_module
 endforeach
-
-hse_python_dep = declare_dependency(
-    sources: extension_modules,
-    variables: {
-        'build-root': meson.project_build_root(),
-    },
-    version: meson.project_version()
-)
-
-meson.override_dependency('hse-python', hse_python_dep)
