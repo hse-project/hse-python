@@ -35,28 +35,26 @@ pp = find_program('pp.py')
 cython = find_program('cython')
 python = pymod.find_installation('python3')
 
-if not meson.is_subproject()
-    black = find_program('black', required: ci)
-    if black.found()
-        black_command = [
-            black,
-            meson.project_source_root(),
+black = find_program('black', required: false)
+if black.found()
+    black_command = [
+        black,
+        meson.project_source_root(),
+    ]
+
+    run_target(
+        'format',
+        command: black_command
+    )
+
+    run_target(
+        'format-check',
+        command: [
+            black_command,
+            '--check',
+            '--diff',
         ]
-
-        run_target(
-            'format',
-            command: black_command
-        )
-
-        run_target(
-            'format-check',
-            command: [
-                black_command,
-                '--check',
-                '--diff',
-            ]
-        )
-    endif
+    )
 endif
 
 # Exported for usage in hse.
@@ -65,7 +63,6 @@ project_build_root = meson.project_build_root()
 hse_dep = dependency(
     'hse-2',
     version: '>=2.1.0',
-    required: true,
     fallback: ['hse', 'hse_dep'],
     default_options: [
         'cli=false',

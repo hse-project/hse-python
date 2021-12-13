@@ -1,0 +1,149 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  MESON_TESTTHREADS: 1
+
+jobs:
+  ubuntu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        buildtype: [release, debug]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Initialize
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential ninja-build libbsd-dev pkg-config libmicrohttpd-dev liburcu-dev libyaml-dev liblz4-dev libcurl4-openssl-dev python3-dev
+          sudo python3 -m pip install meson Cython
+
+      - name: Setup
+        run: |
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+
+      - name: Build
+        run: |
+          ninja -C builddir
+
+      - name: Test
+        run: |
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: build-artifact-${{ matrix.os }}-${{ matrix.buildtype }}
+          path: builddir/meson-logs/
+
+  fedora:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:${{ matrix.image-tag }}
+      options: --privileged  -v /usr/src:/usr/src -v /lib/modules:/lib/modules
+    strategy:
+      fail-fast: false
+      matrix:
+        image-tag: [35]
+        buildtype: [release, debug]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Initialize
+        run: |
+          sudo dnf install -y git ninja-build meson pkg-config python3-Cython libmicrohttpd-devel userspace-rcu-devel libyaml-devel lz4-devel libbsd-devel libcurl-devel python3-devel
+          sudo dnf install -y xz cmake make automake gcc gcc-c++ kernel-devel
+          sudo dnf install -y libxml2-devel libxslt-devel
+
+      - name: Setup
+        run: |
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+
+      - name: Build
+        run: |
+          ninja -C builddir
+
+      - name: Test
+        run: |
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: build-artifact-fedora-${{ matrix.image-tag }}-${{ matrix.buildtype }}
+          path: builddir/meson-logs/
+
+  almalinux:
+    runs-on: ubuntu-latest
+    container:
+      image: almalinux:${{ matrix.image-tag }}
+      options: --privileged  -v /usr/src:/usr/src -v /lib/modules:/lib/modules
+    strategy:
+      fail-fast: false
+      matrix:
+        image-tag: [8]
+        buildtype: [release, debug]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Initialize
+        run: |
+          dnf install -y sudo dnf-plugins-core epel-release
+          dnf config-manager --set-enabled powertools
+          dnf install -y git ninja-build pkg-config libmicrohttpd-devel userspace-rcu-devel libyaml-devel lz4-devel libbsd-devel libcurl-devel python3-devel
+          dnf install -y xz cmake make automake gcc gcc-c++ kernel-devel
+          dnf install -y python36 python3-devel libxml2 libxslt
+          python3 -m pip install meson Cython
+
+      - name: Setup
+        run: |
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+
+      - name: Build
+        run: |
+          ninja -C builddir
+
+      - name: Test
+        run: |
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: build-artifact-almalinux-${{ matrix.image-tag }}-${{ matrix.buildtype }}
+          path: builddir/meson-logs/
+
+  format-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install black
+
+    - name: Black format check
+      continue-on-error: true
+      run: |
+        black --check ./
+
+  checkoss:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: check for license
+      run: |
+        scripts/checkoss
