@@ -28,7 +28,7 @@ jobs:
 
       - name: Setup
         run: |
-          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true
 
       - name: Build
         run: |
@@ -36,7 +36,7 @@ jobs:
 
       - name: Test
         run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
       - uses: actions/upload-artifact@v2
         if: failure()
@@ -66,7 +66,7 @@ jobs:
 
       - name: Setup
         run: |
-          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true
 
       - name: Build
         run: |
@@ -74,7 +74,7 @@ jobs:
 
       - name: Test
         run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
       - uses: actions/upload-artifact@v2
         if: failure()
@@ -107,7 +107,7 @@ jobs:
 
       - name: Setup
         run: |
-          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true -Dhse:tests=true
+          meson builddir -Dbuildtype=${{ matrix.buildtype }} --fatal-meson-warnings -Dwerror=true
 
       - name: Build
         run: |
@@ -115,7 +115,7 @@ jobs:
 
       - name: Test
         run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit --suite hse-python --suite hse:python
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
       - uses: actions/upload-artifact@v2
         if: failure()
