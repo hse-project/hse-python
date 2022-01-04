@@ -37,7 +37,7 @@ the scenes.
 
 ### From Build
 
-The default install directory is `/opt/hse`. This can be overridden by
+The default install directory is `/opt/hse`[^1]. This can be overridden by
 configuring the build with either `-Dprefix=$prefix` or `--prefix=$prefix`.
 
 ```shell
@@ -48,3 +48,7 @@ meson install -C build
 
 Information on running test suites and contributing to `hse-python` is located
 in the [`CONTRIBUTING.md`](./CONTRIBUTING.md) file.
+
+[^1]: You may have to configure your `PYTHONPATH` environment variable to allow
+the Python interpreter to see the `hse-python` module. This is almost surely
+the case if you do not change the default install prefix.

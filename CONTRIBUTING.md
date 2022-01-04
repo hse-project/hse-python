@@ -27,9 +27,6 @@ git clone git@github.com:hse-project/hse.git
 Please format Python source and stub files with
 [`black`](https://github.com/psf/black).
 
-In order to contribute to the project, you may want to setup a virtual
-environment for the project which can be done using the following:
-
 ### Working in the HSE Repository
 
 If you are working on a feature or bug that requires work in both `hse` and
