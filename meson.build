@@ -1,7 +1,7 @@
 project(
     'hse-python',
     ['c'], # until Meson supports Cython as a language
-    version: '2.2.0',
+    version: files('VERSION'),
     default_options: [
         'prefix=/opt/hse',
         'buildtype=debugoptimized',
