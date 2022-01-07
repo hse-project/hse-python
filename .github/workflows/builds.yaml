@@ -1,9 +1,24 @@
-name: CI
+name: Builds
 
 on:
   push:
+    branches:
+      - master
+      - v*.*
+    paths-ignore:
+      - "**.md"
+      - .coveragerc
+      - .gitignore
+      - .shellcheckrc
+      - LICENSE
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**.md"
+      - .coveragerc
+      - .gitignore
+      - .shellcheckrc
+      - LICENSE
 
 env:
   MESON_TESTTHREADS: 1
@@ -122,28 +137,3 @@ jobs:
         with:
           name: build-artifact-almalinux-${{ matrix.image-tag }}-${{ matrix.buildtype }}
           path: builddir/meson-logs/
-
-  format-check:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run: |
-        python3 -m pip install black
-
-    - name: Black format check
-      continue-on-error: true
-      run: |
-        black --check ./
-
-  checkoss:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: check for license
-      run: |
-        scripts/checkoss

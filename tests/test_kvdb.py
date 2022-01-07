@@ -3,7 +3,6 @@
 # Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
 
 import unittest
-import pathlib
 
 from common import ARGS, UNKNOWN, kvdb_fixture, kvs_fixture, HseTestCase
 from hse2 import hse
