@@ -37,7 +37,7 @@ init_py = custom_target(
         '@OUTPUT@',
     ],
     install: true,
-    install_dir: python.get_install_dir(pure: false) / hse_python_module_name,
+    install_dir: python.get_install_dir(pure: false) / root_module,
 )
 
 py_typed = custom_target(
@@ -50,7 +50,7 @@ py_typed = custom_target(
         '@OUTPUT@',
     ],
     install: true,
-    install_dir: python.get_install_dir(pure: false) / hse_python_module_name,
+    install_dir: python.get_install_dir(pure: false) / root_module,
 )
 
 modules = [
@@ -107,7 +107,7 @@ foreach m : modules
         ],
         output: '@0@.pyi'.format(m),
         install: true,
-        install_dir: python.get_install_dir(pure: false) / hse_python_module_name
+        install_dir: python.get_install_dir(pure: false) / root_module
     )
 
     pyx = custom_target(
@@ -155,7 +155,7 @@ foreach m : modules
             hse_dep,
             python.dependency(),
         ],
-        subdir: hse_python_module_name,
+        subdir: root_module,
         install: true,
     )
 
