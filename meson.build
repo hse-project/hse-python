@@ -13,57 +13,33 @@ project(
     meson_version: '>=0.57',
 )
 
-sh = find_program('sh')
-
-ci = run_command(sh, '-c', '[ ${CI+x} ]', check: false).returncode() == 0
-
 version_components = meson.project_version().split('.')
 
 hse_python_major_version = version_components[0]
 hse_python_minor_version = version_components[1]
 hse_python_patch_version = version_components[2]
 
-hse_python_module_name = 'hse@0@'.format(hse_python_major_version)
+root_module = 'hse@0@'.format(hse_python_major_version)
 
 cc = meson.get_compiler('c')
 
 fs = import('fs')
 pymod = import('python')
 
+sh = find_program('sh')
 docstrings = find_program('docstrings.py')
 pp = find_program('pp.py')
 cython = find_program('cython')
 python = pymod.find_installation('python3')
 
-black = find_program('black', required: false)
-if black.found()
-    black_command = [
-        black,
-        meson.project_source_root(),
-    ]
-
-    run_target(
-        'format',
-        command: black_command
-    )
-
-    run_target(
-        'format-check',
-        command: [
-            black_command,
-            '--check',
-            '--diff',
-        ]
-    )
-endif
+ci = run_command(sh, '-c', '[ ${CI+x} ]', check: false).returncode() == 0
 
 # Exported for usage in hse.
 project_build_root = meson.project_build_root()
 
 hse_dep = dependency(
     'hse-2',
-    version: '>=2.1.0',
-    fallback: ['hse', 'hse_dep'],
+    version: '>=2.2.0',
     default_options: [
         'cli=false',
         'docs=disabled',
@@ -81,15 +57,58 @@ if get_option('tests')
     subdir('tests')
 endif
 
-run_target(
-    'python-repl',
-    command: [
-        python,
-    ],
-    env: environment({
-        'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
-    }),
-    depends: [
-        extension_modules,
-    ]
-)
+if not meson.is_subproject()
+    run_target(
+        'python-repl',
+        command: [
+            python,
+        ],
+        env: environment({
+            'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
+        }),
+        depends: [
+            extension_modules,
+        ]
+    )
+
+    black = find_program('black', required: false)
+    if black.found()
+        black_command = [
+            black,
+            meson.project_source_root(),
+        ]
+
+        run_target(
+            'format',
+            command: black_command
+        )
+
+        run_target(
+            'format-check',
+            command: [
+                black_command,
+                '--check',
+                '--diff',
+            ]
+        )
+    endif
+
+    run_target(
+        'checkoss',
+        command: [
+            find_program('scripts/dev/checkoss.sh'),
+            '@BUILD_ROOT@',
+            '@SOURCE_ROOT@',
+        ],
+    )
+
+    shellcheck = find_program('shellcheck', required: false)
+    if shellcheck.found()
+        run_target(
+            'shellcheck',
+            command: [
+                find_program('scripts/dev/shellcheck.sh'),
+            ]
+        )
+    endif
+endif
