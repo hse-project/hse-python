@@ -28,7 +28,7 @@ Check the output of `meson configure build` or
 ### From PyPI
 
 ```shell
-python3 -m pip install hse2
+python3 -m pip install hse
 ```
 
 In this case, you may need to properly set `CFLAGS` and `LDFLAGS` according to
