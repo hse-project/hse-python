@@ -65,32 +65,26 @@ if USE_CYTHON:
         docstrings.insert(
             HSE_PACKAGE / "hse.in.pyx",
             HSE_PACKAGE / "hse.pyx",
-            HERE / "docstrings.toml",
         )
         docstrings.insert(
             HSE_PACKAGE / "hse.pyi.pp",
             HSE_PACKAGE / "hse.pyi",
-            HERE / "docstrings.toml",
         )
         docstrings.insert(
             HSE_PACKAGE / "limits.in.pyx",
             HSE_PACKAGE / "limits.pyx",
-            HERE / "docstrings.toml",
         )
         docstrings.insert(
             HSE_PACKAGE / "limits.in.pyi",
             HSE_PACKAGE / "limits.pyi",
-            HERE / "docstrings.toml",
         )
         docstrings.insert(
             HSE_PACKAGE / "version.in.pyx",
             HSE_PACKAGE / "version.pyx",
-            HERE / "docstrings.toml",
         )
         docstrings.insert(
             HSE_PACKAGE / "version.in.pyi",
             HSE_PACKAGE / "version.pyi",
-            HERE / "docstrings.toml",
         )
 
         return cythonize(
@@ -120,7 +114,7 @@ if USE_CYTHON:
 
 
 setup(
-    name="hse2",
+    name="hse",
     version="2.2.0",
     maintainer="Micron HSE",
     maintainer_email="hse@micron.com",
