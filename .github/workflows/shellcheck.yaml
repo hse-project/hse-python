@@ -4,8 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
     paths:
-      - '**/*.sh'
-      - 'scripts/git-hooks/*'
+      - "**.sh"
+      - "scripts/git-hooks/*"
 
 jobs:
   lint:
