@@ -130,7 +130,7 @@ foreach m : modules
         '@0@-c'.format(m),
         input: pyx,
         command: [
-            cython,
+            cython.cmd_array(),
             '@INPUT@',
             '--output-file',
             '@OUTPUT@',
