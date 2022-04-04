@@ -141,3 +141,57 @@ jobs:
         with:
           name: build-artifact-${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
           path: builddir/meson-logs/
+
+  architectures:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11
+    strategy:
+      fail-fast: false
+      matrix:
+        buildtype: [release, debug]
+        arch: [s390x]
+
+    steps:
+      - name: Checkout hse-python
+        uses: actions/checkout@v2
+
+      - name: Checkout HSE
+        uses: actions/checkout@v2
+        with:
+          repository: hse-project/hse
+          path: subprojects/hse
+          ref: ${{ github.base_ref || github.ref }}
+
+      - name: Post-checkout
+        run: |
+          git -C subprojects/hse checkout ${{ github.head_ref }} || true
+
+      - name: Initialize
+        run: |
+          dpkg --add-architecture ${{ matrix.arch }}
+          apt-get -y update
+          apt-get -y install python3 python3-pip pkg-config ninja-build \
+            build-essential crossbuild-essential-${{ matrix.arch }} \
+            libpython3-dev:${{ matrix.arch }} liburcu-dev:${{ matrix.arch }} \
+            libcurl4-openssl-dev:${{ matrix.arch }} \
+            libbsd-dev:${{ matrix.arch }} libmicrohttpd-dev:${{ matrix.arch }} \
+            libyaml-dev:${{ matrix.arch }}
+          python3 -m pip install meson Cython
+
+      - name: Setup
+        run: |
+          meson builddir --cross-file cross/${{ matrix.arch }}.ini \
+            --cross-file cross/common.ini -Dbuildtype=${{ matrix.buildtype }} \
+            -Dwerror=true
+
+      - name: Build
+        run: |
+          ninja -C builddir
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: ${{ github.job }}-${{ matrix.arch }}-${{ matrix.buildtype }}
+          path: |
+            builddir/meson-logs/

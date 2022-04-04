@@ -1,6 +1,6 @@
 project(
     'hse-python',
-    ['cython', 'c'], # until Meson supports Cython as a language
+    ['c'],
     version: files('VERSION'),
     license: 'Apache-2.0',
     default_options: [
@@ -13,6 +13,8 @@ project(
     ],
     meson_version: '>=0.59.0'
 )
+
+add_languages('cython', native: true)
 
 version_components = meson.project_version().split('.')
 
