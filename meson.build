@@ -23,7 +23,7 @@ hse_python_patch_version = version_components[2]
 root_module = 'hse@0@'.format(hse_python_major_version)
 
 cc = meson.get_compiler('c')
-cython = meson.get_compiler('cython')
+cython = meson.get_compiler('cython', native: true)
 
 fs = import('fs')
 pymod = import('python')
