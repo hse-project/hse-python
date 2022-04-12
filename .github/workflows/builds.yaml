@@ -33,7 +33,7 @@ jobs:
         buildtype: [release, debug]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Initialize
         run: |
@@ -72,7 +72,7 @@ jobs:
         buildtype: [release, debug]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Initialize
         run: |
@@ -112,7 +112,7 @@ jobs:
         buildtype: [release, debug]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Initialize
         run: |
@@ -154,10 +154,10 @@ jobs:
 
     steps:
       - name: Checkout hse-python
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Checkout HSE
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: hse-project/hse
           path: subprojects/hse

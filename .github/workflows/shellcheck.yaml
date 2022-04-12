@@ -15,7 +15,7 @@ jobs:
       options: --privileged -v /usr/src:/usr/src -v /lib/modules:/lib/modules
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Initialize
         run: |
