@@ -65,58 +65,53 @@ if get_option('tests')
     subdir('tests')
 endif
 
-if not meson.is_subproject()
+run_target(
+    'python-repl',
+    command: [
+        python,
+    ],
+    env: environment({
+        'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
+    }),
+    depends: [
+        extension_modules,
+    ]
+)
+
+black = find_program('black', required: false, disabler: true)
+run_target(
+    'format',
+    command: [
+        black,
+        meson.project_source_root(),
+    ]
+)
+
+run_target(
+    'format-check',
+    command: [
+        black,
+        meson.project_source_root(),
+        '--check',
+        '--diff',
+    ]
+)
+
+run_target(
+    'checkoss',
+    command: [
+        find_program('scripts/dev/checkoss.sh'),
+        '@BUILD_ROOT@',
+        '@SOURCE_ROOT@',
+    ]
+)
+
+shellcheck = find_program('shellcheck', required: false)
+if shellcheck.found()
     run_target(
-        'python-repl',
+        'shellcheck',
         command: [
-            python,
-        ],
-        env: environment({
-            'PYTHONPATH': '@0@:@1@'.format(meson.project_build_root(), meson.project_source_root()),
-        }),
-        depends: [
-            extension_modules,
+            find_program('scripts/dev/shellcheck.sh'),
         ]
     )
-
-    black = find_program('black', required: false)
-    if black.found()
-        black_command = [
-            black,
-            meson.project_source_root(),
-        ]
-
-        run_target(
-            'format',
-            command: black_command
-        )
-
-        run_target(
-            'format-check',
-            command: [
-                black_command,
-                '--check',
-                '--diff',
-            ]
-        )
-    endif
-
-    run_target(
-        'checkoss',
-        command: [
-            find_program('scripts/dev/checkoss.sh'),
-            '@BUILD_ROOT@',
-            '@SOURCE_ROOT@',
-        ],
-    )
-
-    shellcheck = find_program('shellcheck', required: false)
-    if shellcheck.found()
-        run_target(
-            'shellcheck',
-            command: [
-                find_program('scripts/dev/shellcheck.sh'),
-            ]
-        )
-    endif
 endif
