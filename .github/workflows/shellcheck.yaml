@@ -11,7 +11,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     container:
-      image: fedora:latest
+      image: fedora:36
       options: --privileged -v /usr/src:/usr/src -v /lib/modules:/lib/modules
 
     steps:

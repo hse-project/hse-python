@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image-tag: [35]
+        image-tag: [36]
         buildtype: [release, debug]
 
     steps:
