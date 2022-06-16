@@ -7,6 +7,12 @@ on:
       - "**.sh"
       - "scripts/git-hooks/*"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   lint:
     runs-on: ubuntu-latest
