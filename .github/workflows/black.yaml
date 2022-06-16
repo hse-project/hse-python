@@ -7,6 +7,12 @@ on:
       - "**.py"
       - "**.pyi"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   formatting:
     runs-on: ubuntu-latest
