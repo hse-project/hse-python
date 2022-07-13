@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: fedora:36
-      options: --privileged -v /usr/src:/usr/src -v /lib/modules:/lib/modules
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout hse-python
+        uses: actions/checkout@v3
 
       - name: Initialize
         run: |

@@ -46,8 +46,8 @@ assert(
 project_build_root = meson.project_build_root()
 
 hse_dep = dependency(
-    'hse-2',
-    version: '>=2.2.0',
+    'hse-3',
+    version: ['>=3.0.0', '<4.0.0'],
     default_options: [
         'cli=false',
         'docs=disabled',
@@ -59,7 +59,7 @@ hse_dep = dependency(
     ],
 )
 
-subdir('hse2')
+subdir('hse@0@'.format(hse_python_major_version))
 
 if get_option('tests')
     subdir('tests')

@@ -1,0 +1,86 @@
+name: Builds
+
+on:
+  push:
+    branches:
+      - master
+      - v*.*
+    paths:
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/builds.yaml"
+      - .coveragerc
+      - .gitattributes
+      - .github/dependabot.yaml
+      - .gitignore
+      - .shellcheckrc
+      - LICENSE
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/workflows/**"
+      - "!.github/workflows/builds.yaml"
+      - .coveragerc
+      - .gitattributes
+      - .github/dependabot.yaml
+      - .gitignore
+      - .shellcheckrc
+      - LICENSE
+
+concurrency:
+  group: ${{ github.workflow }}-ignore-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image-tag: ["18.04", "20.04"]
+        buildtype: [release, debug]
+
+    steps:
+      - run: |
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
+
+  fedora:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image-tag: [36]
+        buildtype: [release, debug]
+
+    steps:
+      - run: |
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
+
+  almalinux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image-tag: [8]
+        buildtype: [release, debug]
+
+    steps:
+      - run: |
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
+
+  architectures:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        buildtype: [release, debug]
+        arch: [s390x]
+
+    steps:
+      - run: |
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}"

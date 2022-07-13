@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2021-2022 Micron Technology, Inc. All rights reserved.
 
 import unittest
 
-from hse2 import hse
 from common import UNKNOWN
+
+from hse3 import hse
 
 
 class HseTests(unittest.TestCase):

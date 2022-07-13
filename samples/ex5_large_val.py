@@ -2,14 +2,14 @@
 
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
-from typing import List
-from hse2 import hse, limits
-import sys
 import argparse
+import sys
 from functools import partial
+from typing import List
 
+from hse3 import hse, limits
 
 # This example demonstrates how one could add key-value pairs where the value
 # length could be larger than the allowed maximum limits.KVS_VALUE_LEN_MAX.
