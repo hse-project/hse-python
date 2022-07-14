@@ -40,7 +40,6 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         image-tag: ["18.04", "20.04"]
         buildtype: [release, debug]
@@ -52,7 +51,6 @@ jobs:
   fedora:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         image-tag: [36]
         buildtype: [release, debug]
@@ -64,7 +62,6 @@ jobs:
   almalinux:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         image-tag: [8]
         buildtype: [release, debug]
@@ -76,7 +73,6 @@ jobs:
   architectures:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         buildtype: [release, debug]
         arch: [s390x]
