@@ -65,12 +65,13 @@ jobs:
 
       - name: Determine branches
         id: determine-branches
+        shell: sh +e {0}
         run: |
           for p in hse; do
             [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
               --exit-code --heads "https://github.com/hse-project/$p.git" \
               "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            if [ $? -eq 0 ]; then
               echo "::set-output name=$p::$GITHUB_HEAD_REF"
             else
               echo "::set-output name=$p::master"
@@ -107,7 +108,7 @@ jobs:
         run: |
           meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
@@ -138,12 +139,13 @@ jobs:
 
       - name: Determine branches
         id: determine-branches
+        shell: sh +e {0}
         run: |
           for p in hse; do
             [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
               --exit-code --heads "https://github.com/hse-project/$p.git" \
               "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            if [ $? -eq 0 ]; then
               echo "::set-output name=$p::$GITHUB_HEAD_REF"
             else
               echo "::set-output name=$p::master"
@@ -169,7 +171,7 @@ jobs:
         run: |
           meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
@@ -201,12 +203,13 @@ jobs:
 
       - name: Determine branches
         id: determine-branches
+        shell: sh +e {0}
         run: |
           for p in hse; do
             [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
               --exit-code --heads "https://github.com/hse-project/$p.git" \
               "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            if [ $? -eq 0 ]; then
               echo "::set-output name=$p::$GITHUB_HEAD_REF"
             else
               echo "::set-output name=$p::master"
@@ -232,7 +235,7 @@ jobs:
         run: |
           meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
@@ -266,12 +269,13 @@ jobs:
 
       - name: Determine branches
         id: determine-branches
+        shell: sh +e {0}
         run: |
           for p in hse; do
             [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
               --exit-code --heads "https://github.com/hse-project/$p.git" \
               "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            if [ $? -eq 0 ]; then
               echo "::set-output name=$p::$GITHUB_HEAD_REF"
             else
               echo "::set-output name=$p::master"
@@ -295,7 +299,7 @@ jobs:
         run: |
           ninja -C builddir
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: ${{ github.job }}-${{ matrix.arch }}-${{ matrix.buildtype }}
