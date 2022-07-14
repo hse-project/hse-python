@@ -4,5 +4,5 @@ revision = master
 depth = 1
 
 [provide]
-dependency_names = hse-2
-program_names = hse2
+dependency_names = hse-3
+program_names = hse3

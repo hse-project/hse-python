@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 import unittest
 
-from common import ARGS, UNKNOWN, kvdb_fixture, kvs_fixture, HseTestCase
-from hse2 import hse
+from common import ARGS, UNKNOWN, HseTestCase, kvdb_fixture, kvs_fixture
+
+from hse3 import hse
 
 
 class KvdbTests(HseTestCase):
