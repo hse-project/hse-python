@@ -56,7 +56,7 @@ hse_dep = dependency(
         'samples=false',
         'bindings=none',
         'db_bench=false',
-    ],
+    ]
 )
 
 subdir('hse@0@'.format(hse_python_major_version))

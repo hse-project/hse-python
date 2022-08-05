@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - v*.*
+      - "v[0-9]+.[0-9]+"
     paths:
       - "**.md"
       - ".github/ISSUE_TEMPLATE/**"
@@ -37,46 +37,21 @@ concurrency:
 permissions: {}
 
 jobs:
-  ubuntu:
+  normal:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        image-tag: ["18.04", "20.04"]
+        image:
+          - almalinux-8
+          - almalinux-9
+          - cross-s390x
+          - fedora-36
+          - ubuntu-18.04
+          - ubuntu-20.04
+          - ubuntu-22.04
         buildtype: [release, debug]
 
     steps:
       - run: |
-          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
-
-  fedora:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image-tag: [36]
-        buildtype: [release, debug]
-
-    steps:
-      - run: |
-          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
-
-  almalinux:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image-tag: [8]
-        buildtype: [release, debug]
-
-    steps:
-      - run: |
-          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
-
-  architectures:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        buildtype: [release, debug]
-        arch: [s390x]
-
-    steps:
-      - run: |
-          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}/${{ matrix.image }}/${{ matrix.buildtype }}"
