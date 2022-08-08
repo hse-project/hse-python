@@ -1,10 +1,12 @@
 name: Builds
 
 on:
+  release:
+    types: [created]
   push:
     branches:
       - master
-      - v*.*
+      - "v[0-9]+.[0-9]+"
     paths-ignore:
       - "**.md"
       - ".github/ISSUE_TEMPLATE/**"
@@ -34,51 +36,98 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
-permissions: {}
+permissions:
+  packages: read
 
 env:
   MESON_TESTTHREADS: 1
 
 jobs:
-  ubuntu:
+  determine-tag:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.determine-tag.outputs.tag }}
+
+    steps:
+      - name: Determine tag
+        id: determine-tag
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            echo "::set-output name=tag::$GITHUB_BASE_REF"
+          else
+            echo "::set-output name=tag::$GITHUB_REF_NAME"
+          fi
+
+  normal:
+    runs-on: ubuntu-latest
+    needs:
+      - determine-tag
     container:
-      image: ubuntu:${{ matrix.image-tag }}
+      image: ghcr.io/hse-project/ci-images/${{ matrix.image }}:${{ needs.determine-tag.outputs.tag }}
     strategy:
       fail-fast: false
       matrix:
-        image-tag: ["18.04", "20.04"]
+        image:
+          - almalinux-8
+          - almalinux-9
+          - cross-s390x
+          - fedora-36
+          - ubuntu-18.04
+          - ubuntu-20.04
+          - ubuntu-22.04
         buildtype: [release, debug]
-    env:
-      DEBIAN_FRONTEND: noninteractive
 
     steps:
-      - name: Initialize
+      - name: To skip or not to skip
+        id: to-skip
+        shell: sh +e {0}
         run: |
-          apt-get -y update
-          apt-get -y install git build-essential ninja-build pkg-config \
-            libbsd-dev libmicrohttpd-dev liburcu-dev libyaml-dev liblz4-dev \
-            libcurl4-openssl-dev python3-dev python3-pip
+          skip="false"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            echo "${{ matrix.image }}" | grep -P --quiet "(almalinux-8|almalinux-9|ubuntu-20.04|ubuntu-22.04)"
+            if [ $? -eq 0 ]; then
+              skip="true"
+            fi
+          fi
+
+          echo "::set-output name=skip::$skip"
 
       - name: Checkout hse-python
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         uses: actions/checkout@v3
 
       - name: Determine branches
         id: determine-branches
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         shell: sh +e {0}
         run: |
           for p in hse; do
-            [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
-              --exit-code --heads "https://github.com/hse-project/$p.git" \
-              "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ]; then
-              echo "::set-output name=$p::$GITHUB_HEAD_REF"
+            branch=master
+            if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+              git ls-remote --exit-code --heads \
+                "https://github.com/hse-project/$p.git" "$GITHUB_HEAD_REF" \
+                > /dev/null
+
+              if [ $? -eq 0 ]; then
+                branch="$GITHUB_HEAD_REF"
+              fi
+            elif [ "$GITHUB_EVENT_NAME" = "release" ]; then
+              branch="$GITHUB_REF_NAME"
             else
-              echo "::set-output name=$p::master"
+              git ls-remote --exit-code --heads \
+                "https://github.com/hse-project/$p.git" "$GITHUB_REF" \
+                > /dev/null
+
+              if [ $? -eq 0 ]; then
+                branch="$GITHUB_REF_NAME"
+              fi
             fi
+
+            echo "::set-output name=$p::$branch"
           done
 
       - name: Checkout HSE
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         uses: actions/checkout@v3
         with:
           repository: hse-project/hse
@@ -86,246 +135,42 @@ jobs:
           ref: ${{ steps.determine-branches.outputs.hse }}
 
       - name: Cache Meson packagecache
+        id: meson-packagecache
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: meson-packagecache-ubuntu:${{ matrix.image-tag }}-${{ hashFiles('subprojects/hse/subprojects/*.wrap') }}
+          key: meson-packagecache-${{ hashFiles('subprojects/hse/subprojects/*.wrap') }}
 
-      - name: Get Meson on ubuntu-18.04
-        if: ${{ matrix.image-tag == '18.04' }}
+      - name: Download Meson subprojects
+        if: ${{ steps.to-skip.outputs.skip == 'false' && !steps.meson-packagecache.outputs.cache-hit }}
         run: |
-          apt-get -y install python3.7
-          python3.7 -m pip install meson Cython
+          meson subprojects download
 
-      - name: Get Meson on ubuntu-20.04
-        if: ${{ matrix.image-tag == '20.04' }}
+      - name: Export cross arguments
+        if: ${{ steps.to-skip.outputs.skip == 'false' && startsWith(matrix.image, 'cross') }}
         run: |
-          python3 -m pip install meson Cython
+          image="${{ matrix.image }}"
+          echo "CROSS_ARGS=--cross-file cross/${image##*-}.ini --cross-file cross/common.ini" >> "$GITHUB_ENV"
 
       - name: Setup
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         run: |
-          meson builddir --buildtype=${{ matrix.buildtype }} --werror
-
-      - name: Build
-        run: |
-          ninja -C builddir
-
-      - name: Test
-        run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
-
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
-          path: builddir/meson-logs/
-
-  fedora:
-    runs-on: ubuntu-latest
-    container:
-      image: fedora:${{ matrix.image-tag }}
-    strategy:
-      fail-fast: false
-      matrix:
-        image-tag: [36]
-        buildtype: [release, debug]
-
-    steps:
-      - name: Initialize
-        run: |
-          dnf group install -y --with-optional \
-            "C Development Tools and Libraries"
-          dnf install -y git ninja-build meson pkg-config libmicrohttpd-devel \
-            userspace-rcu-devel libyaml-devel lz4-devel libbsd-devel \
-            libcurl-devel libxml2-devel libxslt-devel \
-            python3-devel python3-Cython
-
-      - name: Checkout hse-python
-        uses: actions/checkout@v3
-
-      - name: Determine branches
-        id: determine-branches
-        shell: sh +e {0}
-        run: |
-          for p in hse; do
-            [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
-              --exit-code --heads "https://github.com/hse-project/$p.git" \
-              "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ]; then
-              echo "::set-output name=$p::$GITHUB_HEAD_REF"
-            else
-              echo "::set-output name=$p::master"
-            fi
-          done
-
-      - name: Checkout HSE
-        uses: actions/checkout@v3
-        with:
-          repository: hse-project/hse
-          path: subprojects/hse
-          ref: ${{ steps.determine-branches.outputs.hse }}
-
-      - name: Cache Meson packagecache
-        uses: actions/cache@v3
-        with:
-          path: subprojects/packagecache
-          key: meson-packagecache-fedora:${{ matrix.image-tag }}-${{ hashFiles('subprojects/hse/subprojects/*.wrap') }}
-
-      - name: Setup
-        run: |
-          meson builddir --buildtype=${{ matrix.buildtype }} --werror
-
-      - name: Build
-        run: |
-          ninja -C builddir
-
-      - name: Test
-        run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
-
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
-          path: builddir/meson-logs/
-
-  almalinux:
-    runs-on: ubuntu-latest
-    container:
-      image: almalinux:${{ matrix.image-tag }}
-    strategy:
-      fail-fast: false
-      matrix:
-        image-tag: [8]
-        buildtype: [release, debug]
-
-    steps:
-      - name: Initialize
-        run: |
-          dnf install -y sudo dnf-plugins-core epel-release
-          dnf config-manager --set-enabled powertools
-          dnf group install -y --with-optional "Development Tools"
-          dnf install -y git ninja-build libmicrohttpd-devel \
-            userspace-rcu-devel libyaml-devel lz4-devel libbsd-devel \
-            libcurl-devel libxml2 libxslt python36 python36-devel
-          python3 -m pip install meson Cython
-
-      - name: Checkout hse-python
-        uses: actions/checkout@v3
-
-      - name: Determine branches
-        id: determine-branches
-        shell: sh +e {0}
-        run: |
-          for p in hse; do
-            [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
-              --exit-code --heads "https://github.com/hse-project/$p.git" \
-              "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ]; then
-              echo "::set-output name=$p::$GITHUB_HEAD_REF"
-            else
-              echo "::set-output name=$p::master"
-            fi
-          done
-
-      - name: Checkout HSE
-        uses: actions/checkout@v3
-        with:
-          repository: hse-project/hse
-          path: subprojects/hse
-          ref: ${{ steps.determine-branches.outputs.hse }}
-
-      - name: Cache Meson packagecache
-        uses: actions/cache@v3
-        with:
-          path: subprojects/packagecache
-          key: meson-packagecache-almalinux:${{ matrix.image-tag }}-${{ hashFiles('subprojects/hse/subprojects/*.wrap') }}
-
-      - name: Setup
-        run: |
-          meson builddir --buildtype=${{ matrix.buildtype }} --werror
-
-      - name: Build
-        run: |
-          ninja -C builddir
-
-      - name: Test
-        run: |
-          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
-
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: ${{ github.job }}-${{ matrix.image-tag }}-${{ matrix.buildtype }}
-          path: builddir/meson-logs/
-
-  architectures:
-    runs-on: ubuntu-latest
-    container:
-      image: debian:11
-    strategy:
-      fail-fast: false
-      matrix:
-        buildtype: [release, debug]
-        arch: [s390x]
-
-    steps:
-      - name: Initialize
-        run: |
-          dpkg --add-architecture ${{ matrix.arch }}
-          apt-get -y update
-          apt-get -y install git python3 python3-pip pkg-config ninja-build \
-            build-essential crossbuild-essential-${{ matrix.arch }} \
-            libpython3-dev:${{ matrix.arch }} liburcu-dev:${{ matrix.arch }} \
-            libcurl4-openssl-dev:${{ matrix.arch }} \
-            libbsd-dev:${{ matrix.arch }} libmicrohttpd-dev:${{ matrix.arch }} \
-            libyaml-dev:${{ matrix.arch }}
-          python3 -m pip install meson Cython
-
-      - name: Checkout hse-python
-        uses: actions/checkout@v3
-
-      - name: Determine branches
-        id: determine-branches
-        shell: sh +e {0}
-        run: |
-          for p in hse; do
-            [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git ls-remote \
-              --exit-code --heads "https://github.com/hse-project/$p.git" \
-              "$GITHUB_HEAD_REF" > /dev/null
-            if [ $? -eq 0 ]; then
-              echo "::set-output name=$p::$GITHUB_HEAD_REF"
-            else
-              echo "::set-output name=$p::master"
-            fi
-          done
-
-      - name: Checkout HSE
-        uses: actions/checkout@v3
-        with:
-          repository: hse-project/hse
-          path: subprojects/hse
-          ref: ${{ steps.determine-branches.outputs.hse }}
-
-      - name: Cache Meson packagecache
-        uses: actions/cache@v3
-        with:
-          path: subprojects/packagecache
-          key: meson-packagecache-debian:11-${{ hashFiles('subprojects/hse/subprojects/*.wrap') }}
-
-      - name: Setup
-        run: |
-          meson builddir --cross-file cross/${{ matrix.arch }}.ini \
-            --cross-file cross/common.ini --buildtype=${{ matrix.buildtype }} \
+          meson builddir --buildtype=${{ matrix.buildtype }} $CROSS_ARGS \
             --werror
 
       - name: Build
+        if: ${{ steps.to-skip.outputs.skip == 'false' }}
         run: |
           ninja -C builddir
+
+      - name: Test
+        if: ${{ steps.to-skip.outputs.skip == 'false' && !startsWith(matrix.image, 'cross') }}
+        run: |
+          meson test -C builddir --setup=ci --print-errorlogs --no-stdsplit
 
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: ${{ github.job }}-${{ matrix.arch }}-${{ matrix.buildtype }}
-          path: |
-            builddir/meson-logs/
+          name: ${{ matrix.image }}-${{ matrix.buildtype }}
+          path: builddir/meson-logs/

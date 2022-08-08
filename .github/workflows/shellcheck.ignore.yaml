@@ -1,11 +1,11 @@
-name: Black
+name: ShellCheck
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore:
-      - "**.py"
-      - "**.pyi"
+      - "**.sh"
+      - .github/workflows/shellcheck.yaml
 
 concurrency:
   group: ${{ github.workflow }}-ignore-${{ github.head_ref }}
@@ -14,9 +14,8 @@ concurrency:
 permissions: {}
 
 jobs:
-  black:
+  shellcheck:
     runs-on: ubuntu-latest
-
     steps:
       - run: |
           echo "Skipping ${{ github.workflow }}/${{ github.job }}"
