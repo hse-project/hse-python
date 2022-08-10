@@ -45,6 +45,7 @@ env:
 jobs:
   determine-tag:
     runs-on: ubuntu-latest
+    continue-on-error: false
     outputs:
       tag: ${{ steps.determine-tag.outputs.tag }}
 
