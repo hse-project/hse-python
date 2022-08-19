@@ -150,7 +150,7 @@ jobs:
       - name: Setup
         if: ${{ steps.to-skip.outputs.skip == 'false' }}
         run: |
-          meson builddir --buildtype=${{ matrix.buildtype }} $CROSS_ARGS \
+          meson setup builddir --buildtype=${{ matrix.buildtype }} $CROSS_ARGS \
             --werror
 
       - name: Build
