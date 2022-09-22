@@ -2,13 +2,12 @@
 
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 import argparse
 import pathlib
 import re
 import sys
-
 
 IFDEF_RE = re.compile(r"#\W+ifdef\W+HSE_PYTHON_EXPERIMENTAL")
 ENDIF_RE = re.compile(r"#\W+endif")
@@ -16,7 +15,7 @@ ENDIF_RE = re.compile(r"#\W+endif")
 
 def preprocess(file: pathlib.Path, output: pathlib.Path, experimental: bool = False):
     lines = file.read_text().splitlines(keepends=True)
-    with open(output, "w") as out:
+    with open(output, "w", encoding="utf-8") as out:
         while lines:
             line = lines.pop(0)
             if IFDEF_RE.match(line.strip()):

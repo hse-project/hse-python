@@ -1,0 +1,22 @@
+[flake8]
+extend-ignore =
+    # Formatting is done by Black
+    E301,
+    # Formatting is done by Black
+    E302,
+    # Remove when oldest platform we support supports >= Python 3.11 by default
+    F821,
+    # We need docstrings in stubs to support language servers on hover
+    Y021,
+    # Remove when oldest platform we support supports >= Python 3.9 by default
+    Y022,
+    # Remove when oldest platform we support supports >= Python 3.10 by default
+    Y034,
+    # Remove when oldest platform we support supports >= Python 3.10 by default
+    Y036,
+    # Remove when oldest platform we support supports >= Python 3.10 by default
+    Y037,
+    # We need docstrings in stubs to support language servers on hover
+    Y048
+
+max-line-length = 100

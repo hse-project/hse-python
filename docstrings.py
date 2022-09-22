@@ -11,6 +11,12 @@
 #
 # PYTHON IS PAIN...
 
+import argparse
+import pathlib
+import re
+import sys
+from io import StringIO
+from typing import List
 
 __DOCSTRINGS = {
     "hse.init": """
@@ -836,14 +842,6 @@ Patch version of HSE.
 Kvdb.compact() flags.
 """
 }
-
-
-import re
-import sys
-import argparse
-import pathlib
-from typing import List
-from io import StringIO
 
 
 __DOCSTRING_PATTERN = re.compile(r"(\s*)@SUB@\s+([a-zA-Z0-9._]+)")

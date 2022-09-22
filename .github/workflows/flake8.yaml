@@ -1,4 +1,4 @@
-name: Black
+name: Flake8
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ concurrency:
 permissions: {}
 
 jobs:
-  black:
+  flake8:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +23,9 @@ jobs:
 
     - name: Setup
       run: |
-        python3 -m pip install black
+        python3 -m pip install flake8 flake8-pyi
 
     - name: Check
       continue-on-error: true
       run: |
-        black --check ./
+        flake8 .

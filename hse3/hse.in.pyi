@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 import os
 import pathlib
+from collections.abc import Iterator
 from enum import Enum, IntEnum, IntFlag, unique
 from types import TracebackType
-from typing import Iterator, List, Optional, SupportsBytes, Tuple, Type, Any, Union
+from typing import List, Optional, SupportsBytes, Tuple, Type, Union
 
 def init(config: Optional[Union[str, os.PathLike[str]]] = ..., *params: str) -> None:
     """
@@ -167,7 +168,7 @@ class Kvdb:
         ...
     # endif
     @staticmethod
-    def storage_add(kvdb_home: Union[str, "os.PathLike[str]"], params: str) -> None:
+    def storage_add(kvdb_home: Union[str, os.PathLike[str]], params: str) -> None:
         """
         @SUB@ hse.Kvdb.storage_add
         """
@@ -301,7 +302,7 @@ class KvdbTransaction:
     def __exit__(
         self,
         exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[Any],
+        exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None: ...
     def begin(self) -> None:
@@ -331,7 +332,7 @@ class KvsCursor:
     def __exit__(
         self,
         exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[Any],
+        exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None: ...
     @property
