@@ -421,8 +421,9 @@ Raises:
 
     "hse.KvsPutFlag": """
 Attributes:
-    PRIO: Operation will not be throttled
-    VCOMP_OFF: Value will not be compressed
+    PRIO: Operation will not be throttled.
+    VCOMP_OFF: Value will not be compressed.
+    VCOMP_ON: Value may be compressed.
 """,
 
     "hse.Kvs.put": """
@@ -436,15 +437,19 @@ The HSE KVDB attempts to maintain reasonable QoS and for high-throughput
 clients this results in very short sleep's being inserted into the put path.
 For some kinds of data (e.g., control metadata) the client may wish to not
 experience that delay. For relatively low data rate uses, the caller can set
-the ``KvsPutFlags.PRIO`` flag for an ``Kvs.put()``. Care should be taken when
+the ``KvsPutFlag.PRIO`` flag for an ``Kvs.put()``. Care should be taken when
 doing so to ensure that the system does not become overrun. As a rough
 approximation, doing 1M priority puts per second marked as PRIO is likely an
 issue. On the other hand, doing 1K small puts per second marked as PRIO is
 almost certainly fine.
 
-If compression is enabled for the given kvs, then ``Kvs.put()`` will attempt
-to compress the value unless the ``KvsPutFlags.VCOMP_OFF`` flag is given.
-Otherwise, the ``KvsPutFlags.VCOMP_OFF`` flag is ignored.
+If compression is on by default for the given kvs, then ``Kvs.put()`` will
+attempt to compress the value unless the ``KvsPutFlag.VCOMP_OFF`` flag is
+given. Otherwise, the ``KvsPutFlag.VCOMP_OFF`` flag is ignored.
+
+If compression is off by default for the given kvs, then ``Kvs.put()`` will not
+attempt to compress a value unless the ``KvsPutFlag.VCOMP_ON`` flag is given.
+Otherwise, the ``KvsPutFlag.VCOMP_ON`` flag is ignored.
 
 This function is thread safe.
 
@@ -873,9 +878,9 @@ def insert(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
         input_file: Path to file containing templated docstrings.
         output_file: Path to output file.
     """
-    with open(input_file, "r") as input:
+    with open(input_file, "r", encoding="utf-8") as inf:
         output_lines: List[str] = []
-        for line in input.readlines():
+        for line in inf.readlines():
             match = __DOCSTRING_PATTERN.search(line)
             if match is None:
                 output_lines.append(line)
@@ -891,9 +896,9 @@ def insert(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
                         )
                     )
 
-        with open(output_file, "w") as output:
+        with open(output_file, "w", encoding="utf-8") as outf:
             for line in output_lines:
-                output.write(line)
+                outf.write(line)
 
 
 if __name__ == "__main__":

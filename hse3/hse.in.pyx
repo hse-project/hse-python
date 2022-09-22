@@ -425,6 +425,7 @@ class KvsPutFlag(IntFlag):
     """
     PRIO = HSE_KVS_PUT_PRIO
     VCOMP_OFF = HSE_KVS_PUT_VCOMP_OFF
+    VCOMP_ON = HSE_KVS_PUT_VCOMP_ON
 
 
 @unique

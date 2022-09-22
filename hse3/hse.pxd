@@ -15,6 +15,7 @@ cdef extern from "Python.h":
 cdef extern from "hse/flags.h":
     cdef unsigned int HSE_KVS_PUT_PRIO
     cdef unsigned int HSE_KVS_PUT_VCOMP_OFF
+    cdef unsigned int HSE_KVS_PUT_VCOMP_ON
 
     cdef unsigned int HSE_CURSOR_CREATE_REV
 
