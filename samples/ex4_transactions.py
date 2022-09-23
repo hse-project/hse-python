@@ -4,8 +4,9 @@
 #
 # Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
-from hse3 import hse
 import sys
+
+from hse3 import hse
 
 
 def main() -> int:

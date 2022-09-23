@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 import os
 import pathlib
 from typing import Any, Dict, List, Type
-from setuptools import Command, find_packages, setup, Extension
 
+from setuptools import Command, Extension, find_packages, setup
 
 HERE = pathlib.Path(__file__).parent
 HSE_PACKAGE = pathlib.Path("hse2")

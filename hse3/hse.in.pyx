@@ -1,17 +1,19 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 import errno
 import os
 import pathlib
+
 cimport cython
 cimport limits
-from enum import Enum, IntFlag, unique, IntEnum
-from types import TracebackType
-from typing import List, Optional, Tuple, Dict, Iterator, Type, Union, Iterable, SupportsBytes
-from libc.stdlib cimport malloc, free
 
+from enum import Enum, IntEnum, IntFlag, unique
+from types import TracebackType
+from typing import Dict, Iterable, Iterator, List, Optional, SupportsBytes, Tuple, Type, Union
+
+from libc.stdlib cimport free, malloc
 
 # Throughout these bindings, you will see C pointers be set to NULL after their
 # destruction. Please continue to follow this pattern as the HSE C code does

@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
 from libc.stdint cimport uint64_t
+
 # Avoid interfering with Python bool type since Cython seems to struggle
 # differentiating the two
 from libcpp cimport bool as cbool
