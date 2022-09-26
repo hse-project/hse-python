@@ -34,7 +34,7 @@ def main() -> int:
         key, val = cursor.read()
 
         print("After seek to key010:")
-        print(f"expected: key: key010\tval: val010")
+        print("expected: key: key010\tval: val010")
         print(
             f"found   : key: {key.decode() if key else None}\tval: {val.decode() if val else None}"
         )
