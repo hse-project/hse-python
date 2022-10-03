@@ -178,9 +178,9 @@ class Kvdb:
         """
         ...
 
-class KvsPutFlag(IntFlag):
+class KvsPutFlags(IntFlag):
     """
-    @SUB@ hse.KvsPutFlag
+    @SUB@ hse.KvsPutFlags
     """
 
     PRIO = ...
@@ -228,7 +228,7 @@ class Kvs:
         key: Union[str, bytes, SupportsBytes],
         value: Optional[Union[str, bytes, SupportsBytes]],
         txn: Optional[KvdbTransaction] = ...,
-        flags: Optional[KvsPutFlag] = ...,
+        flags: Optional[KvsPutFlags] = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.put

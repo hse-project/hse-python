@@ -421,9 +421,9 @@ cdef class Kvdb:
 
 
 @unique
-class KvsPutFlag(IntFlag):
+class KvsPutFlags(IntFlag):
     """
-    @SUB@ hse.KvsPutFlag
+    @SUB@ hse.KvsPutFlags
     """
     PRIO = HSE_KVS_PUT_PRIO
     VCOMP_OFF = HSE_KVS_PUT_VCOMP_OFF
@@ -513,7 +513,7 @@ cdef class Kvs:
             key: Union[str, bytes, SupportsBytes],
             value: Optional[Union[str, bytes, SupportsBytes]],
             KvdbTransaction txn=None,
-            flags: Optional[KvsPutFlag]=None,
+            flags: Optional[KvsPutFlags]=None,
         ) -> None:
         """
         @SUB@ hse.Kvs.put
