@@ -23,7 +23,8 @@ class Test(abc.ABC):
         self._program = program
         self._args = args
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def name(self) -> str:
         raise NotImplementedError()
 
@@ -46,9 +47,6 @@ class Test(abc.ABC):
 
 
 class PlainTest(Test):
-    def __init__(self, program: pathlib.Path, *args: str) -> None:
-        super().__init__(program, *args)
-
     @property
     def name(self) -> str:
         return self._program.stem
@@ -92,9 +90,9 @@ class Args(argparse.Namespace):
 
 
 def default_dir() -> str:
-    dir = os.getenv("HSE_TEST_RUNNER_DIR")
-    if dir:
-        return dir
+    runner_dir = os.getenv("HSE_TEST_RUNNER_DIR")
+    if runner_dir:
+        return runner_dir
     root = os.getenv("MESON_BUILD_ROOT")
     if root:
         return root
@@ -109,17 +107,21 @@ if __name__ == "__main__":
         "-d",
         "--dir",
         type=pathlib.Path,
-        help="Directory to place home in; Can also set the HSE_TEST_RUNNER_DIR environment variable",
-        default=pathlib.Path(default_dir()).resolve()
+        help="Directory to place home in; "
+        "Can also set the HSE_TEST_RUNNER_DIR environment variable",
+        default=pathlib.Path(default_dir()).resolve(),
     )
 
     args = cast(Args, parser.parse_args())
 
     test = Test.create(args.program, *args.arguments)
 
-    with tempfile.TemporaryDirectory(prefix=f"mtest-{test.name}-", dir=args.dir) as home:
+    with tempfile.TemporaryDirectory(
+        prefix=f"mtest-{test.name}-", dir=args.dir
+    ) as home:
         proc = subprocess.Popen(test.command_line(home))
 
+        # pylint: disable-next=unused-argument
         def proxy(s: int, frame: Optional[FrameType]):
             proc.send_signal(s)
 

@@ -4,8 +4,9 @@
 #
 # Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
-from hse3 import hse
 import sys
+
+from hse3 import hse
 
 
 def main() -> int:
@@ -13,11 +14,11 @@ def main() -> int:
         print(f"Usage: {sys.argv[0]} <home> <kvs>")
         return 1
 
-    KVDB_HOME = sys.argv[1]
-    KVS_NAME = sys.argv[2]
+    kvdb_home = sys.argv[1]
+    kvs_name = sys.argv[2]
 
-    kvdb = hse.Kvdb.open(KVDB_HOME)
-    kvs = kvdb.kvs_open(KVS_NAME)
+    kvdb = hse.Kvdb.open(kvdb_home)
+    kvs = kvdb.kvs_open(kvs_name)
 
     kvs.put(b"k1", b"val1")
     kvs.put(b"k2", b"val2")

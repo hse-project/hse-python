@@ -80,9 +80,9 @@ class CursorTests(HseTestCase):
                             )
 
     def test_seek(self):
-        for filter, key in ((None, b"key3"), ("key", "key3"), (b"key", b"key3")):
-            with self.subTest(filter=filter, key=key):
-                with self.kvs.cursor(filter) as cursor:
+        for filt, key in ((None, b"key3"), ("key", "key3"), (b"key", b"key3")):
+            with self.subTest(filt=filt, key=key):
+                with self.kvs.cursor(filt) as cursor:
                     found = cursor.seek(key)
                     self.assertEqual(found, b"key3")
                     kv = cursor.read()
@@ -93,13 +93,13 @@ class CursorTests(HseTestCase):
                     self.assertTrue(cursor.eof)
 
     def test_seek_range(self):
-        for filter, filt_min, filt_max in (
+        for filt, filt_min, filt_max in (
             (None, "key0", "key3"),
             ("key", "key0", "key3"),
             (b"key", b"key0", b"key3"),
         ):
-            with self.subTest(filter=filter, filt_min=filt_min, filt_max=filt_max):
-                with self.kvs.cursor(filter) as cursor:
+            with self.subTest(filt=filt, filt_min=filt_min, filt_max=filt_max):
+                with self.kvs.cursor(filt) as cursor:
                     found = cursor.seek_range(filt_min, filt_max)
                     self.assertEqual(found, b"key0")
                     kv = cursor.read()

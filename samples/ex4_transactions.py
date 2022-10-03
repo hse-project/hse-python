@@ -4,8 +4,9 @@
 #
 # Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
 
-from hse3 import hse
 import sys
+
+from hse3 import hse
 
 
 def main() -> int:
@@ -13,14 +14,14 @@ def main() -> int:
         print(f"Usage: {sys.argv[0]} <home> <kvs1> <kvs2>")
         return 1
 
-    KVDB_HOME = sys.argv[1]
-    KVS1_NAME = sys.argv[2]
-    KVS2_NAME = sys.argv[3]
+    kvdb_home = sys.argv[1]
+    kvs1_name = sys.argv[2]
+    kvs2_name = sys.argv[3]
 
     # Open the KVDB and the KVS instances in it
-    kvdb = hse.Kvdb.open(KVDB_HOME)
-    kvs1 = kvdb.kvs_open(KVS1_NAME)
-    kvs2 = kvdb.kvs_open(KVS2_NAME)
+    kvdb = hse.Kvdb.open(kvdb_home)
+    kvs1 = kvdb.kvs_open(kvs1_name)
+    kvs2 = kvdb.kvs_open(kvs2_name)
 
     with kvdb.transaction() as txn:
         kvs1.put(b"k1", b"val1", txn=txn)

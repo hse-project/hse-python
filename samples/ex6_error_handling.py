@@ -18,9 +18,8 @@ def main() -> int:
         if e.returncode == errno.EINVAL:
             print(f"Correctly received a EINVAL for non-null argument: {str(e)}")
             return 0
-        else:
-            print(f"Unexpected errno value: {e.returncode}")
-            return e.returncode
+        print(f"Unexpected errno value: {e.returncode}")
+        return e.returncode
 
     return 0
 
