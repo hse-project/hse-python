@@ -11,7 +11,7 @@ from hse3 import hse
 
 class HseTests(unittest.TestCase):
     def test_param(self):
-        for args in (("socket.enabled", "false"), ("this-does-not-exist", None)):
+        for args in (("rest.enabled", "false"), ("this-does-not-exist", None)):
             with self.subTest(param=args[0], value=args[1]):
                 if args[1]:
                     self.assertEqual(hse.param(args[0]), args[1])
