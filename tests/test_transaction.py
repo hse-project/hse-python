@@ -5,6 +5,7 @@
 import unittest
 
 from common import ARGS, UNKNOWN, HseTestCase, kvdb_fixture
+
 from hse3 import hse
 
 

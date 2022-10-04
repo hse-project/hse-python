@@ -5,8 +5,8 @@
 import os
 import pathlib
 from typing import Any, Dict, List, Type
-from setuptools import Command, find_packages, setup, Extension
 
+from setuptools import Command, Extension, find_packages, setup
 
 HERE = pathlib.Path(__file__).parent
 HSE_PACKAGE = pathlib.Path("hse2")

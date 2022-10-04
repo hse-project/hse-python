@@ -1,0 +1,24 @@
+name: isort
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**.py"
+      - "**.pxd"
+      - "**.pyi"
+      - "**.pyx"
+
+concurrency:
+  group: ${{ github.workflow }}-ignore-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  isort:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "Skipping ${{ github.workflow }}/${{ github.job }}"
