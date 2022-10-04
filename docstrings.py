@@ -419,7 +419,7 @@ Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
 
-    "hse.KvsPutFlag": """
+    "hse.KvsPutFlags": """
 Attributes:
     PRIO: Operation will not be throttled.
     VCOMP_OFF: Value will not be compressed.
@@ -437,19 +437,19 @@ The HSE KVDB attempts to maintain reasonable QoS and for high-throughput
 clients this results in very short sleep's being inserted into the put path.
 For some kinds of data (e.g., control metadata) the client may wish to not
 experience that delay. For relatively low data rate uses, the caller can set
-the ``KvsPutFlag.PRIO`` flag for an ``Kvs.put()``. Care should be taken when
+the ``KvsPutFlags.PRIO`` flag for an ``Kvs.put()``. Care should be taken when
 doing so to ensure that the system does not become overrun. As a rough
 approximation, doing 1M priority puts per second marked as PRIO is likely an
 issue. On the other hand, doing 1K small puts per second marked as PRIO is
 almost certainly fine.
 
 If compression is on by default for the given kvs, then ``Kvs.put()`` will
-attempt to compress the value unless the ``KvsPutFlag.VCOMP_OFF`` flag is
-given. Otherwise, the ``KvsPutFlag.VCOMP_OFF`` flag is ignored.
+attempt to compress the value unless the ``KvsPutFlags.VCOMP_OFF`` flag is
+given. Otherwise, the ``KvsPutFlags.VCOMP_OFF`` flag is ignored.
 
 If compression is off by default for the given kvs, then ``Kvs.put()`` will not
-attempt to compress a value unless the ``KvsPutFlag.VCOMP_ON`` flag is given.
-Otherwise, the ``KvsPutFlag.VCOMP_ON`` flag is ignored.
+attempt to compress a value unless the ``KvsPutFlags.VCOMP_ON`` flag is given.
+Otherwise, the ``KvsPutFlags.VCOMP_ON`` flag is ignored.
 
 This function is thread safe.
 
