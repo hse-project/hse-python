@@ -31,8 +31,8 @@ fs = import('fs')
 pymod = import('python')
 
 sh = find_program('sh')
-docstrings = find_program('docstrings.py')
-pp = find_program('pp.py')
+docstrings = find_program('scripts/build/docstrings.py')
+pp = find_program('scripts/build/pp.py')
 python = pymod.find_installation('python3')
 
 ci = run_command(sh, '-c', '[ ${CI+x} ]', check: false).returncode() == 0
