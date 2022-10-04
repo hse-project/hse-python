@@ -1,6 +1,6 @@
 project(
     'hse-python',
-    ['c'],
+    'c',
     version: files('VERSION'),
     license: 'Apache-2.0',
     default_options: [
@@ -9,7 +9,7 @@ project(
         'warning_level=2',
         # Meson for whatever reason chooses not to respect HSE's default
         # options :).
-        'force_fallback_for=xxhash,lz4,cjson',
+        'force_fallback_for=lz4,cjson',
     ],
     meson_version: '>=0.59.0'
 )
