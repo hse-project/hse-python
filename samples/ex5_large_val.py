@@ -72,17 +72,17 @@ def main():
     parser.add_argument("-x", action="store_true")
     args = parser.parse_args(sys.argv[1:])
 
-    KVDB_HOME: str = args.home
-    KVS_NAME: str = args.kvs
-    FILES: List[str] = args.files
+    kvdb_home: str = args.home
+    kvs_name: str = args.kvs
+    files: List[str] = args.files
 
-    kvdb = hse.Kvdb.open(KVDB_HOME)
-    kvs = kvdb.kvs_open(KVS_NAME)
+    kvdb = hse.Kvdb.open(kvdb_home)
+    kvs = kvdb.kvs_open(kvs_name)
 
     if args.x:
-        extract_kv_to_files(kvs, FILES)
+        extract_kv_to_files(kvs, files)
     else:
-        put_files_as_kv(kvs, FILES)
+        put_files_as_kv(kvs, files)
 
     kvs.close()
     kvdb.close()

@@ -887,10 +887,11 @@ def insert(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
                 continue
             indents = int(len(match.group(1)) / 4)
             key = match.group(2)
-            if key in __DOCSTRINGS.keys():
+            if key in __DOCSTRINGS.keys():  # pylint: disable=consider-iterating-dictionary
                 with StringIO(__DOCSTRINGS[key].lstrip()) as docstring:
                     output_lines.extend(
                         map(
+                            # pylint: disable-next=cell-var-from-loop
                             lambda s: __INDENT * indents + s if not s.isspace() else s,
                             docstring.readlines(),
                         )

@@ -1,0 +1,24 @@
+[MASTER]
+jobs = 0
+
+[REPORTS]
+score = no
+
+[BASIC]
+variable-rgx = [a-z_]+
+
+[VARIABLES]
+dummy-variables-rgx = _$
+
+[MESSAGES CONTROL]
+disable =
+    duplicate-code,
+    import-error,
+    import-outside-toplevel,
+    missing-class-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
+    no-name-in-module,
+    redefined-outer-name,
+    too-few-public-methods,
+    undefined-all-variable,

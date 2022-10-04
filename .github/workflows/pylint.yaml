@@ -1,0 +1,31 @@
+name: Pylint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**.py"
+      - "**.pyi"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout hse-python
+      uses: actions/checkout@v3
+
+    - name: Setup
+      run: |
+        python3 -m pip install pylint
+
+    - name: Check
+      continue-on-error: true
+      run: |
+        pylint --recursive=yes .
