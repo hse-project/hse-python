@@ -24,14 +24,14 @@ __parser.add_argument("-C", "--home", type=pathlib.Path, default=pathlib.Path.cw
 __parser.add_argument("--config", type=pathlib.Path)
 __parser.add_argument("--experimental", action="store_true")
 
-ARGS, __unknown = cast(Tuple['TestArgs', List[str]], __parser.parse_known_args())
+ARGS, __unknown = cast(Tuple["TestArgs", List[str]], __parser.parse_known_args())
 UNKNOWN = [sys.argv[0], *__unknown]
 
 
 class HseTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        hse.init(ARGS.config, "socket.enabled=false")
+        hse.init(ARGS.config, "rest.enabled=false")
 
     @classmethod
     def tearDownClass(cls) -> None:

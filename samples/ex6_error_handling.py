@@ -26,7 +26,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     hse.init(
-        None, "logging.destination=stdout", "logging.level=3", "socket.enabled=false"
+        None, "logging.destination=stdout", "logging.level=3", "rest.enabled=false"
     )
     try:
         sys.exit(main())

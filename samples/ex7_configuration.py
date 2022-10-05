@@ -23,7 +23,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     hse.init(
-        None, "logging.destination=stdout", "logging.level=3", "socket.enabled=false"
+        None, "logging.destination=stdout", "logging.level=3", "rest.enabled=false"
     )
     try:
         main()
