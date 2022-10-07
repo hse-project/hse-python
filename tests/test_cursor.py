@@ -16,7 +16,7 @@ class CursorTests(HseTestCase):
 
         cls.kvdb = kvdb_fixture()
         cls.kvs = kvs_fixture(
-            cls.kvdb, "kvs", cparams=("prefix.length=3", "suffix.length=1")
+            cls.kvdb, "kvs", cparams=("prefix.length=3",)
         )
 
     @classmethod
