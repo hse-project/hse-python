@@ -87,7 +87,14 @@ class KvsTests(HseTestCase):
 
                 cnt, k, kl, v, vl = self.kvs.prefix_probe(pfx2)
                 self.assertEqual(cnt, hse.KvsPfxProbeCnt.MUL)
-                self.assertTupleEqual((k, v), (b"abc1", b"value1"))
+
+                if k == b"abc1":
+                    self.assertEqual(v, b"value1")
+                elif k == b"abc2":
+                    self.assertEqual(v, b"value2")
+                else:
+                    self.assertEqual(1, 0)
+
                 self.assertEqual(kl, 4)
                 self.assertEqual(vl, 6)
 
