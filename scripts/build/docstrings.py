@@ -66,6 +66,10 @@ Raises:
 
     "hse.ErrCtx": """
 Error context. Wrapper around ``hse_err_ctx``.
+
+Attributes:
+    NONE: No context.
+    TXN_TIMEOUT: Transaction timed out.
 """,
 
     "hse.HseException": """

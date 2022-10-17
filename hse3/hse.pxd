@@ -30,6 +30,7 @@ cdef extern from "hse/types.h":
 
     cdef enum hse_err_ctx:
         HSE_ERR_CTX_NONE
+        HSE_ERR_CTX_TXN_EXPIRED
 
     cdef struct hse_kvdb:
         pass
