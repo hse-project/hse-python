@@ -12,7 +12,7 @@ from hse3 import hse
 def main():
     home = sys.argv[1]
 
-    kvdb = hse.Kvdb.open(home, "read_only=true")
+    kvdb = hse.Kvdb.open(home, "mode=rdonly")
 
     kvdb.close()
 
