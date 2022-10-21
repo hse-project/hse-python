@@ -34,6 +34,7 @@ class ErrCtx(IntEnum):
     """
 
     NONE = ...
+    TXN_EXPIRED = ...
 
 class HseException(Exception):
     """

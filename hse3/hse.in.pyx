@@ -103,6 +103,7 @@ class ErrCtx(IntEnum):
     @SUB@ hse.ErrCtx
     """
     NONE = HSE_ERR_CTX_NONE
+    TXN_EXPIRED = HSE_ERR_CTX_TXN_EXPIRED
 
 
 class HseException(Exception):
