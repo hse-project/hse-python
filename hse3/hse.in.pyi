@@ -173,7 +173,7 @@ class Kvdb:
         """
         @SUB@ hse.Kvdb.storage_add
         """
-    def transaction(self) -> KvdbTransaction:
+    def transaction(self) -> Transaction:
         """
         @SUB@ hse.Kvdb.transaction
         """
@@ -228,7 +228,7 @@ class Kvs:
         self,
         key: Union[str, bytes, SupportsBytes],
         value: Optional[Union[str, bytes, SupportsBytes]],
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
         flags: Optional[KvsPutFlags] = ...,
     ) -> None:
         """
@@ -238,7 +238,7 @@ class Kvs:
     def get(
         self,
         key: Union[str, bytes, SupportsBytes],
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
         buf: Optional[bytearray] = ...,
     ) -> Tuple[Optional[bytes], int]:
         """
@@ -248,14 +248,14 @@ class Kvs:
     def delete(
         self,
         key: Union[str, bytes, SupportsBytes],
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
     ) -> None:
         """
         @SUB@ hse.Kvs.delete
         """
         ...
     def prefix_delete(
-        self, pfx: Union[str, bytes], txn: Optional[KvdbTransaction] = ...
+        self, pfx: Union[str, bytes], txn: Optional[Transaction] = ...
     ) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete
@@ -267,7 +267,7 @@ class Kvs:
         pfx: Union[str, bytes],
         key_buf: bytearray = ...,
         value_buf: Optional[bytearray] = ...,
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
     ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.prefix_probe
@@ -277,7 +277,7 @@ class Kvs:
     def cursor(
         self,
         filt: Optional[Union[str, bytes]] = ...,
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
         flags: Optional[CursorCreateFlag] = ...,
     ) -> KvsCursor:
         """
@@ -285,9 +285,9 @@ class Kvs:
         """
         ...
 
-class KvdbTransactionState(Enum):
+class TransactionState(Enum):
     """
-    @SUB@ hse.KvdbTransactionState
+    @SUB@ hse.TransactionState
     """
 
     INVALID: int
@@ -295,12 +295,12 @@ class KvdbTransactionState(Enum):
     COMMITTED: int
     ABORTED: int
 
-class KvdbTransaction:
+class Transaction:
     """
-    @SUB@ hse.KvdbTransaction
+    @SUB@ hse.Transaction
     """
 
-    def __enter__(self) -> KvdbTransaction: ...
+    def __enter__(self) -> Transaction: ...
     def __exit__(
         self,
         exc_type: Optional[Type[BaseException]],
@@ -309,23 +309,23 @@ class KvdbTransaction:
     ) -> None: ...
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.begin
+        @SUB@ hse.Transaction.begin
         """
         ...
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.commit
+        @SUB@ hse.Transaction.commit
         """
         ...
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.abort
+        @SUB@ hse.Transaction.abort
         """
         ...
     @property
-    def state(self) -> KvdbTransactionState:
+    def state(self) -> TransactionState:
         """
-        @SUB@ hse.KvdbTransaction.state
+        @SUB@ hse.Transaction.state
         """
         ...
 
@@ -366,7 +366,7 @@ class KvsCursor:
         ...
     def update_view(
         self,
-        txn: Optional[KvdbTransaction] = ...,
+        txn: Optional[Transaction] = ...,
     ) -> None:
         """
         @SUB@ hse.KvsCursor.update_view

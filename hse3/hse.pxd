@@ -56,14 +56,14 @@ cdef extern from "hse/types.h":
     cdef struct hse_kvs_cursor:
         pass
 
-    cdef struct hse_kvdb_txn:
+    cdef struct hse_txn:
         pass
 
-    cdef enum hse_kvdb_txn_state:
-        HSE_KVDB_TXN_INVALID,
-        HSE_KVDB_TXN_ACTIVE,
-        HSE_KVDB_TXN_COMMITTED,
-        HSE_KVDB_TXN_ABORTED
+    cdef enum hse_txn_state:
+        HSE_TXN_INVALID,
+        HSE_TXN_ACTIVE,
+        HSE_TXN_COMMITTED,
+        HSE_TXN_ABORTED
 
 
 IF HSE_PYTHON_EXPERIMENTAL == 1:
@@ -71,7 +71,7 @@ IF HSE_PYTHON_EXPERIMENTAL == 1:
         hse_err_t hse_kvs_prefix_probe(
             hse_kvs *kvs,
             unsigned int flags,
-            hse_kvdb_txn *txn,
+            hse_txn *txn,
             const void *pfx,
             size_t pfx_len,
             hse_kvs_pfx_probe_cnt *found,
@@ -139,7 +139,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvs_put(
         hse_kvs *kvs,
         unsigned int flags,
-        hse_kvdb_txn *txn,
+        hse_txn *txn,
         const void *key,
         size_t key_len,
         const void *val,
@@ -147,7 +147,7 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvs_get(
         hse_kvs *kvs,
         unsigned int flags,
-        hse_kvdb_txn *txn,
+        hse_txn *txn,
         const void *key,
         size_t key_len,
         cbool *found,
@@ -157,13 +157,13 @@ cdef extern from "hse/hse.h":
     hse_err_t hse_kvs_delete(
         hse_kvs *kvs,
         unsigned int flags,
-        hse_kvdb_txn *txn,
+        hse_txn *txn,
         const void *key,
         size_t key_len) nogil
     hse_err_t hse_kvs_prefix_delete(
         hse_kvs *kvs,
         unsigned int flags,
-        hse_kvdb_txn *txn,
+        hse_txn *txn,
         const void *pfx,
         size_t pfx_len) nogil
 
@@ -173,17 +173,17 @@ cdef extern from "hse/hse.h":
 
     hse_err_t hse_kvdb_storage_add(const char *kvdb_home, size_t paramc, const char *const *paramv) nogil
 
-    hse_kvdb_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
-    void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_err_t hse_kvdb_txn_begin(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_err_t hse_kvdb_txn_commit(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_err_t hse_kvdb_txn_abort(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
-    hse_kvdb_txn_state hse_kvdb_txn_state_get(hse_kvdb *kvdb, hse_kvdb_txn *txn) nogil
+    hse_txn *hse_kvdb_txn_alloc(hse_kvdb *kvdb) nogil
+    void hse_kvdb_txn_free(hse_kvdb *kvdb, hse_txn *txn) nogil
+    hse_err_t hse_txn_begin(hse_kvdb *kvdb, hse_txn *txn) nogil
+    hse_err_t hse_txn_commit(hse_kvdb *kvdb, hse_txn *txn) nogil
+    hse_err_t hse_txn_abort(hse_kvdb *kvdb, hse_txn *txn) nogil
+    hse_txn_state hse_txn_state_get(hse_kvdb *kvdb, hse_txn *txn) nogil
 
     hse_err_t hse_kvs_cursor_create(
         hse_kvs *kvs,
         unsigned int flags,
-        hse_kvdb_txn *txn,
+        hse_txn *txn,
         const void *filt,
         size_t filt_len,
         hse_kvs_cursor **cursor) nogil
@@ -235,8 +235,8 @@ cdef class Kvs:
     cdef hse_kvs *_c_hse_kvs
 
 
-cdef class KvdbTransaction:
-    cdef hse_kvdb_txn *_c_hse_kvdb_txn
+cdef class Transaction:
+    cdef hse_txn *_c_hse_txn
     cdef Kvdb kvdb
 
 

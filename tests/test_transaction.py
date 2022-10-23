@@ -25,14 +25,14 @@ class TransactionsTests(HseTestCase):
 
     def test_state_transitions(self):
         txn = self.kvdb.transaction()
-        self.assertEqual(txn.state, hse.KvdbTransactionState.INVALID)
+        self.assertEqual(txn.state, hse.TransactionState.INVALID)
         txn.begin()
-        self.assertEqual(txn.state, hse.KvdbTransactionState.ACTIVE)
+        self.assertEqual(txn.state, hse.TransactionState.ACTIVE)
         txn.abort()
-        self.assertEqual(txn.state, hse.KvdbTransactionState.ABORTED)
+        self.assertEqual(txn.state, hse.TransactionState.ABORTED)
         txn.begin()
         txn.commit()
-        self.assertEqual(txn.state, hse.KvdbTransactionState.COMMITTED)
+        self.assertEqual(txn.state, hse.TransactionState.COMMITTED)
 
 
 if __name__ == "__main__":

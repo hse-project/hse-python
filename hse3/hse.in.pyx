@@ -412,11 +412,11 @@ cdef class Kvdb:
         if err != 0:
             raise HseException(err)
 
-    def transaction(self) -> KvdbTransaction:
+    def transaction(self) -> Transaction:
         """
         @SUB@ hse.Kvdb.transaction
         """
-        txn = KvdbTransaction(self)
+        txn = Transaction(self)
 
         return txn
 
@@ -513,14 +513,14 @@ cdef class Kvs:
             self,
             key: Union[str, bytes, SupportsBytes],
             value: Optional[Union[str, bytes, SupportsBytes]],
-            KvdbTransaction txn=None,
+            Transaction txn=None,
             flags: Optional[KvsPutFlags]=None,
         ) -> None:
         """
         @SUB@ hse.Kvs.put
         """
         cdef unsigned int cflags = int(flags) if flags else 0
-        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef hse_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         cdef const void *value_addr = NULL
@@ -530,7 +530,7 @@ cdef class Kvs:
         cdef const unsigned char [:]value_view = to_bytes(value)
 
         if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+            txn_addr = txn._c_hse_txn
         if key_view is not None:
             key_addr = &key_view[0]
             key_len = key_view.shape[0]
@@ -547,14 +547,14 @@ cdef class Kvs:
     def get(
             self,
             key: Union[str, bytes, SupportsBytes],
-            KvdbTransaction txn=None,
+            Transaction txn=None,
             unsigned char [:]buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
         ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.Kvs.get
         """
         cdef unsigned int cflags = 0
-        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef hse_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
         cdef void *buf_addr = NULL
@@ -563,7 +563,7 @@ cdef class Kvs:
         cdef const unsigned char [:]key_view = to_bytes(key)
 
         if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+            txn_addr = txn._c_hse_txn
         if key_view is not None:
             key_addr = &key_view[0]
             key_len = key_view.shape[0]
@@ -590,19 +590,19 @@ cdef class Kvs:
 
         return bytes(buf), value_len
 
-    def delete(self, key: Union[str, bytes, SupportsBytes], KvdbTransaction txn=None) -> None:
+    def delete(self, key: Union[str, bytes, SupportsBytes], Transaction txn=None) -> None:
         """
         @SUB@ hse.Kvs.delete
         """
         cdef unsigned int cflags = 0
-        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef hse_txn *txn_addr = NULL
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
 
         cdef const unsigned char [:]key_view = to_bytes(key)
 
         if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+            txn_addr = txn._c_hse_txn
         if key_view is not None:
             key_addr = &key_view[0]
             key_len = key_view.shape[0]
@@ -613,19 +613,19 @@ cdef class Kvs:
         if err != 0:
             raise HseException(err)
 
-    def prefix_delete(self, pfx: Union[str, bytes], txn: KvdbTransaction=None) -> None:
+    def prefix_delete(self, pfx: Union[str, bytes], txn: Transaction=None) -> None:
         """
         @SUB@ hse.Kvs.prefix_delete
         """
         cdef unsigned int cflags = 0
-        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef hse_txn *txn_addr = NULL
         cdef const void *pfx_addr = NULL
         cdef size_t pfx_len = 0
 
         cdef const unsigned char[:] pfx_view = to_bytes(pfx)
 
         if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+            txn_addr = txn._c_hse_txn
         if pfx_view is not None:
             pfx_addr = &pfx_view[0]
             pfx_len = pfx_view.shape[0]
@@ -642,12 +642,12 @@ cdef class Kvs:
             pfx: Union[str, bytes],
             unsigned char [:]key_buf=bytearray(limits.HSE_KVS_KEY_LEN_MAX),
             unsigned char [:]value_buf=bytearray(limits.HSE_KVS_VALUE_LEN_MAX),
-            KvdbTransaction txn=None,
+            Transaction txn=None,
         ) -> Tuple[KvsPfxProbeCnt, Optional[bytes], int, Optional[bytes], int]:
             """
             @SUB@ hse.Kvs.prefix_probe
             """
-            cdef hse_kvdb_txn *txn_addr = NULL
+            cdef hse_txn *txn_addr = NULL
             cdef const void *pfx_addr = NULL
             cdef size_t pfx_len = 0
             cdef hse_kvs_pfx_probe_cnt found = HSE_KVS_PFX_FOUND_ZERO
@@ -670,7 +670,7 @@ cdef class Kvs:
                 value_buf_addr = &value_buf[0]
                 value_buf_len = len(value_buf)
             if txn:
-                txn_addr = txn._c_hse_kvdb_txn
+                txn_addr = txn._c_hse_txn
 
             cdef hse_err_t err = 0
             with nogil:
@@ -693,7 +693,7 @@ cdef class Kvs:
     def cursor(
         self,
         filt: Optional[Union[str, bytes]]=None,
-        KvdbTransaction txn=None,
+        Transaction txn=None,
         flags: Optional[CursorCreateFlag]=None,
     ) -> KvsCursor:
         """
@@ -710,38 +710,38 @@ cdef class Kvs:
 
 
 @unique
-class KvdbTransactionState(Enum):
+class TransactionState(Enum):
     """
-    @SUB@ hse.KvdbTransactionState
+    @SUB@ hse.TransactionState
     """
-    INVALID = HSE_KVDB_TXN_INVALID
-    ACTIVE = HSE_KVDB_TXN_ACTIVE
-    COMMITTED = HSE_KVDB_TXN_COMMITTED
-    ABORTED = HSE_KVDB_TXN_ABORTED
+    INVALID = HSE_TXN_INVALID
+    ACTIVE = HSE_TXN_ACTIVE
+    COMMITTED = HSE_TXN_COMMITTED
+    ABORTED = HSE_TXN_ABORTED
 
 
 @cython.no_gc_clear
-cdef class KvdbTransaction:
+cdef class Transaction:
     """
-    @SUB@ hse.KvdbTransaction
+    @SUB@ hse.Transaction
     """
     def __cinit__(self, Kvdb kvdb):
         self.kvdb = kvdb
 
         with nogil:
-            self._c_hse_kvdb_txn = hse_kvdb_txn_alloc(kvdb._c_hse_kvdb)
-        if not self._c_hse_kvdb_txn:
+            self._c_hse_txn = hse_kvdb_txn_alloc(kvdb._c_hse_kvdb)
+        if not self._c_hse_txn:
             raise MemoryError()
 
     def __dealloc__(self):
         if not self.kvdb._c_hse_kvdb:
             return
-        if not self._c_hse_kvdb_txn:
+        if not self._c_hse_txn:
             return
 
         with nogil:
-            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-            self._c_hse_kvdb_txn = NULL
+            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_txn)
+            self._c_hse_txn = NULL
 
     def __enter__(self):
         self.begin()
@@ -753,52 +753,52 @@ cdef class KvdbTransaction:
             self.abort()
             return
 
-        if self.state == KvdbTransactionState.ACTIVE:
+        if self.state == TransactionState.ACTIVE:
             self.commit()
 
         with nogil:
-            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-            self._c_hse_kvdb_txn = NULL
+            hse_kvdb_txn_free(self.kvdb._c_hse_kvdb, self._c_hse_txn)
+            self._c_hse_txn = NULL
 
     def begin(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.begin
+        @SUB@ hse.Transaction.begin
         """
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            err = hse_txn_begin(self.kvdb._c_hse_kvdb, self._c_hse_txn)
         if err != 0:
             raise HseException(err)
 
     def commit(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.commit
+        @SUB@ hse.Transaction.commit
         """
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            err = hse_txn_commit(self.kvdb._c_hse_kvdb, self._c_hse_txn)
         if err != 0:
             raise HseException(err)
 
     def abort(self) -> None:
         """
-        @SUB@ hse.KvdbTransaction.abort
+        @SUB@ hse.Transaction.abort
         """
         cdef hse_err_t err = 0
         with nogil:
-            err = hse_kvdb_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
+            err = hse_txn_abort(self.kvdb._c_hse_kvdb, self._c_hse_txn)
         if err != 0:
             raise HseException(err)
 
     @property
-    def state(self) -> KvdbTransactionState:
+    def state(self) -> TransactionState:
         """
-        @SUB@ hse.KvdbTransaction.state
+        @SUB@ hse.Transaction.state
         """
-        cdef hse_kvdb_txn_state state = HSE_KVDB_TXN_INVALID
+        cdef hse_txn_state state = HSE_TXN_INVALID
         with nogil:
-            state = hse_kvdb_txn_state_get(self.kvdb._c_hse_kvdb, self._c_hse_kvdb_txn)
-        return KvdbTransactionState(state)
+            state = hse_txn_state_get(self.kvdb._c_hse_kvdb, self._c_hse_txn)
+        return TransactionState(state)
 
 
 cdef class KvsCursor:
@@ -806,20 +806,20 @@ cdef class KvsCursor:
         self,
         Kvs kvs,
         filt: Optional[Union[str, bytes]]=None,
-        KvdbTransaction txn=None,
+        Transaction txn=None,
         flags: Optional[CursorCreateFlag]=None,
     ):
         self._eof = False
 
         cdef unsigned int cflags = int(flags) if flags else 0
-        cdef hse_kvdb_txn *txn_addr = NULL
+        cdef hse_txn *txn_addr = NULL
         cdef const void *filt_addr = NULL
         cdef size_t filt_len = 0
 
         cdef const unsigned char[:] filt_view = to_bytes(filt)
 
         if txn:
-            txn_addr = txn._c_hse_kvdb_txn
+            txn_addr = txn._c_hse_txn
         if filt_view is not None:
             filt_addr = &filt_view[0]
             filt_len = filt_view.shape[0]
