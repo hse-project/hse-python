@@ -195,7 +195,8 @@ cdef extern from "hse/hse.h":
         unsigned int flags,
         const void *key,
         size_t key_len,
-        const void **found,
+        void *found_buf,
+        size_t found_buf_sz,
         size_t *found_len) nogil
     hse_err_t hse_kvs_cursor_seek_range(
         hse_kvs_cursor *cursor,
@@ -204,17 +205,10 @@ cdef extern from "hse/hse.h":
         size_t filt_min_len,
         const void *filt_max,
         size_t filt_max_len,
-        const void **found,
+        void *found_buf,
+        size_t found_buf_sz,
         size_t *found_len) nogil
     hse_err_t hse_kvs_cursor_read(
-        hse_kvs_cursor  *cursor,
-        unsigned int flags,
-        const void **key,
-        size_t *key_len,
-        const void **val,
-        size_t *val_len,
-        cbool *eof) nogil
-    hse_err_t hse_kvs_cursor_read_copy(
         hse_kvs_cursor *cursor,
         unsigned int flags,
         void *keybuf,

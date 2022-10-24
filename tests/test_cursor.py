@@ -15,9 +15,7 @@ class CursorTests(HseTestCase):
         super().setUpClass()
 
         cls.kvdb = kvdb_fixture()
-        cls.kvs = kvs_fixture(
-            cls.kvdb, "kvs", cparams=("prefix.length=3",)
-        )
+        cls.kvs = kvs_fixture(cls.kvdb, "kvs", cparams=("prefix.length=3",))
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -83,8 +81,9 @@ class CursorTests(HseTestCase):
         for filt, key in ((None, b"key3"), ("key", "key3"), (b"key", b"key3")):
             with self.subTest(filt=filt, key=key):
                 with self.kvs.cursor(filt) as cursor:
-                    found = cursor.seek(key)
+                    found, found_len = cursor.seek(key)
                     self.assertEqual(found, b"key3")
+                    self.assertEqual(len(found), found_len)
                     kv = cursor.read()
                     self.assertTupleEqual(kv, (b"key3", b"value3"))
                     cursor.read()
@@ -100,8 +99,9 @@ class CursorTests(HseTestCase):
         ):
             with self.subTest(filt=filt, filt_min=filt_min, filt_max=filt_max):
                 with self.kvs.cursor(filt) as cursor:
-                    found = cursor.seek_range(filt_min, filt_max)
+                    found, found_len = cursor.seek_range(filt_min, filt_max)
                     self.assertEqual(found, b"key0")
+                    self.assertEqual(len(found), found_len)
                     kv = cursor.read()
                     self.assertTupleEqual(kv, (b"key0", b"value0"))
                     cursor.read()

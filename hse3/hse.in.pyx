@@ -684,9 +684,9 @@ cdef class Kvs:
 
             return (
                 KvsPfxProbeCnt(found),
-                bytes(key_buf)[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
+                key_buf[:key_len] if key_buf is not None and key_len < len(key_buf) else key_buf,
                 key_len,
-                bytes(value_buf)[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
+                value_buf[:value_len] if value_buf is not None and value_len < len(value_buf) else value_buf,
                 value_len
             )
 
@@ -883,22 +883,30 @@ cdef class KvsCursor:
         if err != 0:
             raise HseException(err)
 
-    def seek(self, key: Union[str, bytes, SupportsBytes]) -> Optional[bytes]:
+    def seek(
+            self,
+            key: Union[str, bytes, SupportsBytes],
+            unsigned char [:]found_buf=None
+        ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.KvsCursor.seek
         """
         cdef unsigned int cflags = 0
         cdef const void *key_addr = NULL
         cdef size_t key_len = 0
+        cdef void *found_buf_addr = NULL
+        cdef size_t found_buf_sz = 0
+        cdef size_t found_len = 0
 
         cdef const unsigned char [:]key_view = to_bytes(key)
 
         if key_view is not None:
             key_addr = &key_view[0]
             key_len = key_view.shape[0]
+        if found_buf is not None and len(found_buf) > 0:
+            found_buf_addr = &found_buf[0]
+            found_buf_sz = len(found_buf)
 
-        cdef const void *found = NULL
-        cdef size_t found_len = 0
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvs_cursor_seek(
@@ -906,18 +914,24 @@ cdef class KvsCursor:
                 cflags,
                 key_addr,
                 key_len,
-                &found,
+                found_buf_addr,
+                found_buf_sz,
                 &found_len
             )
         if err != 0:
             raise HseException(err)
 
-        if not found:
+        if found_len == 0:
             return None
 
-        return (<char *>found)[:found_len]
+        return found_buf[:found_len] if found_buf is not None else None, found_len
 
-    def seek_range(self, filt_min: Optional[Union[str, bytes, SupportsBytes]], filt_max: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
+    def seek_range(
+            self,
+            filt_min: Optional[Union[str, bytes, SupportsBytes]],
+            filt_max: Optional[Union[str, bytes, SupportsBytes]],
+            unsigned char [:]found_buf=None
+        ) -> Tuple[Optional[bytes], int]:
         """
         @SUB@ hse.KvsCursor.seek_range
         """
@@ -926,6 +940,9 @@ cdef class KvsCursor:
         cdef size_t filt_min_len = 0
         cdef const void *filt_max_addr = NULL
         cdef size_t filt_max_len = 0
+        cdef void *found_buf_addr = NULL
+        cdef size_t found_buf_sz = 0
+        cdef size_t found_len = 0
 
         cdef const unsigned char[:] filt_min_view = to_bytes(filt_min)
         cdef const unsigned char[:] filt_max_view = to_bytes(filt_max)
@@ -936,9 +953,10 @@ cdef class KvsCursor:
         if filt_max_view is not None:
             filt_max_addr = &filt_max_view[0]
             filt_max_len = filt_max_view.shape[0]
+        if found_buf is not None and len(found_buf) > 0:
+            found_buf_addr = &found_buf[0]
+            found_buf_sz = len(found_buf)
 
-        cdef const void *found = NULL
-        cdef size_t found_len = 0
         cdef hse_err_t err = 0
         with nogil:
             err = hse_kvs_cursor_seek_range(
@@ -948,16 +966,17 @@ cdef class KvsCursor:
                 filt_min_len,
                 filt_max_addr,
                 filt_max_len,
-                &found,
+                found_buf_addr,
+                found_buf_sz,
                 &found_len
             )
         if err != 0:
             raise HseException(err)
 
-        if not found:
+        if found_len == 0:
             return None
 
-        return (<char *>found)[:found_len]
+        return found_buf[:found_len] if found_buf is not None else None, found_len
 
     def read(self, unsigned char [:]key_buf=None, unsigned char [:]value_buf=None) -> Tuple[Optional[bytes], Optional[bytes]]:
         """
@@ -977,39 +996,25 @@ cdef class KvsCursor:
         cdef const void *key = NULL
         cdef const void *value = NULL
 
-        copy = key_buf is not None or value_buf is not None
+        if key_buf is not None and len(key_buf) > 0:
+            key_buf_addr = &key_buf[0]
+            key_buf_sz = key_buf.shape[0]
+        if value_buf is not None and len(value_buf) > 0:
+            value_buf_addr = &value_buf[0]
+            value_buf_sz = value_buf.shape[0]
 
-        if copy:
-            if key_buf is not None and len(key_buf) > 0:
-                key_buf_addr = &key_buf[0]
-                key_buf_sz = key_buf.shape[0]
-            if value_buf is not None and len(value_buf) > 0:
-                value_buf_addr = &value_buf[0]
-                value_buf_sz = value_buf.shape[0]
-
-            with nogil:
-                err = hse_kvs_cursor_read_copy(
-                    self._c_hse_kvs_cursor,
-                    cflags,
-                    key_buf_addr,
-                    key_buf_sz,
-                    &key_len,
-                    value_buf_addr,
-                    value_buf_sz,
-                    &value_len,
-                    &eof
-                )
-        else:
-            with nogil:
-                err = hse_kvs_cursor_read(
-                    self._c_hse_kvs_cursor,
-                    cflags,
-                    &key,
-                    &key_len,
-                    &value,
-                    &value_len,
-                    &eof
-                )
+        with nogil:
+            err = hse_kvs_cursor_read(
+                self._c_hse_kvs_cursor,
+                cflags,
+                key_buf_addr,
+                key_buf_sz,
+                &key_len,
+                value_buf_addr,
+                value_buf_sz,
+                &value_len,
+                &eof
+            )
         if err != 0:
             raise HseException(err)
 
@@ -1017,10 +1022,7 @@ cdef class KvsCursor:
         if eof:
             return None, None
         else:
-            if copy:
-                return bytes(key_buf)[:key_len] if key_buf is not None else None, bytes(value_buf)[:value_len] if value_buf is not None else None
-            else:
-                return (<char *>key)[:key_len] if key else None, (<char *>value)[:value_len] if value else None
+            return key_buf[:key_len] if key_buf is not None else None, value_buf[:value_len] if value_buf is not None else None
 
 
     @property

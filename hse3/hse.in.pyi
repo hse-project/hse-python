@@ -372,7 +372,11 @@ class KvsCursor:
         @SUB@ hse.KvsCursor.update_view
         """
         ...
-    def seek(self, key: Optional[Union[str, bytes, SupportsBytes]]) -> Optional[bytes]:
+    def seek(
+        self,
+        key: Optional[Union[str, bytes, SupportsBytes]],
+        found_buf: Optional[bytearray] = ...,
+    ) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek
         """
@@ -381,6 +385,7 @@ class KvsCursor:
         self,
         filt_min: Optional[Union[str, bytes, SupportsBytes]],
         filt_max: Optional[Union[str, bytes, SupportsBytes]],
+        found_buf: Optional[bytearray] = ...,
     ) -> Optional[bytes]:
         """
         @SUB@ hse.KvsCursor.seek_range
