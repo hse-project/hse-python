@@ -1,44 +1,44 @@
 [project]
 name = "hse"
 dynamic = [
-	"version"
+    "version"
 ]
 description = "HSE is a fast embeddable key-value store designed for SSDs and persistent memory."
 maintainers = [
-	{ name = "Micron HSE", email = "hse@micron.com" },
+    { name = "Micron HSE", email = "hse@micron.com" },
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.6"
 keywords = [
-	"micron",
-	"hse",
-	"key",
-	"value",
-	"database",
-	"bindings",
-	"heterogeneous",
-	"memory",
-	"storage",
-	"engine",
+    "micron",
+    "hse",
+    "key",
+    "value",
+    "database",
+    "bindings",
+    "heterogeneous",
+    "memory",
+    "storage",
+    "engine",
 ]
 classifiers = [
-	"License :: OSI Approved :: Apache Software License",
-	"Operating System :: POSIX :: Linux",
-	"Programming Language :: Cython",
-	"Programming Language :: Python :: 3 :: Only",
-	"Topic :: Database",
-	"Topic :: Database :: Database Engines/Servers",
-	"Typing :: Typed",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Database",
+    "Topic :: Database :: Database Engines/Servers",
+    "Typing :: Typed",
 ]
 
 [project.urls]
 repohome = "https://github.com/hse-project/hse-python"
-projecthome = "https://hse-project.github.io/"
+projecthome = "https://github.com/hse-project"
 
 [build-system]
 requires = [
-	"meson-python",
-	"Cython >= 0.29.21",
+    "meson-python",
+    "Cython >= 0.29.21",
 ]
 build-backend = "mesonpy"
