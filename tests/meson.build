@@ -23,6 +23,12 @@ add_test_setup(
 )
 
 add_test_setup(
+    'all',
+    exe_wrapper: wrapper,
+    env: env
+)
+
+add_test_setup(
     'ci',
     exe_wrapper: wrapper,
     env: env
