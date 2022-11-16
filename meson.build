@@ -14,13 +14,15 @@ project(
     meson_version: '>=0.59.0'
 )
 
+# Move this back into the project() call when hse-python depends on
+# meson_version >=0.64.0.
 add_languages('cython', native: true)
 
 version_components = meson.project_version().split('.')
 
-hse_python_major_version = version_components[0]
-hse_python_minor_version = version_components[1]
-hse_python_patch_version = version_components[2]
+hse_python_major_version = version_components[0].to_int()
+hse_python_minor_version = version_components[1].to_int()
+hse_python_patch_version = version_components[2].to_int()
 
 root_module = 'hse@0@'.format(hse_python_major_version)
 
@@ -45,9 +47,18 @@ assert(
 # Exported for usage in hse.
 project_build_root = meson.project_build_root()
 
+# https://github.com/cython/cython/issues/5132
+add_project_arguments(
+    cc.get_supported_arguments('-Wno-error=unused-parameter'),
+    language: 'c'
+)
+
 hse_dep = dependency(
-    'hse-3',
-    version: ['>=3.0.0', '<4.0.0'],
+    'hse-@0@'.format(hse_python_major_version),
+    version: [
+        '>=@0@.0.0'.format(hse_python_major_version),
+        '<@0@.0.0'.format(hse_python_major_version + 1)
+    ],
     default_options: [
         'cli=false',
         'docs=disabled',
