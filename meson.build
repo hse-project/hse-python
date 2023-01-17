@@ -60,6 +60,9 @@ hse_dep = dependency(
         '<@0@.0.0'.format(hse_python_major_version + 1)
     ],
     default_options: [
+        'default_library=static',
+        'warning_level=0',
+        'werror=false',
         'cli=false',
         'docs=disabled',
         'tests=false',
