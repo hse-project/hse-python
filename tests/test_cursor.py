@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 import unittest
 
@@ -15,9 +15,7 @@ class CursorTests(HseTestCase):
         super().setUpClass()
 
         cls.kvdb = kvdb_fixture()
-        cls.kvs = kvs_fixture(
-            cls.kvdb, "kvs", cparams=("prefix.length=3",)
-        )
+        cls.kvs = kvs_fixture(cls.kvdb, "kvs", cparams=("prefix.length=3",))
 
     @classmethod
     def tearDownClass(cls) -> None:

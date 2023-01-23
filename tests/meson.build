@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
+
 if get_option('b_sanitize') != 'none'
     subdir_done()
 endif

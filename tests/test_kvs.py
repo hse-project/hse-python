@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 import unittest
 from typing import SupportsBytes
@@ -32,9 +32,7 @@ class KvsTests(HseTestCase):
         super().setUpClass()
 
         cls.kvdb = kvdb_fixture()
-        cls.kvs = kvs_fixture(
-            cls.kvdb, "kvs", cparams=("prefix.length=3",)
-        )
+        cls.kvs = kvs_fixture(cls.kvdb, "kvs", cparams=("prefix.length=3",))
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -121,7 +119,7 @@ class KvsTests(HseTestCase):
 
     def test_param(self):
         for args in (
-            ("transactions.enabled", 'false'),
+            ("transactions.enabled", "false"),
             ("this-does-not-exist", None),
         ):
             with self.subTest(param=args[0], value=args[1]):

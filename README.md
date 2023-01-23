@@ -1,3 +1,9 @@
+<!--
+SPDX-License-Identifier: Apache-2.0 OR MIT
+
+SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
+-->
+
 # HSE Python Bindings
 
 [Heterogeneous-Memory Storage Engine](https://github.com/hse-project/hse)

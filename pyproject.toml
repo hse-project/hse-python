@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
+
 [project]
 name = "hse"
 dynamic = [
@@ -8,7 +12,7 @@ maintainers = [
     { name = "Micron HSE", email = "hse@micron.com" },
 ]
 readme = "README.md"
-license = { file = "LICENSE" }
+license = { text = "Apache-2.0 OR MIT" }
 requires-python = ">=3.6"
 keywords = [
     "micron",
@@ -24,6 +28,7 @@ keywords = [
 ]
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Cython",
     "Programming Language :: Python :: 3 :: Only",

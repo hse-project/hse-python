@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 cdef extern from "hse/limits.h":
     cdef size_t HSE_KVS_COUNT_MAX

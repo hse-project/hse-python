@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2021 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 # This script exists because Python/Cython tooling is absolutely horrible. In
 # what world do 2 copies of the same docstring have to be kept in a pyx file
@@ -34,7 +34,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.fini": """
 Shutdown the HSE subsystem.
 
@@ -46,7 +45,6 @@ result in undefined behavior unless HSE is re-initialized.
 
 This function is not thread safe.
 """,
-
     "hse.param": """
 Get HSE global parameter.
 
@@ -63,7 +61,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.ErrCtx": """
 Error context. Wrapper around ``hse_err_ctx``.
 
@@ -71,19 +68,15 @@ Attributes:
     NONE: No context.
     TXN_TIMEOUT: Transaction timed out.
 """,
-
     "hse.HseException": """
 Raised when HSE encounters an error. Wrapper around ``hse_err_t``.
 """,
-
     "hse.HseException.returncode": """
 Errno value returned by HSE.
 """,
-
     "hse.HseException.ctx": """
 Error context.
 """,
-
     "hse.Kvdb.close": """
 Close a KVDB.
 
@@ -98,7 +91,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.compact": """
 Request a data compaction operation.
 
@@ -117,7 +109,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.compact_status": """
 Get status of an ongoing compaction activity.
 
@@ -132,7 +123,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.create": """
 Create a KVDB.
 
@@ -145,7 +135,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.drop": """
 Drop a KVDB.
 
@@ -159,7 +148,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.home": """
 Get the KVDB home.
 
@@ -168,7 +156,6 @@ This function is thread safe.
 Returns:
     pathlib.Path: KVDB home.
 """,
-
     "hse.Kvdb.kvs_names": """
 Get the names of the KVSs within the given KVDB.
 
@@ -183,7 +170,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.mclass_info": """
 Get media class information from a KVDB.
 
@@ -198,7 +184,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.mclass_is_configured": """
 Check if a media class is configured for a KVDB.
 
@@ -207,7 +192,6 @@ This function is thread safe.
 Returns:
     bool: Whether or not mclass is configured.
 """,
-
     "hse.Kvdb.open": """
 Open a KVDB.
 
@@ -223,7 +207,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.param": """
 Get KVDB parameter.
 
@@ -240,7 +223,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.storage_add": """
 Add a new media class storage to an existing offline KVDB.
 
@@ -253,12 +235,10 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbSyncFlag": """
 Attributes:
     ASYNC: Return immediately after initiating operation
 """,
-
     "hse.Kvdb.sync": """
 Sync data in all of the referenced KVDB's KVSs to stable media.
 
@@ -268,7 +248,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.close": """
 Close an open KVS.
 
@@ -280,7 +259,6 @@ This function is not thread safe.
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.kvs_create": """
 Create a new KVS within the referenced KVDB.
 
@@ -293,7 +271,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.kvs_drop": """
 Drop a KVS from the referenced KVDB.
 
@@ -307,7 +284,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvdb.kvs_open": """
 Open a KVS in a KVDB.
 
@@ -323,7 +299,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.delete": """
 Delete the key and its associated value from the KVS.
 
@@ -338,7 +313,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.get": """
 Retrieve the value for a given key from the KVS.
 
@@ -360,7 +334,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.name": """
 Get KVS parameter.
 
@@ -377,7 +350,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.prefix_delete": """
 Delete all key-value pairs matching the key prefix from a KVS storing
 segmented keys.
@@ -402,7 +374,6 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.Kvs.prefix_probe": """
 Probe for a prefix.
 
@@ -422,14 +393,12 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsPutFlags": """
 Attributes:
     PRIO: Operation will not be throttled.
     VCOMP_OFF: Value will not be compressed.
     VCOMP_ON: Value may be compressed.
 """,
-
     "hse.Kvs.put": """
 Put a key-value pair into KVS.
 
@@ -466,11 +435,9 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbTransactionState": """
 Transaction state.
 """,
-
     "hse.KvdbTransaction": """
 The HSE KVDB provides transactions with operations spanning KVSs within a
 single KVDB. These transactions have snapshot isolation (a specific form of
@@ -523,7 +490,6 @@ encounters a write conflict, that operation returns an error code of
 ECANCELED. The caller is then expected to re-try the operation in a new
 transaction, see ``HseException``.
 """,
-
     "hse.Kvdb.transaction": """
 Allocate transaction object.
 
@@ -538,7 +504,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbTransaction.abort": """
 Abort/rollback transaction.
 
@@ -549,7 +514,6 @@ This function is thread safe with different transactions.
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbTransaction.begin": """
 Initiate transaction.
 
@@ -560,7 +524,6 @@ This function is thread safe with different transactions.
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbTransaction.commit": """
 Commit all the mutations of the referenced transaction.
 
@@ -571,7 +534,6 @@ This function is thread safe with different transactions.
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvdbTransaction.state": """
 Retrieve the state of the referenced transaction.
 
@@ -580,12 +542,10 @@ This function is thread safe with different transactions.
 Returns:
     KvdbTransactionState: Transaction's state.
 """,
-
     "hse.CursorCreateFlag": """
 Attributes:
     REV: iterate in reverse lexicographical order
 """,
-
     "hse.Kvs.cursor": """
 Non-transactional cursors:
 
@@ -641,7 +601,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.destroy": """
 Destroy cursor.
 
@@ -651,7 +610,6 @@ with this handle will result in undefined behavior.
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.items": """
 Convenience function to return an iterator over key-value pairs in a cursor's
 view.
@@ -666,7 +624,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.read": """
 Iteratively access the elements pointed to by the cursor.
 
@@ -688,7 +645,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.seek": """
 Move the cursor to point at the key-value pair at or closest to ``key``.
 
@@ -705,7 +661,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.seek_range": """
 Move the cursor to the closest match to key, gated by the given filter.
 
@@ -728,7 +683,6 @@ Returns:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "hse.KvsCursor.update_view": """
 Update a the cursor view.
 
@@ -743,11 +697,9 @@ Args:
 Raises:
     HseException: Underlying C function returned a non-zero value.
 """,
-
     "limits.KVS_COUNT_MAX": """
 Maximum number of KVSs contained within one KVDB.
 """,
-
     "limits.KVS_KEY_LEN_MAX": """
 Maximum key length.
 
@@ -757,46 +709,36 @@ Combined with a discriminant and (potentially) a chunk key, this pushes us to
 can have at most 3 keys of such large size in a 4k page. Lopping off 64-bytes
 for other data, and we can have 3 keys of 1344 bytes.
 """,
-
     "limits.KVS_NAME_LEN_MAX": """
 Maximum length of a KVS name.
 
 KVS names are NULL-terminated strings. The string plus the NULL-terminator
 must fit into a ``KVS_NAME_LEN_MAX`` byte buffer.
 """,
-
     "limits.KVS_VALUE_LEN_MAX": """
 Max value length is 1MiB.
 """,
-
     "limits.KVS_PFX_LEN_MAX": """
 Max key prefix length.
 """,
-
     "hse.KvdbCompactStatus": """
 Status of a compaction request.
 """,
-
     "hse.KvdbCompactStatus.samp_lwm": """
 space amp low water mark (%).
 """,
-
     "hse.KvdbCompactStatus.samp_hwm": """
 space amp high water mark (%).
 """,
-
     "hse.KvdbCompactStatus.samp_curr": """
 current space amp (%).
 """,
-
     "hse.KvdbCompactStatus.active": """
 is an externally requested compaction underway.
 """,
-
     "hse.KvdbCompactStatus.canceled": """
 was an externally requested compaction canceled.
 """,
-
     "hse.Mclass": """
 Media class types.
 
@@ -805,23 +747,18 @@ Attributes:
     STAGING: Staging media class.
     PMEM: PMEM media class.
 """,
-
     "hse.MclassInfo": """
 Media class information.
 """,
-
     "hse.MclassInfo.allocated_bytes": """
 Allocated storage space for a media class.
 """,
-
     "hse.MclassInfo.used_bytes": """
 Used storage space for a media class.
 """,
-
     "hse.MclassInfo.path": """
 Path to the media class.
 """,
-
     "hse.KvsPfxProbeCnt": """
 Number of keys found from a prefix probe operation.
 
@@ -830,26 +767,21 @@ Attributes:
     ONE: One key found with prefix.
     MUL: Multiple keys found with prefix.
 """,
-
     "hse.version.STRING": """
 A string representing the HSE libary version.
 """,
-
     "hse.version.MAJOR": """
 Major version of HSE.
 """,
-
     "hse.version.MINOR": """
 Minor version of HSE.
 """,
-
     "hse.version.PATCH": """
 Patch version of HSE.
 """,
-
     "hse.KvdbCompactFlag": """
 Kvdb.compact() flags.
-"""
+""",
 }
 
 
@@ -891,7 +823,9 @@ def insert(input_file: pathlib.Path, output_file: pathlib.Path) -> None:
                 continue
             indents = int(len(match.group(1)) / 4)
             key = match.group(2)
-            if key in __DOCSTRINGS.keys():  # pylint: disable=consider-iterating-dictionary
+            if (
+                key in __DOCSTRINGS.keys()
+            ):  # pylint: disable=consider-iterating-dictionary
                 with StringIO(__DOCSTRINGS[key].lstrip()) as docstring:
                     output_lines.extend(
                         map(
@@ -910,7 +844,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Insert docstrings into input files")
     parser.add_argument("-o", "--output", nargs=1, required=True, help="Output file")
     parser.add_argument(
-        "-f", "--file", nargs=1, required=True, type=pathlib.Path, help="Files to manipulate"
+        "-f",
+        "--file",
+        nargs=1,
+        required=True,
+        type=pathlib.Path,
+        help="Files to manipulate",
     )
     ns = parser.parse_args(sys.argv[1:])
 

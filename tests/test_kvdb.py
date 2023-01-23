@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 import unittest
 
@@ -32,7 +32,7 @@ class KvdbTests(HseTestCase):
 
     def test_param(self):
         for args in (
-            ("durability.interval_ms", '100'),
+            ("durability.interval_ms", "100"),
             ("this-does-not-exist", None),
         ):
             with self.subTest(param=args[0], value=args[1]):
