@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 import argparse
 import sys
@@ -60,7 +60,9 @@ def extract_kv_to_files(kvs: hse.Kvs, files: List[str]) -> None:
 def put_files_as_kv(kvs: hse.Kvs, keys: List[str]) -> None:
     for key in keys:
         with open(key, "rb") as f:
-            for i, chunk in enumerate(iter(partial(f.read, limits.KVS_VALUE_LEN_MAX), b"")):
+            for i, chunk in enumerate(
+                iter(partial(f.read, limits.KVS_VALUE_LEN_MAX), b"")
+            ):
                 kvs.put(f"{key}|{i:08x}".encode(), chunk)
 
 

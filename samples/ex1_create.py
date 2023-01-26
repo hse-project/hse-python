@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Copyright (C) 2020-2022 Micron Technology, Inc. All rights reserved.
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
 
 import sys
 
@@ -18,7 +18,7 @@ def main() -> int:
     kvs_list = sys.argv[2:]
 
     hse.Kvdb.create(kvdb_home)
-    kvdb = hse.Kvdb.open(kvs_list)
+    kvdb = hse.Kvdb.open(kvdb_home)
     for kvs in kvs_list:
         kvdb.kvs_create(kvs)
 

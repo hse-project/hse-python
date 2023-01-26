@@ -1,8 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# SPDX-FileCopyrightText: Copyright 2020 Micron Technology, Inc.
+
 project(
     'hse-python',
     'c',
     version: files('VERSION'),
-    license: 'Apache-2.0',
+    license: 'Apache-2.0 OR MIT',
     default_options: [
         'prefix=/opt/hse',
         'buildtype=debugoptimized',
