@@ -41,7 +41,10 @@ foreach t : tests
         suite: ['unit'],
         workdir: meson.current_source_dir(),
         env: env,
-        depends: extension_modules,
+        depends: [
+            extension_modules,
+            init_py,
+        ],
         timeout: 60
     )
 endforeach
