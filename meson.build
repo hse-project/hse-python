@@ -5,6 +5,7 @@
 project(
     'hse-python',
     'c',
+    'cython',
     version: files('VERSION'),
     license: 'Apache-2.0 OR MIT',
     default_options: [
@@ -15,12 +16,8 @@ project(
         # options :).
         'force_fallback_for=lz4,cjson',
     ],
-    meson_version: '>=0.59.0'
+    meson_version: '>=1.0.0'
 )
-
-# Move this back into the project() call when hse-python depends on
-# meson_version >=0.64.0.
-add_languages('cython', native: true)
 
 version_components = meson.project_version().split('.')
 
@@ -53,7 +50,7 @@ project_build_root = meson.project_build_root()
 
 # https://github.com/cython/cython/issues/5132
 add_project_arguments(
-    cc.get_supported_arguments('-Wno-error=unused-parameter'),
+    cc.get_supported_arguments('-Wno-unused-parameter'),
     language: 'c'
 )
 
