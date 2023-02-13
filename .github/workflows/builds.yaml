@@ -11,30 +11,30 @@ on:
     branches:
       - master
       - "v[0-9]+.[0-9]+"
-    paths-ignore:
-      - "**.md"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/workflows/**"
-      - "!.github/workflows/builds.yaml"
-      - .coveragerc
-      - .gitattributes
-      - .github/dependabot.yaml
-      - .gitignore
-      - .shellcheckrc
-      - LICENSE
+    paths:
+      - "**.pxd"
+      - "**.py"
+      - "**.pyi"
+      - "**.pyx"
+      - "**/meson.build"
+      - "cross/*.ini"
+      - "subprojects/*.wrap"
+      - .github/workflows/builds.yaml
+      - meson_options.txt
+      - VERSION
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore:
-      - "**.md"
-      - ".github/ISSUE_TEMPLATE/**"
-      - ".github/workflows/**"
-      - "!.github/workflows/builds.yaml"
-      - .coveragerc
-      - .gitattributes
-      - .github/dependabot.yaml
-      - .gitignore
-      - .shellcheckrc
-      - LICENSE
+    paths:
+      - "**.pxd"
+      - "**.py"
+      - "**.pyi"
+      - "**.pyx"
+      - "**/meson.build"
+      - "cross/*.ini"
+      - "subprojects/*.wrap"
+      - .github/workflows/builds.yaml
+      - meson_options.txt
+      - VERSION
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
